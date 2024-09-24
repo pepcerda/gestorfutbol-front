@@ -18,21 +18,12 @@ import 'primeicons/primeicons.css';
 i18next
     .use(LanguageDetector)
     .init({
+        lng: 'ca',
         interpolation: {escapeValue: false},  // React already does escaping
         resources: {
-            es: {
-                common: common_es
-            },
             ca: {
                 common: common_ca
-            },
-            en: {
-                common: common_en
-            },
-            de: {
-                common: common_de
             }
-
         }
     });
 
