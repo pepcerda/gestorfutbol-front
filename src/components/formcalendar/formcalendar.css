@@ -1,0 +1,50 @@
+.formcalendar {
+}
+
+.formcalendar input {
+    width: 100%;
+}
+
+.formcalendar button {
+    background: var(--main-color);
+    border: var(--main-color);
+    border-radius: 0 5px 5px 0;
+}
+
+.formcalendar-invalid input {
+    border-color: var(--error-color) !important;
+    border-width: 2px;
+}
+
+
+.formcalendar-invalid button {
+    background: var(--error-color) !important;
+    border: var(--error-color) !important;
+    border-radius: 0 5px 5px 0;
+}
+
+.calendar-label {
+    display: block;
+    color: var(--main-color);
+    font-weight: 600;
+
+}
+@media (min-width: 576px) {
+
+}
+
+@media (min-width: 768px) {
+
+}
+
+@media (min-width: 992px) {
+
+}
+
+@media (min-width: 1200px) {
+
+}
+
+@media (min-width: 1400px) {
+
+}

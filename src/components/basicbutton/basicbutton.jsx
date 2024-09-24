@@ -1,0 +1,14 @@
+import './basicbutton.css';
+import {Button} from "primereact/button";
+import {useEffect} from "react";
+
+const BasicButton = ({props}) => {
+
+    return (
+        <Button icon={props.icon} label={props.label} className={`basicbutton ${props.className}`}
+                onClick={props.onClick} disabled={props.disabled} outlined={props.outlined} type={props.type}></Button>
+    );
+}
+
+
+export default BasicButton;

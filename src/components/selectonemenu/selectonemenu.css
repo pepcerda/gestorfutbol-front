@@ -1,0 +1,43 @@
+.selectonemenu {
+    display: flex !important;
+    padding: 0 !important;
+    width: 75% !important;
+}
+
+.selectonemenu-label {
+    color: var(--main-color);
+    font-weight: 600;
+}
+
+.selectonemenu-panel ul{
+    padding: 0 !important;
+}
+
+.invalid-select {
+    border-color: var(--error-color) !important;
+    border-width: 2px !important;
+}
+
+.invalid-select:focus {
+    box-shadow: 0 0 0 .25rem var(--error-color-outline) !important;
+}
+
+@media (min-width: 576px) {
+
+}
+
+@media (min-width: 768px) {
+
+}
+
+@media (min-width: 992px) {
+
+}
+
+@media (min-width: 1200px) {
+
+}
+
+@media (min-width: 1400px) {
+
+}

@@ -1,0 +1,79 @@
+.table-component-wrapper {
+
+
+
+}
+
+.table-component {
+}
+
+.table-component th {
+    background: var(--main-color) ;
+    color: var(--white-color);
+}
+
+.table-paginator .p-dropdown-items {
+    padding: 0 !important;
+}
+
+.table-paginator .p-dropdown-items-wrapper {
+    max-height: fit-content !important;
+}
+
+
+.table-paginator .p-paginator-page {
+    border-radius: 50%;
+}
+
+/* PrimeReact Responsive CSS */
+.table-component.p-datatable.p-datatable-striped .p-datatable-tbody > tr.p-row-odd {
+    background-color: var(--light-gray-color);
+}
+
+.p-datatable .p-datatable-tbody > tr > td > .p-column-title {
+    display: none;
+    font-weight: 600;
+}
+
+@media screen and (max-width: 960px) {
+    .p-datatable .p-datatable-thead > tr > th,
+    .p-datatable .p-datatable-tfoot > tr > td {
+        display: none !important;
+    }
+
+    .p-datatable .p-datatable-tbody > tr > td:not(:last-child) {
+        border: 0 none;
+    }
+
+    .p-datatable .p-datatable-tbody > tr > td {
+        display: flex;
+        width: 100% !important;
+        align-items: center;
+        justify-content: space-between !important;
+    }
+
+    .p-datatable .p-datatable-tbody > tr > td > .p-column-title {
+        display: block;
+    }
+}
+
+
+@media (min-width: 576px) {
+
+}
+
+@media (min-width: 768px) {
+
+}
+
+@media (min-width: 992px) {
+
+}
+
+@media (min-width: 1200px) {
+
+}
+
+@media (min-width: 1400px) {
+
+}

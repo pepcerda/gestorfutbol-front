@@ -1,0 +1,36 @@
+.formselectbutton {
+
+}
+
+.formselectbutton .p-button {
+    padding: .3rem .8rem !important;
+}
+
+.invalid-selectbutton {
+    border-color: var(--error-color) !important;
+    border-width: 2px !important;
+}
+
+.invalid-selectbutton:focus {
+    box-shadow: 0 0 0 .25rem var(--error-color-outline) !important;
+}
+
+@media (min-width: 576px) {
+
+}
+
+@media (min-width: 768px) {
+
+}
+
+@media (min-width: 992px) {
+
+}
+
+@media (min-width: 1200px) {
+
+}
+
+@media (min-width: 1400px) {
+
+}

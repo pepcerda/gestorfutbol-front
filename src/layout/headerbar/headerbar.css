@@ -1,0 +1,40 @@
+.headerbar {
+    background-color: hsla(0, 0%, 100%, 0.5) !important;
+    left: 120px;
+    height: 5rem;
+    z-index: 0;
+    width: 100%;
+}
+
+.profile {
+    background: rgba(114, 154, 198, 0.42);
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+}
+
+.logo {
+    padding-left: 2rem;
+    width: 5.5rem;
+    margin-top: .5rem;
+}
+
+@media (min-width: 576px) {
+
+}
+
+@media (min-width: 768px) {
+
+}
+
+@media (min-width: 992px) {
+
+}
+
+@media (min-width: 1200px) {
+
+}
+
+@media (min-width: 1400px) {
+
+}

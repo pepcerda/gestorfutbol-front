@@ -1,0 +1,16 @@
+import './formcalendar.css';
+import {Calendar} from "primereact/calendar";
+import {useTranslation} from "react-i18next";
+
+const FormCalendar = ({props})=> {
+
+    return (
+      <>
+          <label htmlFor={props.id} className={`calendar-label mb-2 ${props.labelClassName}`}>{props.label}</label>
+          <Calendar id={props.id} value={props.value} onChange={props.onChange}
+                    placeholder={props.placeholder} className={`formcalendar  ${props.className} ${props.classNameError}`} showIcon/>
+      </>);
+}
+
+
+export default FormCalendar;

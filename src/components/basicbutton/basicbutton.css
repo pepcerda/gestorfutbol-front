@@ -1,0 +1,50 @@
+.basicbutton {
+    background: var(--main-color) ;
+    border: var(--main-color) ;
+    transition: 0.2s;
+}
+
+.basicbutton:hover{
+    background: rgba(22, 53, 90, 0.5);
+}
+
+.basicbutton:focus {
+    box-shadow: none;
+}
+
+.circular-btn {
+    border-radius: 50%;
+    max-width: 3rem !important;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+
+}
+
+.rounded-border-btn {
+    border-radius: 5px;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+}
+
+.basicbutton-outlined {
+    background: transparent;
+    color: var(--main-color);
+}
+
+@media (min-width: 576px) {
+
+}
+
+@media (min-width: 768px) {
+
+}
+
+@media (min-width: 992px) {
+
+}
+
+@media (min-width: 1200px) {
+
+}
+
+@media (min-width: 1400px) {
+
+}
