@@ -2,7 +2,6 @@ import './headerbar.css';
 import logo from '../../resources/logoapp.png';
 import {useContext, useEffect, useState} from "react";
 import {ViewWidthContext} from "../../App";
-import {useKeycloak} from "@react-keycloak/web";
 import {useKindeAuth} from "@kinde-oss/kinde-auth-react";
 import {useTranslation} from "react-i18next";
 import BasicButton from "../../components/basicbutton/basicbutton";
