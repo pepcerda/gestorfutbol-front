@@ -1,5 +1,5 @@
 import './headerbar.css';
-import logo from '../../resources/logoapp.png';
+import logo from '../../resources/file.png';
 import {useContext, useEffect, useState} from "react";
 import {ViewWidthContext} from "../../App";
 import {useKindeAuth} from "@kinde-oss/kinde-auth-react";
@@ -15,7 +15,7 @@ const Logo = () => {
 
 const Title = () => {
     return (
-        <h2 className="text-light fw-bold">PESCAPP</h2>
+        <h2 className="text-light fw-bold">GESTOR FUTBOL</h2>
     )
 }
 

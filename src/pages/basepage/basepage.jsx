@@ -1,5 +1,6 @@
 import './basepage.css';
 import {Route, Routes, Switch} from "react-router-dom";
+import EntryPage from "../entrypage/entrypage";
 /*Página base de contenidos. En esta página se añadirán las rutas a diferentes páginas de contenido.
 * Es el componente base que se añade a ContentLayout
 * */
@@ -25,6 +26,8 @@ const BasePage = (props) => {
                         <Route path={"species"} element={<SpeciesPage/>}></Route>
                         <Route path={"configuration"} element={<ConfigurationPage/>}></Route>
                     </Route>*/}
+                    <Route path={"/home"} element={<HomePage/>}></Route>
+
                 </Routes>
             </div>
         </div>);

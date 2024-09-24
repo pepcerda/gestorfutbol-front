@@ -3,6 +3,7 @@ import {useKindeAuth} from "@kinde-oss/kinde-auth-react";
 import {Outlet} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 import {useState} from "react";
+import EntryPage from "../entrypage/entrypage";
 
 const ProtectedPage = ({props}) => {
 
@@ -16,10 +17,7 @@ const ProtectedPage = ({props}) => {
     if (!isLoading && !isAuthenticated) {
         console.log(isAuthenticated, isLoading);
         return (
-            <div>
-                <h1>Not Authenticated</h1>
-                <button onClick={login}>Login</button>
-            </div>
+            <EntryPage/>
         )
     }
     if (!isLoading && isAuthenticated) {
