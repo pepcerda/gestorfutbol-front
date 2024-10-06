@@ -1,25 +1,27 @@
-.form-inputtext {
+.form-inputnumber {
     max-width: 75% !important;
-    padding: .75rem .75rem !important;
-
 }
 
-.form-inputtext:focus{
-    border-color: var(--secondary-color) !important;
-    box-shadow: 0 0 0 .25rem var(--secondary-color) !important;
-}
-
-.inputtext-label {
+.inputnumber-label {
     color: var(--main-color);
     font-weight: 600;
 }
 
-.invalid-inputtext {
+.form-inputnumber input:hover {
+    border-color: var(--secondary-color) !important;
+}
+
+.form-inputnumber input:focus {
+    border-color: var(--secondary-color) !important;
+    box-shadow: 0 0 0 .25rem var(--secondary-color) !important;
+}
+
+.invalid-inputnumber input {
     border-color: var(--error-color) !important;
     border-width: 2px !important;
 }
 
-.invalid-inputtext:focus {
+.invalid-inputnumber input:focus {
     box-shadow: 0 0 0 .25rem var(--error-color-outline) !important;
 }
 

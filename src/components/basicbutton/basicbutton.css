@@ -5,7 +5,8 @@
 }
 
 .basicbutton:hover{
-    background: rgba(22, 53, 90, 0.5);
+    background: var(--main-color);
+    opacity: 0.5;
 }
 
 .basicbutton:focus {

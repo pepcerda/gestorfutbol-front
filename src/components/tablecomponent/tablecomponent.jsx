@@ -27,7 +27,7 @@ const TableComponent = ({props}) => {
                        rowsPerPageOptions={props.rowsPerPageOptions}
                        onRowUnselect={props.onRowUnselect} lazy={props.lazy} first={props.first}
                        totalRecords={props.totalRecords} onPage={props.onPage} onSort={props.onSort}
-                       sortOrder={props.sortOrder} sortField={props.sortField}>
+                       sortOrder={props.sortOrder} sortField={props.sortField} editMode={props.editMode} onRowEditComplete={props.onRowEditComplete}>
                 {props.columns.map((c, idx) => (
                     <Column
                         key={idx}

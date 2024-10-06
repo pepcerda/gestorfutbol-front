@@ -96,12 +96,12 @@
 
     .sidenav-item .p-menuitem-icon {
         margin: 0 !important;
-        color: var(--white-color)  !important;
+        color: var(--main-color)  !important;
     }
 
     .sidenav-item .p-menuitem-text {
         margin: auto;
-        color: var(--white-color) !important;
+        color: var(--main-color) !important;
         font-weight: bold;
     }
 

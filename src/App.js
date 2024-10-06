@@ -3,10 +3,11 @@ import {createContext, useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {KindeProvider} from "@kinde-oss/kinde-auth-react";
 import {Route, Routes, Switch} from "react-router-dom";
-import EntryPage from "./pages/entrypage/entrypage";
 import HomePage from "./pages/homepage/homepage";
 import ProtectedPage from "./pages/protectedpage/protectedpage";
+import BackofficePage from "./pages/backofficepage/backofficepage";
 import NotFoundPage from "./pages/notfoundpage/notfoundpage";
+import CampaignPage from "./pages/campaignpage/campaignpage";
 
 export const ViewWidthContext = createContext();
 
@@ -29,8 +30,12 @@ function App() {
             <ViewWidthContext.Provider value={{viewWidth, setViewWidth}}>
                 <Routes>
                     <Route path={"/"} element={<ProtectedPage/>}>
-                        <Route path={"/"} element={<HomePage/>}></Route>
-                        <Route path="*" element={<NotFoundPage/>}></Route>
+                        <Route path={"/"} element={<BackofficePage/>}>
+                            <Route path={"/"} element={<HomePage/>}></Route>
+                            <Route path={"/home"} element={<HomePage/>}></Route>
+                            <Route path={"/campanya"} element={<CampaignPage/>}></Route>
+                            <Route path={"*"} element={<NotFoundPage/>}></Route>
+                        </Route>
                     </Route>
                 </Routes>
             </ViewWidthContext.Provider>

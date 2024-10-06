@@ -25,14 +25,6 @@ const HorizontalBar = ({props}) => {
         eliminateAriaSelected();
     }, [])
 
-    const items = [
-        {icon: 'pi pi-home'},
-        {icon: 'pi pi-calendar'},
-        {icon: 'pi pi-sign-in'},
-        {icon: 'pi pi-file'},
-        {icon: 'pi pi-conf'}
-    ];
-
 
     return (
         <TabMenu model={props}
@@ -72,7 +64,7 @@ const Navbar = () => {
                         ) : (
                             <>
                                 <span className="p-menuitem-icon pi pi-fw pi-home fs-2"></span>
-                                <span className="p-menuitem-text">{t("menu.home")}</span>
+                                <span className="p-menuitem-text">{t("t.home")}</span>
                             </>)}
                     </NavLink>
                 );
@@ -83,14 +75,14 @@ const Navbar = () => {
             template: () => {
                 return (
                     <NavLink
-                        to={"/calendar"}
+                        to={"/campanya"}
                         className="p-menuitem-link">
                         {viewWidth <= process.env.REACT_APP_XL_VW ? (<>
-                            <i className="pi pi-calendar"></i>
+                            <i className="pi pi-users"></i>
                         </>) : (
                             <>
-                                <span className="p-menuitem-icon pi pi-fw pi-calendar fs-2"></span>
-                                <span className="p-menuitem-text">{t("menu.calendar")}</span>
+                                <span className="p-menuitem-icon pi pi-fw pi-users fs-2"></span>
+                                <span className="p-menuitem-text">{t("t.campaigns")}</span>
                             </>)}
                     </NavLink>
                 );
@@ -110,7 +102,7 @@ const Navbar = () => {
                         ) : (
                             <>
                                 <span className="p-menuitem-icon pi pi-fw pi-sign-in fs-2"></span>
-                                <span className="p-menuitem-text">{t("menu.trips")}</span>
+                                <span className="p-menuitem-text">{t("t.trips")}</span>
                             </>)}
                     </NavLink>
                 );
@@ -129,7 +121,7 @@ const Navbar = () => {
                             </>) : (
                             <>
                                 <span className="p-menuitem-icon pi pi-fw pi-calendar fs-2"></span>
-                                <span className="p-menuitem-text">{t("menu.species")}</span>
+                                <span className="p-menuitem-text">{t("t.species")}</span>
                             </>)}
 
                     </NavLink>
@@ -150,7 +142,7 @@ const Navbar = () => {
                         ) : (
                             <>
                                 <span className="p-menuitem-icon pi pi-fw pi-cog fs-2"></span>
-                                <span className="p-menuitem-text">{t("menu.settings")}</span>
+                                <span className="p-menuitem-text">{t("t.settings")}</span>
                             </>)}
                     </NavLink>
                 );

@@ -1,4 +1,20 @@
 {
-  "gf.autenticat": "Autentica't"
+  "t.autenticat": "Autentica't",
+  "t.logout": "Tanca sessió",
+  "t.id": "Id",
+  "t.title": "Títol",
+  "t.year": "Any",
+  "t.amount": "Import",
+  "t.actual": "Actual",
+  "t.members": "Socis",
+  "t.confirm.delete": "Està segur que desitja eliminar aquesta fila?",
+  "t.campaigns.title": "Campanyes",
+  "t.home": "Inici",
+  "t.campaigns": "Campanyes",
+  "t.new.campaign": "Nova campanya",
+  "t.import": "Import Socis",
+  "t.cancel": "Cancel·la",
+  "t.save": "Guarda"
+
 
 }

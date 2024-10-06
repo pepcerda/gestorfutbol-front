@@ -4,6 +4,7 @@ import {Outlet} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 import {useState} from "react";
 import EntryPage from "../entrypage/entrypage";
+import BackofficePage from "../backofficepage/backofficepage";
 
 const ProtectedPage = ({props}) => {
 

@@ -1,9 +1,10 @@
 .headerbar {
     background-color: hsla(0, 0%, 100%, 0.5) !important;
     left: 120px;
-    height: 5rem;
+    height: 6rem;
     z-index: 0;
     width: 100%;
+    padding-top: .8rem;
 }
 
 .profile {
