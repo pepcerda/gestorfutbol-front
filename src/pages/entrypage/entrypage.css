@@ -1,0 +1,39 @@
+.entrypage {
+    min-height: 100vh;
+}
+
+.logo {
+    width: 10rem;
+    height: fit-content;
+}
+
+.entrypage-square {
+    border: 5px solid var(--main-color);
+    border-radius: 5px;
+    padding: 1rem;
+    width: 70vw !important;
+    max-width: 60vw !important;
+    height: 50vh;
+    box-shadow: 0px 2px 3px #440000;
+    box-shadow: 0px 6px 10px #440000;
+}
+
+@media (min-width: 576px) {
+
+}
+
+@media (min-width: 768px) {
+
+}
+
+@media (min-width: 992px) {
+
+}
+
+@media (min-width: 1200px) {
+
+}
+
+@media (min-width: 1400px) {
+
+}
