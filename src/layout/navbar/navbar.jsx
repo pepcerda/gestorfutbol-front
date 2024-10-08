@@ -78,10 +78,10 @@ const Navbar = () => {
                         to={"/campanya"}
                         className="p-menuitem-link">
                         {viewWidth <= process.env.REACT_APP_XL_VW ? (<>
-                            <i className="pi pi-users"></i>
+                            <i className="pi pi-book"></i>
                         </>) : (
                             <>
-                                <span className="p-menuitem-icon pi pi-fw pi-users fs-2"></span>
+                                <span className="p-menuitem-icon pi pi-fw pi-book fs-2"></span>
                                 <span className="p-menuitem-text">{t("t.campaigns")}</span>
                             </>)}
                     </NavLink>
@@ -93,16 +93,16 @@ const Navbar = () => {
             template: () => {
                 return (
                     <NavLink
-                        to={"/trips"}
+                        to={"/socis"}
                         className="p-menuitem-link">
                         {viewWidth <= process.env.REACT_APP_XL_VW ? (
                             <>
-                                <i className="pi pi-sign-in"></i>
+                                <i className="pi pi-users"></i>
                             </>
                         ) : (
                             <>
-                                <span className="p-menuitem-icon pi pi-fw pi-sign-in fs-2"></span>
-                                <span className="p-menuitem-text">{t("t.trips")}</span>
+                                <span className="p-menuitem-icon pi pi-fw pi-users fs-2"></span>
+                                <span className="p-menuitem-text">{t("t.members")}</span>
                             </>)}
                     </NavLink>
                 );

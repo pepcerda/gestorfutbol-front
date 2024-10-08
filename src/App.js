@@ -8,6 +8,7 @@ import ProtectedPage from "./pages/protectedpage/protectedpage";
 import BackofficePage from "./pages/backofficepage/backofficepage";
 import NotFoundPage from "./pages/notfoundpage/notfoundpage";
 import CampaignPage from "./pages/campaignpage/campaignpage";
+import MembersPage from './pages/memberspage/memberspage';
 
 export const ViewWidthContext = createContext();
 
@@ -34,6 +35,7 @@ function App() {
                             <Route path={"/"} element={<HomePage/>}></Route>
                             <Route path={"/home"} element={<HomePage/>}></Route>
                             <Route path={"/campanya"} element={<CampaignPage/>}></Route>
+                            <Route path={"/socis"} element={<MembersPage/>}></Route>
                             <Route path={"*"} element={<NotFoundPage/>}></Route>
                         </Route>
                     </Route>
