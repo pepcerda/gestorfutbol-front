@@ -1,0 +1,63 @@
+{
+  "data": {
+    "total": 140,
+    "results": [{
+      "id": 1,
+      "nom": "Bebe",
+      "llinatge": "Ewence",
+      "llinatge2": "Ferrick",
+      "patrocinador": false,
+      "estat_pagament": "P"
+    }, {
+      "id": 2,
+      "nom": "Troy",
+      "llinatge": "McBain",
+      "llinatge2": "Surgeon",
+      "patrocinador": true,
+      "estat_pagament": "P"
+    }, {
+      "id": 3,
+      "nom": "Tory",
+      "llinatge": "Pannaman",
+      "llinatge2": "Witherington",
+      "patrocinador": true,
+      "estat_pagament": "D"
+    }, {
+      "id": 4,
+      "nom": "Nisse",
+      "llinatge": "Crannis",
+      "llinatge2": "Jeffels",
+      "patrocinador": false,
+      "estat_pagament": "D"
+    }, {
+      "id": 5,
+      "nom": "Maxie",
+      "llinatge": "Avieson",
+      "llinatge2": "Rospars",
+      "patrocinador": true,
+      "estat_pagament": "P"
+    }, {
+      "id": 6,
+      "nom": "Jewelle",
+      "llinatge": "Welburn",
+      "llinatge2": "McSperron",
+      "patrocinador": false,
+      "estat_pagament": "D"
+    }, {
+      "id": 7,
+      "nom": "Carmita",
+      "llinatge": "Salmond",
+      "llinatge2": "Pock",
+      "patrocinador": false,
+      "estat_pagament": "D"
+    }, {
+      "id": 8,
+      "nom": "Lauritz",
+      "llinatge": "Tanner",
+      "llinatge2": "Marousek",
+      "patrocinador": false,
+      "estat_pagament": "P"
+    }]
+
+  }
+}

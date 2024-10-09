@@ -14,7 +14,11 @@
   "t.new.campaign": "Nova campanya",
   "t.import": "Import Socis",
   "t.cancel": "Cancel·la",
-  "t.save": "Guarda"
-
-
+  "t.save": "Guarda",
+  "t.nom": "Nom",
+  "t.llinatge1": "Primer Llinatge",
+  "t.llinatge2": "Segon Llinatge",
+  "t.patrocinador": "Patrocinador",
+  "t.estat.pagament": "Estat pagament",
+  "t.new.member": "Nou soci"
 }

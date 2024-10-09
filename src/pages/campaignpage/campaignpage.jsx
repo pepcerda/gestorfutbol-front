@@ -157,7 +157,7 @@ const CampaignPage = ({props})=> {
     };
 
     const reject = () => {
-
+        setDeleteFlag(false);
     };
 
     const confirm = (event) => {
