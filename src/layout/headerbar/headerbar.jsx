@@ -63,7 +63,6 @@ const UserProfile = () => {
                     <h6 className="text-light fw-semibold">{}</h6>
                 )}
                 <h6 className="fw-bold">Usuari connectat: {user.given_name} {user.family_name}</h6>
-
             </>
         )
     }

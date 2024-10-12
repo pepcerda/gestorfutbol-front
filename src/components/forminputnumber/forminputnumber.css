@@ -1,5 +1,6 @@
 .form-inputnumber {
     max-width: 75% !important;
+    display: block;
 }
 
 .inputnumber-label {

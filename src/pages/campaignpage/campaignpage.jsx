@@ -84,23 +84,20 @@ const CampaignDataForm = ({props}) => {
             <div className="row">
                 <div className="col-12 form-group text-center text-md-start mt-3 mt-md-0">
                     <FormInputText props={titleProps}></FormInputText>
-                    {getFormErrorMessage('species')}
+                    {getFormErrorMessage('titol')}
                 </div>
                 <div className="col-12 col-md-5 form-group text-center text-md-start mt-3 mt-md-0">
                     <FormCalendar props={calendar}/>
                     <br/>
-                    {getFormErrorMessage('date')}
+                    {getFormErrorMessage('any')}
                 </div>
                 <div className="col-12 col-md-4 form-group text-center text-md-start mt-3 mt-md-0">
                     <FormInputNumber props={importProps}></FormInputNumber>
-                    {getFormErrorMessage('depth')}
+                    {getFormErrorMessage('import')}
                 </div>
                 <div className="col-12 col-md-2 form-group text-center text-md-start mt-3 mt-md-0">
                     <FormCheckbox props={actualProps}></FormCheckbox>
                 </div>
-            </div>
-            <div className="row">
-
             </div>
 
         </>
@@ -182,7 +179,7 @@ const CampaignPage = ({props})=> {
         icon: "pi pi-plus",
         className: "circular-btn",
         onClick: () => {
-            setSelectedCampaign(emptyCampaign);
+            formikCampaign.resetForm()
             setCaptureDialog(true);
         }
     };
@@ -239,12 +236,13 @@ const CampaignPage = ({props})=> {
     };
 
 
-    const saveCampaign = () => {
-        gestorfutbolService.newCampaign(selectedCampaign);
+    const saveCampaign = (data) => {
+        gestorfutbolService.newCampaign(data);
         setCaptureDialog(false);
     };
 
     const hideDialog = () => {
+        console.log(emptyCampaign)
         setCaptureDialog(false);
     };
 
@@ -252,6 +250,7 @@ const CampaignPage = ({props})=> {
         icon: "pi pi-times",
         className: "basicbutton-outlined me-2",
         label: `${t('t.cancel')}`,
+        type: 'button',
         onClick: hideDialog
     };
 
@@ -286,9 +285,13 @@ const CampaignPage = ({props})=> {
             return errors;
         },
         onSubmit: (data) => {
-            saveCampaign();
+            saveCampaign(data);
         }
     });
+
+    const header = () => {
+        return <h1>Prova</h1>
+    }
 
 
 

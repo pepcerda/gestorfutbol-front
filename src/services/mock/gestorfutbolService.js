@@ -17,6 +17,7 @@ export const gestorfutbolService = {
         return Promise.resolve(members)
     },
     newMember(member) {
+        console.log("Entra en new Member");
         console.log(member)
     }
 }

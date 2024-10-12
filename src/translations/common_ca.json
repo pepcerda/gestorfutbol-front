@@ -20,5 +20,9 @@
   "t.llinatge2": "Segon Llinatge",
   "t.patrocinador": "Patrocinador",
   "t.estat.pagament": "Estat pagament",
-  "t.new.member": "Nou soci"
+  "t.new.member": "Nou soci",
+  "t.sponsor": "Patrocinador",
+  "t.pending.payment": "Pendent de pagar",
+  "t.payed": "Pagat",
+  "t.payment.state": "Estat pagament"
 }
