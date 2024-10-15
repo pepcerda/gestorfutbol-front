@@ -11,6 +11,8 @@ import TableComponent from "../../components/tablecomponent/tablecomponent";
 import { Dialog } from "primereact/dialog";
 import SelectOneMenu from "../../components/selectonemenu/selectonemenu";
 import FormInputText from "../../components/forminputtext/forminputtext";
+import { InputText } from "primereact/inputtext";
+import { Dropdown } from "react-bootstrap";
 
 const MemberContext = createContext();
 
@@ -20,10 +22,7 @@ const MemberDataForm = ({ props }) => {
     useContext(MemberContext);
 
   const [selectCheck, setSelectedCheck] = useState(null);
-  const opcionsPagament = [
-    { nom: `${t("t.pending.payment")}`, valor: 'D' },
-    { nom: `${t("t.payed")}`, valor: 'P' },
-  ];
+  const opcionsPagament = gestorfutbolService.getOpcionsPagament(); 
 
   const isFormFieldInvalid = (name) =>
     !!(formikMember.touched[name] && formikMember.errors[name]);
@@ -86,11 +85,11 @@ const MemberDataForm = ({ props }) => {
     label: `${t("t.payment.state")}`,
     value: formikMember.values.estat_pagament,
     onChange: (e) => {
-        formikMember.setFieldValue("estat_pagament", e.value);
+      formikMember.setFieldValue("estat_pagament", e.value);
     },
     options: opcionsPagament,
-    optionLabel: 'nom',
-    optionValue: "valor"
+    optionLabel: "nom",
+    optionValue: "valor",
   };
 
   return (
@@ -114,7 +113,6 @@ const MemberDataForm = ({ props }) => {
         <div className="col-12 col-md-6 form-group d-flex align-items-center align-items-md-start flex-column mt-3">
           <FormCheckbox props={patrocinadorProps}></FormCheckbox>
         </div>
-        
       </div>
     </>
   );
@@ -129,6 +127,8 @@ const MembersPage = ({ props }) => {
     estat_pagament: null,
   };
 
+  
+  const opcionsPagament = gestorfutbolService.getOpcionsPagament(); 
   const [members, setMembers] = useState([]);
   const [selectedMember, setSelectedMember] = useState(emptyMember);
   const { t, i18n } = useTranslation("common");
@@ -152,17 +152,22 @@ const MembersPage = ({ props }) => {
     return <FormCheckbox props={checkBoxTaula}></FormCheckbox>;
   };
 
+  const allowEdit = (rowData) => {
+    return true;
+  }
+
   const tableColumns = [
-    { field: "id", header: `${t("t.id")}` },
-    { field: "nom", header: `${t("t.nom")}` },
-    { field: "llinatge1", header: `${t("t.llinatge1")}` },
-    { field: "llinatge2", header: `${t("t.llinatge2")}` },
+    { field: "id", header: `${t("t.id")}`},
+    { field: "nom", header: `${t("t.nom")}`, editor: (options) => textEditor(options) },
+    { field: "llinatge1", header: `${t("t.llinatge1")}`, editor: (options) => textEditor(options) },
+    { field: "llinatge2", header: `${t("t.llinatge2")}`, editor: (options) => textEditor(options) },
     {
       field: "patrocinador",
       header: `${t("t.sponsor")}`,
       body: patrocinadorBodyTemplate,
     },
-    { field: "estat_pagament", header: `${t("t.payment.state")}` },
+    { field: "estat_pagament", header: `${t("t.payment.state")}`, editor: (options) => opcionsEditor(options) },
+    { rowEditor: true}
   ];
 
   const accept = () => {
@@ -218,6 +223,14 @@ const MembersPage = ({ props }) => {
     });
   };
 
+  const onRowEditComplete = (e) => {
+    let { newData, index } = e;
+    //Aquí faríem call a service, un put actualitzant dades de la fila modificada per id
+    //gestorfutbolService.editMember(newData.id);
+
+    console.log(index, newData);
+  };
+
   const tableProps = {
     data: members,
     selectedData: selectedMember,
@@ -240,6 +253,9 @@ const MembersPage = ({ props }) => {
     onSort: (e) => setlazyState(e),
     sortOrder: lazyState.sortOrder,
     sortField: lazyState.sortField,
+    editMode: 'row',
+    onRowEditComplete: onRowEditComplete,
+    rowEditor: true
   };
 
   const saveMember = (data) => {
@@ -249,14 +265,14 @@ const MembersPage = ({ props }) => {
 
   const hideDialog = () => {
     setCaptureDialog(false);
-    console.log(selectedMember)
+    console.log(selectedMember);
   };
 
   const cancelFormButton = {
     icon: "pi pi-times",
     className: "basicbutton-outlined me-2",
     label: `${t("t.cancel")}`,
-    type: 'button',
+    type: "button",
     onClick: hideDialog,
   };
 
@@ -283,10 +299,9 @@ const MembersPage = ({ props }) => {
       if (!data.llinatge1) {
         errors.llinatge1 = t("t.empty.field");
       }
-      if(!data.llinatge2) {
+      if (!data.llinatge2) {
       }
-      if(!data.patrocinador) {
-
+      if (!data.patrocinador) {
       }
       if (!data.estat_pagament) {
         errors.estat_pagament = t("t.empty.field");
@@ -297,6 +312,27 @@ const MembersPage = ({ props }) => {
       saveMember(data);
     },
   });
+
+
+  const textEditor = (options) => {
+    return (
+      <InputText
+        type="text"
+        value={options.value}
+        onChange={(e) => options.editorCallback(e.target.value)}
+      />
+    );
+  };
+
+  const opcionsEditor = (options) => {
+    return (
+        <Dropdown
+            value={options.value}
+            options={opcionsPagament}
+            onChange={(e) => options.editorCallback(e.value)}
+        />
+    );
+};
 
   return (
     <div className="container p-2 p-xl-4">

@@ -1,5 +1,6 @@
 import campaign from './campaign.json';
 import members from './members.json';
+import opcionsPagament from './opcionsPagament.json';
 
 export const gestorfutbolService = {
     getCampaigns(apiFilter) {
@@ -19,5 +20,9 @@ export const gestorfutbolService = {
     newMember(member) {
         console.log("Entra en new Member");
         console.log(member)
+    },
+
+    getOpcionsPagament() {
+        return opcionsPagament.opcions_pagament;
     }
 }

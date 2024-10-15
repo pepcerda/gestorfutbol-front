@@ -27,19 +27,25 @@ const UserProfile = () => {
 
     const signUp = {
         label: `${t('t.signup')}`,
-        className: "rounded-border-btn",
+        className: "rounded-border-btn header-btn",
         onClick: () => {register()}
     };
 
     const signIn = {
         label: `${t('t.signin')}`,
-        className: "rounded-border-btn",
+        className: "rounded-border-btn header-btn",
         onClick: () => {login()}
     };
 
-    const logOutButton = {
+    const logOutButtonLarge = {
         label: `${t('t.logout')}`,
-        className: "rounded-border-btn",
+        className: "rounded-border-btn header-btn",
+        onClick: () => {logout()}
+    };
+
+    const logOutButtonSmall = {
+        icon: 'pi pi-sign-out',
+        className: "rounded-border-btn header-btn",
         onClick: () => {logout()}
     };
 
@@ -56,13 +62,12 @@ const UserProfile = () => {
     if (!isLoading && isAuthenticated) {
         return (
             <>
-                <BasicButton props={logOutButton}></BasicButton>
-                {viewWidth <= 576 ? (
-                    <></>
+                
+                {viewWidth <= 992 ? (
+                    <BasicButton props={logOutButtonSmall}></BasicButton>
                 ) : (
-                    <h6 className="text-light fw-semibold">{}</h6>
+                    <BasicButton props={logOutButtonLarge}></BasicButton>
                 )}
-                <h6 className="fw-bold">Usuari connectat: {user.given_name} {user.family_name}</h6>
             </>
         )
     }
