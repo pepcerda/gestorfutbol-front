@@ -1,6 +1,12 @@
 {
   "opcions_pagament": [
-    { "nom": "Pendent pagament", "valor": "D" },
-    { "nom": "Pagat", "valor": "P" }
+    {
+      "nom": "Pendent pagament",
+      "valor": "D"
+    },
+    {
+      "nom": "Pagat",
+      "valor": "P"
+    }
   ]
 }

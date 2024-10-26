@@ -135,7 +135,12 @@ const CampaignPage = ({props})=> {
     });
 
     const actualBodyTemplate = (campaign) => {
-        return <Checkbox checked={campaign.actual} disabled></Checkbox>
+        const checkBoxTaula = {
+            checked: campaign.actual,
+            disabled: true,
+        };
+
+        return <FormCheckbox props={checkBoxTaula}></FormCheckbox>;
     }
 
     const tableColumns = [
@@ -179,7 +184,8 @@ const CampaignPage = ({props})=> {
         icon: "pi pi-plus",
         className: "circular-btn",
         onClick: () => {
-            formikCampaign.resetForm()
+            setSelectedCampaign(emptyCampaign);
+            formikCampaign.resetForm();
             setCaptureDialog(true);
         }
     };

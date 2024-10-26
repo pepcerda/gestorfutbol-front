@@ -113,15 +113,15 @@ const Navbar = () => {
             template: () => {
                 return (
                     <NavLink
-                        to={"/species"}
+                        to={"/patrocinadors"}
                         className="p-menuitem-link">
                         {viewWidth <= process.env.REACT_APP_XL_VW ? (
                             <>
                                 <i className="pi pi-calendar"></i>
                             </>) : (
                             <>
-                                <span className="p-menuitem-icon pi pi-fw pi-calendar fs-2"></span>
-                                <span className="p-menuitem-text">{t("t.species")}</span>
+                                <span className="p-menuitem-icon pi pi-fw pi-wallet fs-2"></span>
+                                <span className="p-menuitem-text">{t("t.sponsors")}</span>
                             </>)}
 
                     </NavLink>

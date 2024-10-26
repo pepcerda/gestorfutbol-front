@@ -15,14 +15,19 @@
   "t.import": "Import Socis",
   "t.cancel": "Cancel·la",
   "t.save": "Guarda",
-  "t.nom": "Nom",
-  "t.llinatge1": "Primer Llinatge",
-  "t.llinatge2": "Segon Llinatge",
+  "t.name": "Nom",
+  "t.surname1": "Primer Llinatge",
+  "t.surname2": "Segon Llinatge",
   "t.patrocinador": "Patrocinador",
   "t.estat.pagament": "Estat pagament",
   "t.new.member": "Nou soci",
   "t.sponsor": "Patrocinador",
+  "t.sponsors": "Patrocinis",
   "t.pending.payment": "Pendent de pagar",
   "t.payed": "Pagat",
-  "t.payment.state": "Estat pagament"
+  "t.payment.state": "Estat pagament",
+  "t.cif": "CIF",
+  "t.donation": "Donació",
+  "t.donation.date": "Data de donació",
+  "t.new.sponsor": "Nou patrocinador"
 }

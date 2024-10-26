@@ -4,59 +4,59 @@
     "results": [{
       "id": 1,
       "nom": "Bebe",
-      "llinatge": "Ewence",
+      "llinatge1": "Ewence",
       "llinatge2": "Ferrick",
       "patrocinador": false,
-      "estat_pagament": "P"
+      "estat_pagament": "Pagat"
     }, {
       "id": 2,
       "nom": "Troy",
-      "llinatge": "McBain",
+      "llinatge1": "McBain",
       "llinatge2": "Surgeon",
       "patrocinador": true,
-      "estat_pagament": "P"
+      "estat_pagament": "-"
     }, {
       "id": 3,
       "nom": "Tory",
-      "llinatge": "Pannaman",
+      "llinatge1": "Pannaman",
       "llinatge2": "Witherington",
       "patrocinador": true,
-      "estat_pagament": "D"
+      "estat_pagament": "Pendent pagament"
     }, {
       "id": 4,
       "nom": "Nisse",
-      "llinatge": "Crannis",
+      "llinatge1": "Crannis",
       "llinatge2": "Jeffels",
       "patrocinador": false,
-      "estat_pagament": "D"
+      "estat_pagament": "Pendent pagament"
     }, {
       "id": 5,
       "nom": "Maxie",
-      "llinatge": "Avieson",
+      "llinatge1": "Avieson",
       "llinatge2": "Rospars",
       "patrocinador": true,
-      "estat_pagament": "P"
+      "estat_pagament": "Pagat"
     }, {
       "id": 6,
       "nom": "Jewelle",
-      "llinatge": "Welburn",
+      "llinatge1": "Welburn",
       "llinatge2": "McSperron",
       "patrocinador": false,
-      "estat_pagament": "D"
+      "estat_pagament": "Pendent pagament"
     }, {
       "id": 7,
       "nom": "Carmita",
-      "llinatge": "Salmond",
+      "llinatge1": "Salmond",
       "llinatge2": "Pock",
       "patrocinador": false,
-      "estat_pagament": "D"
+      "estat_pagament": "Pendent pagament"
     }, {
       "id": 8,
       "nom": "Lauritz",
-      "llinatge": "Tanner",
+      "llinatge1": "Tanner",
       "llinatge2": "Marousek",
       "patrocinador": false,
-      "estat_pagament": "P"
+      "estat_pagament": "Pagat"
     }]
 
   }

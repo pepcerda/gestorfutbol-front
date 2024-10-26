@@ -4,6 +4,9 @@
     width: 75% !important;
 }
 
+.selectonemenu.selectonemenu-large {
+    width: 100% !important;
+}
 .selectonemenu-label {
     color: var(--main-color);
     font-weight: 600;
