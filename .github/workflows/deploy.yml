@@ -22,7 +22,13 @@ jobs:
         run: npm install
 
       - name: Build project
-        run: npm run build
+        run: 
+          REACT_APP_KINDE_DOMAIN=${{secrets.KINDE_DOMAIN}}
+          REACT_APP_KINDE_REDIRECT_URL=${{secrets.KINDE_REDIRECT_URL}}
+          REACT_APP_KINDE_LOGOUT_URL=${{secrets.KINDE_LOGOUT_URL}}
+          REACT_APP_KINDE_CLIENT_ID=${{secrets.KINDE_CLIENT_ID}}
+          REACT_APP_XL_VW=${{secrets.XL_VW}}
+          npm run build
         env:
           CI: false
 
