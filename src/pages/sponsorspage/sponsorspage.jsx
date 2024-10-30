@@ -70,16 +70,16 @@ const SponsorDataForm = ({props}) => {
     };
 
     const dataDonacioProps = {
-        id: "data_donacio",
+        id: "dataDonacio",
         label: `${t('t.donation.date')}`,
-        value: formikSponsor.values.data_donacio,
+        value: formikSponsor.values.dataDonacio,
         view: "date",
         dateFormat: "dd/mm/yy",
         onChange: (e) => {
-            formikSponsor.setFieldValue('data_donacio', e.target.value);
+            formikSponsor.setFieldValue('dataDonacio', e.target.value);
         },
-        classNameError: `${isFormFieldInvalid('data_donacio') ? 'formcalendar-invalid' : ''}`,
-        labelClassName: `${isFormFieldInvalid('data_donacio') ? 'form-text-invalid' : ''}`
+        classNameError: `${isFormFieldInvalid('dataDonacio') ? 'formcalendar-invalid' : ''}`,
+        labelClassName: `${isFormFieldInvalid('dataDonacio') ? 'form-text-invalid' : ''}`
     };
 
 
@@ -101,7 +101,7 @@ const SponsorDataForm = ({props}) => {
                 <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
                     <FormCalendar props={dataDonacioProps}/>
                     <br/>
-                    {getFormErrorMessage('data_donacio')}
+                    {getFormErrorMessage('dataDonacio')}
                 </div>
             </div>
         </>
@@ -114,7 +114,7 @@ const SponsorsPage = ({props}) => {
         cif: "",
         nom: "",
         donacio: 0,
-        data_donacio: new Date()
+        dataDonacio: new Date()
     };
 
     const [sponsors, setSponsors] = useState([]);
@@ -136,7 +136,7 @@ const SponsorsPage = ({props}) => {
         {field: "cif", header: `${t("t.cif")}`, editor: (options) => textEditor(options)},
         {field: "nom", header: `${t("t.name")}`, editor: (options) => textEditor(options)},
         {field: "donacio", header: `${t("t.donation")}`, editor: (options) => numberEditor(options)},
-        {field: "data_donacio", header: `${t("t.donation.date")}`, editor: (options) => calendarEditor(options)},
+        {field: "dataDonacio", header: `${t("t.donation.date")}`, editor: (options) => calendarEditor(options)},
         {rowEditor: true}
     ];
 
@@ -260,7 +260,7 @@ const SponsorsPage = ({props}) => {
             cif: selectedSponsor.cif,
             nom: selectedSponsor.nom,
             donacio: selectedSponsor.donacio,
-            data_donacio: selectedSponsor.data_donacio
+            dataDonacio: selectedSponsor.dataDonacio
         },
         enableReinitialize: true,
         validate: (data) => {
@@ -274,8 +274,8 @@ const SponsorsPage = ({props}) => {
             if (!data.donacio) {
                 errors.donacio = t("t.empty.field");
             }
-            if (!data.data_donacio) {
-                errors.data_donacio = t("t.empty.field");
+            if (!data.dataDonacio) {
+                errors.dataDonacio = t("t.empty.field");
             }
             return errors;
         },

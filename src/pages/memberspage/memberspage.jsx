@@ -81,11 +81,11 @@ const MemberDataForm = ({props}) => {
     };
 
     const estatPagamentProps = {
-        id: "estat_pagament",
+        id: "estatPagament",
         label: `${t("t.payment.state")}`,
-        value: formikMember.values.estat_pagament,
+        value: formikMember.values.estatPagament,
         onChange: (e) => {
-            formikMember.setFieldValue("estat_pagament", e.value);
+            formikMember.setFieldValue("estatPagament", e.value);
         },
         options: opcionsPagament,
         optionLabel: "nom",
@@ -113,7 +113,7 @@ const MemberDataForm = ({props}) => {
                 {!formikMember.values.patrocinador ?
                     <div className="col-12 col-md-6 form-group text-center text-md-start mt-3">
                         <SelectOneMenu props={estatPagamentProps}></SelectOneMenu>
-                        {getFormErrorMessage("estat_pagament")}
+                        {getFormErrorMessage("estatPagament")}
                     </div> : <></>}
             </div>
         </>
@@ -126,7 +126,7 @@ const MembersPage = ({props}) => {
         llinatge1: "",
         llinatge2: "",
         patrocinador: false,
-        estat_pagament: null,
+        estatPagament: null,
     };
 
 
@@ -172,8 +172,8 @@ const MembersPage = ({props}) => {
     const opcionsEditor = (options) => {
 
         const optionsProps = {
-            id: "estat_pagament_editor",
-            value: options.rowData.estat_pagament,
+            id: "estatPagament_editor",
+            value: options.rowData.estatPagament,
             onChange: (e) => options.editorCallback(e.value),
             options: opcionsPagament,
             optionLabel: "nom",
@@ -196,7 +196,7 @@ const MembersPage = ({props}) => {
             header: `${t("t.sponsor")}`,
             body: patrocinadorBodyTemplate,
         },
-        {field: "estat_pagament", header: `${t("t.payment.state")}`, editor: (options) => opcionsEditor(options)},
+        {field: "estatPagament", header: `${t("t.payment.state")}`, editor: (options) => opcionsEditor(options)},
         {rowEditor: true}
     ];
 
@@ -321,7 +321,7 @@ const MembersPage = ({props}) => {
             llinatge1: selectedMember.llinatge1,
             llinatge2: selectedMember.llinatge2,
             patrocinador: selectedMember.patrocinador,
-            estat_pagament: selectedMember.estat_pagament,
+            estatPagament: selectedMember.estatPagament,
         },
         enableReinitialize: true,
         validate: (data) => {
@@ -336,8 +336,8 @@ const MembersPage = ({props}) => {
             }
             if (!data.patrocinador) {
             }
-            if (!data.estat_pagament) {
-                errors.estat_pagament = t("t.empty.field");
+            if (!data.estatPagament) {
+                errors.estatPagament = t("t.empty.field");
             }
             return errors;
         },

@@ -6,61 +6,61 @@
       "cif": "JLG LIaVLz",
       "nom": "ABC Company",
       "donacio": 832,
-      "data_donacio": "12/10/2024"
+      "dataDonacio": "12/10/2024"
     }, {
       "id": 2,
       "cif": "cdf OOrKfi",
       "nom": "Golden Gate Group",
       "donacio": 1258,
-      "data_donacio": "10/09/2024"
+      "dataDonacio": "10/09/2024"
     }, {
       "id": 3,
       "cif": "VkZ DXyRSg",
       "nom": "XYZ Corporation",
       "donacio": 1294,
-      "data_donacio": "05/08/2024"
+      "dataDonacio": "05/08/2024"
     }, {
       "id": 4,
       "cif": "VDh yYPUQu",
       "nom": "ABC Company",
       "donacio": 939,
-      "data_donacio": "07/09/2024"
+      "dataDonacio": "07/09/2024"
     }, {
       "id": 5,
       "cif": "BTB RMfDHM",
       "nom": "Sunrise Enterprises",
       "donacio": 1454,
-      "data_donacio": "23/11/2024"
+      "dataDonacio": "23/11/2024"
     }, {
       "id": 6,
       "cif": "gmN DtUBwB",
       "nom": "XYZ Corporation",
       "donacio": 817,
-      "data_donacio": "25/08/2024"
+      "dataDonacio": "25/08/2024"
     }, {
       "id": 7,
       "cif": "Ros JaRHFM",
       "nom": "Blue Sky Industries",
       "donacio": 828,
-      "data_donacio": "15/09/2024"
+      "dataDonacio": "15/09/2024"
     }, {
       "id": 8,
       "cif": "nFD mJpwcj",
       "nom": "ABC Company",
       "donacio": 876,
-      "data_donacio": "12/10/2024"
+      "dataDonacio": "12/10/2024"
     }, {
       "id": 9,
       "cif": "rQK kgBsoL",
       "nom": "Blue Sky Industries",
       "donacio": 1963,
-      "data_donacio": "13/02/2025"
+      "dataDonacio": "13/02/2025"
     }, {
       "id": 10,
       "cif": "aaz AaZsZc",
       "nom": "Sunrise Enterprises",
       "donacio": 1078,
-      "data_donacio": "14/09/2024"
+      "dataDonacio": "14/09/2024"
     }]
   }
 }
