@@ -1,14 +1,13 @@
 import './campaignpage.css';
 import {useKindeAuth} from "@kinde-oss/kinde-auth-react";
-import {createContext, useEffect, useState, useContext} from "react";
+import {createContext, useEffect, useState, useContext, useRef} from "react";
 import {useTranslation} from "react-i18next";
 import {useNavigate} from "react-router-dom";
-import {gestorfutbolService} from "../../services/mock/gestorfutbolService";
+import {gestorfutbolService} from "../../services/real/gestorfutbolService";
 import {ConfirmPopup, confirmPopup} from "primereact/confirmpopup";
 import PageTitle from "../../components/pagetitle/pagetitle";
 import BasicButton from "../../components/basicbutton/basicbutton";
 import TableComponent from "../../components/tablecomponent/tablecomponent";
-import {Checkbox} from "primereact/checkbox";
 import {useFormik} from "formik";
 import FormCalendar from "../../components/formcalendar/formcalendar";
 import FormInputText from "../../components/forminputtext/forminputtext";
@@ -47,7 +46,7 @@ const CampaignDataForm = ({props}) => {
         label: `${t('t.year')}`,
         value: new Date(formikCampaign.values.any),
         view: "year",
-        dateFormat : "yy",
+        dateFormat: "yy",
         onChange: (e) => {
             formikCampaign.setFieldValue('any', e.target.value);
         },
@@ -55,29 +54,30 @@ const CampaignDataForm = ({props}) => {
         labelClassName: `${isFormFieldInvalid('any') ? 'form-text-invalid' : ''}`
     };
 
-    const importProps = {
-        id: "import",
+    const importSocisProps = {
+        id: "importSocis",
         label: `${t('t.import')}`,
-        value: formikCampaign.values.import,
+        value: formikCampaign.values.importSocis,
         mode: "currency",
         currency: "EUR",
         onValueChange: (e) => {
-            formikCampaign.setFieldValue('import', e.target.value);
+            formikCampaign.setFieldValue('importSocis', e.target.value);
         },
-        classNameError: `${isFormFieldInvalid('import') ? 'invalid-inputnumber' : ''}`,
-        labelClassName: `${isFormFieldInvalid('import') ? 'form-text-invalid' : ''}`
+        classNameError: `${isFormFieldInvalid('importSocis') ? 'invalid-inputnumber' : ''}`,
+        labelClassName: `${isFormFieldInvalid('importSocis') ? 'form-text-invalid' : ''}`
     }
 
-    const actualProps = {
-        id: "actual",
-        label: `${t('t.actual')}`,
-        value: formikCampaign.values.actual,
-        checked: formikCampaign.values.actual,
+    const activaProps = {
+        id: "activa",
+        label: `${t('t.activa')}`,
+        value: formikCampaign.values.activa,
+        checked: formikCampaign.values.activa,
         onChange: (e) => {
-            formikCampaign.setFieldValue('actual', e.checked);
+            formikCampaign.setFieldValue('activa', e.checked);
         },
-        classNameError: `${isFormFieldInvalid('actual') ? 'invalid-inputtext' : ''}`,
-        labelClassName: `${isFormFieldInvalid('actual') ? 'form-text-invalid' : ''}`    }
+        classNameError: `${isFormFieldInvalid('activa') ? 'invalid-inputtext' : ''}`,
+        labelClassName: `${isFormFieldInvalid('activa') ? 'form-text-invalid' : ''}`
+    }
 
     return (
         <>
@@ -92,11 +92,11 @@ const CampaignDataForm = ({props}) => {
                     {getFormErrorMessage('any')}
                 </div>
                 <div className="col-12 col-md-4 form-group text-center text-md-start mt-3 mt-md-0">
-                    <FormInputNumber props={importProps}></FormInputNumber>
-                    {getFormErrorMessage('import')}
+                    <FormInputNumber props={importSocisProps}></FormInputNumber>
+                    {getFormErrorMessage('importSocis')}
                 </div>
                 <div className="col-12 col-md-2 form-group text-center text-md-start mt-3 mt-md-0">
-                    <FormCheckbox props={actualProps}></FormCheckbox>
+                    <FormCheckbox props={activaProps}></FormCheckbox>
                 </div>
             </div>
 
@@ -108,13 +108,13 @@ const CampaignDataForm = ({props}) => {
 }
 
 
-const CampaignPage = ({props})=> {
+const CampaignPage = ({props}) => {
 
     let emptyCampaign = {
         titol: "",
         any: new Date(),
-        import: 0,
-        actual: true
+        importSocis: 0,
+        activa: true
     }
 
 
@@ -126,6 +126,7 @@ const CampaignPage = ({props})=> {
     const [totalRecords, setTotalRecords] = useState(0);
     const [captureDialog, setCaptureDialog] = useState(false);
     const [deleteFlag, setDeleteFlag] = useState(false);
+    const confirmRef = useRef();
     const [lazyState, setlazyState] = useState({
         first: 0,
         rows: 10,
@@ -134,9 +135,9 @@ const CampaignPage = ({props})=> {
         sortField: null
     });
 
-    const actualBodyTemplate = (campaign) => {
+    const activaBodyTemplate = (campaign) => {
         const checkBoxTaula = {
-            checked: campaign.actual,
+            checked: campaign.activa,
             disabled: true,
         };
 
@@ -147,15 +148,17 @@ const CampaignPage = ({props})=> {
         {field: "id", header: `${t('t.id')}`},
         {field: "titol", header: `${t('t.title')}`},
         {field: "any", header: `${t('t.year')}`},
-        {field: "import", header: `${t('t.amount')}`},
-        {field: "actual", header: `${t('t.actual')}`, body: actualBodyTemplate},
+        {field: "importSocis", header: `${t('t.amount')}`},
+        {field: "activa", header: `${t('t.activa')}`, body: activaBodyTemplate},
         {field: "socis", header: `${t('t.members')}`}
     ];
 
 
     const accept = () => {
-        gestorfutbolService.deleteCampaign(selectedCampaign.id);
-        setDeleteFlag(true);
+        gestorfutbolService.deleteCampaign(selectedCampaign.id)
+            .then(() => {
+                setDeleteFlag(true);
+            });
     };
 
     const reject = () => {
@@ -166,17 +169,36 @@ const CampaignPage = ({props})=> {
         confirmPopup({
             target: event.currentTarget,
             message: `${t('t.confirm.delete')}`,
-            icon: 'pi pi-info-circle',
-            acceptClassName: 'p-button-danger',
+            acceptLabel: "Sí",
+            rejectLabel: "No",
             accept,
             reject
+        });
+    };
+
+    const acceptNewActiveCampaign = (data) => {
+        console.log(data);
+        saveCampaign(data);
+    };
+
+    const rejectNewActiveCampaign = () => {
+    };
+
+    const confirmNewActiveCampaign = (event) => {
+        confirmPopup({
+            target: event.currentTarget,
+            message: `${t('t.confirm.new.active.campaign')}`,
+            acceptLabel: "Sí",
+            rejectLabel: "No",
+            accept: () => acceptNewActiveCampaign(event),
+            reject: rejectNewActiveCampaign
         });
     };
 
     const deleteButton = {
         icon: "pi pi-trash",
         className: "circular-btn",
-        disabled: selectedCampaign === null,
+        disabled: selectedCampaign.id === undefined,
         onClick: confirm
     };
 
@@ -190,14 +212,14 @@ const CampaignPage = ({props})=> {
         }
     };
 
-/*    const editButton = {
-        icon: "pi pi-pencil",
-        className: "circular-btn",
-        disabled: selectedCampaign === null,
-        onClick: () => {
-            navigate(`/trip/${selectedProduct.id}`)
-        }
-    }*/
+    /*    const editButton = {
+            icon: "pi pi-pencil",
+            className: "circular-btn",
+            disabled: selectedCampaign === null,
+            onClick: () => {
+                navigate(`/trip/${selectedProduct.id}`)
+            }
+        }*/
 
     useEffect(() => {
         loadLazyData();
@@ -211,7 +233,7 @@ const CampaignPage = ({props})=> {
         }
         gestorfutbolService.getCampaigns(apiFilter).then((data) => {
             setTotalRecords(data.data.total)
-            let results = data.data.results;
+            let results = data.data.result;
             setCampaigns(results);
         });
     };
@@ -221,7 +243,7 @@ const CampaignPage = ({props})=> {
         data: campaigns,
         selectedData: selectedCampaign,
         onChangeSelectedDataEvent: (e) => {
-            if(e.value != null) {
+            if (e.value != null) {
                 setSelectedCampaign(e.value);
             }
         },
@@ -243,12 +265,15 @@ const CampaignPage = ({props})=> {
 
 
     const saveCampaign = (data) => {
-        gestorfutbolService.newCampaign(data);
-        setCaptureDialog(false);
+        gestorfutbolService.newCampaign(data)
+            .then(() => {
+                    setCaptureDialog(false);
+                    loadLazyData();
+                }
+            );
     };
 
     const hideDialog = () => {
-        console.log(emptyCampaign)
         setCaptureDialog(false);
     };
 
@@ -270,8 +295,8 @@ const CampaignPage = ({props})=> {
         initialValues: {
             titol: selectedCampaign.titol,
             any: selectedCampaign.any,
-            import: selectedCampaign.import,
-            actual: selectedCampaign.actual
+            importSocis: selectedCampaign.importSocis,
+            activa: selectedCampaign.activa
         },
         enableReinitialize: true,
         validate: (data) => {
@@ -282,16 +307,20 @@ const CampaignPage = ({props})=> {
             if (!data.any) {
                 errors.any = t('t.empty.field');
             }
-            if (!data.import) {
-                errors.import = t('t.empty.field');
+            if (!data.importSocis) {
+                errors.importSocis = t('t.empty.field');
             }
-            if (!data.actual) {
-                errors.actual = t('t.empty.field');
+            if (!data.activa) {
+                errors.activa = t('t.empty.field');
             }
             return errors;
         },
         onSubmit: (data) => {
-            saveCampaign(data);
+            if(data.activa) {
+                confirmNewActiveCampaign(data);
+            } else {
+                saveCampaign(data);
+            }
         }
     });
 
@@ -300,14 +329,13 @@ const CampaignPage = ({props})=> {
     }
 
 
-
     return (
         <div className="container p-2 p-xl-4">
             <ConfirmPopup/>
             <PageTitle props={{title: `${t('t.campaigns.title')}`}}></PageTitle>
             <div className="row gap-3 justify-content-center justify-content-xl-end">
                 <BasicButton props={newButton}></BasicButton>
-     {/*           <BasicButton props={editButton}></BasicButton>*/}
+                {/*           <BasicButton props={editButton}></BasicButton>*/}
                 <BasicButton props={deleteButton}></BasicButton>
 
             </div>
@@ -321,7 +349,7 @@ const CampaignPage = ({props})=> {
                     <CampaignContext.Provider value={{selectedCampaign, setSelectedCampaign, formikCampaign}}>
                         <CampaignDataForm/>
                     </CampaignContext.Provider>
-                    <div className="p-dialog-footer pb-0 mt-5">
+                    <div ref={confirmRef} className="p-dialog-footer pb-0 mt-5">
                         <BasicButton props={cancelFormButton}/>
                         <BasicButton props={saveFormButton}/>
                     </div>
