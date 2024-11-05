@@ -48,7 +48,7 @@ export const gestorfutbolService = {
         return response;
     },
 
-    newMember(member) {
+    saveMember(member) {
         const axiosConfig = {
             headers: {
                 'Accept': 'application/json',

@@ -14,6 +14,7 @@ import FormInputText from "../../components/forminputtext/forminputtext";
 import {Dialog} from "primereact/dialog";
 import FormCheckbox from "../../components/formcheckbox/formcheckbox";
 import FormInputNumber from "../../components/forminputnumber/forminputnumber";
+import {confirmDialog, ConfirmDialog} from "primereact/confirmdialog";
 
 const CampaignContext = createContext();
 
@@ -113,7 +114,7 @@ const CampaignPage = ({props}) => {
     let emptyCampaign = {
         titol: "",
         any: new Date(),
-        importSocis: 0,
+        importSocis: null,
         activa: true
     }
 
@@ -177,7 +178,6 @@ const CampaignPage = ({props}) => {
     };
 
     const acceptNewActiveCampaign = (data) => {
-        console.log(data);
         saveCampaign(data);
     };
 
@@ -185,11 +185,13 @@ const CampaignPage = ({props}) => {
     };
 
     const confirmNewActiveCampaign = (event) => {
-        confirmPopup({
+        confirmDialog({
             target: event.currentTarget,
             message: `${t('t.confirm.new.active.campaign')}`,
             acceptLabel: "Sí",
             rejectLabel: "No",
+            acceptClassName: 'basicbutton',
+            rejectClassName: 'basicbutton basicbutton-outlined',
             accept: () => acceptNewActiveCampaign(event),
             reject: rejectNewActiveCampaign
         });
@@ -332,6 +334,7 @@ const CampaignPage = ({props}) => {
     return (
         <div className="container p-2 p-xl-4">
             <ConfirmPopup/>
+            <ConfirmDialog/>
             <PageTitle props={{title: `${t('t.campaigns.title')}`}}></PageTitle>
             <div className="row gap-3 justify-content-center justify-content-xl-end">
                 <BasicButton props={newButton}></BasicButton>

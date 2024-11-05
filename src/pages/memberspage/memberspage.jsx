@@ -2,7 +2,7 @@ import "./memberspage.css";
 import {useTranslation} from "react-i18next";
 import {createContext, useContext, useEffect, useState} from "react";
 import FormCheckbox from "../../components/formcheckbox/formcheckbox";
-import {gestorfutbolService} from "../../services/mock/gestorfutbolService";
+import {gestorfutbolService} from "../../services/real/gestorfutbolService";
 import {ConfirmPopup, confirmPopup} from "primereact/confirmpopup";
 import {useFormik} from "formik";
 import PageTitle from "../../components/pagetitle/pagetitle";
@@ -11,8 +11,6 @@ import TableComponent from "../../components/tablecomponent/tablecomponent";
 import {Dialog} from "primereact/dialog";
 import SelectOneMenu from "../../components/selectonemenu/selectonemenu";
 import FormInputText from "../../components/forminputtext/forminputtext";
-import {InputText} from "primereact/inputtext";
-import {Dropdown} from "react-bootstrap";
 
 const MemberContext = createContext();
 
@@ -81,7 +79,7 @@ const MemberDataForm = ({props}) => {
     };
 
     const estatPagamentProps = {
-        id: "estatPagament",
+        id: "estat-pagament",
         label: `${t("t.payment.state")}`,
         value: formikMember.values.estatPagament,
         onChange: (e) => {
@@ -89,7 +87,7 @@ const MemberDataForm = ({props}) => {
         },
         options: opcionsPagament,
         optionLabel: "nom",
-        optionValue: "nom",
+        optionValue: "valor",
     };
 
     return (
@@ -121,22 +119,23 @@ const MemberDataForm = ({props}) => {
 };
 
 const MembersPage = ({props}) => {
+
+    const opcionsPagament = gestorfutbolService.getOpcionsPagament();
+    const [members, setMembers] = useState([]);
+    const {t, i18n} = useTranslation("common");
+    const [totalRecords, setTotalRecords] = useState(0);
+    const [captureDialog, setCaptureDialog] = useState(false);
+    const [deleteFlag, setDeleteFlag] = useState(false);
+    const [activeCampaign, setActiveCampaign] = useState(null);
     let emptyMember = {
         nom: "",
         llinatge1: "",
         llinatge2: "",
         patrocinador: false,
         estatPagament: null,
+        campanya: activeCampaign
     };
-
-
-    const opcionsPagament = gestorfutbolService.getOpcionsPagament();
-    const [members, setMembers] = useState([]);
     const [selectedMember, setSelectedMember] = useState(emptyMember);
-    const {t, i18n} = useTranslation("common");
-    const [totalRecords, setTotalRecords] = useState(0);
-    const [captureDialog, setCaptureDialog] = useState(false);
-    const [deleteFlag, setDeleteFlag] = useState(false);
     const [lazyState, setlazyState] = useState({
         first: 0,
         rows: 10,
@@ -238,30 +237,32 @@ const MembersPage = ({props}) => {
     };
 
     useEffect(() => {
-        loadLazyData();
+        gestorfutbolService.getActiveCampaign().then((data) => {
+            setActiveCampaign(data.data);
+            loadLazyData();
+        })
+
+
         setDeleteFlag(false);
-    }, [lazyState, deleteFlag]);
+    }, [lazyState, deleteFlag, activeCampaign]);
 
     const loadLazyData = () => {
-        var apiFilter = {
+        const apiFilter = {
             pageNum: lazyState.page,
             pageSize: lazyState.rows,
+            campanyaActiva: activeCampaign
         };
-        //TODO:Llamar primero para conocer cual es la capaña que está activa
-        //gestorfutbolService.getActiveCampaign()
         gestorfutbolService.getMembers(apiFilter).then((data) => {
             setTotalRecords(data.data.total);
-            let results = data.data.results;
+            let results = data.data.result;
             setMembers(results);
         });
     };
 
     const onRowEditComplete = (e) => {
         let {newData, index} = e;
-        //Aquí faríem call a service, un put actualitzant dades de la fila modificada per id
-        //gestorfutbolService.editMember(newData);
-
-        console.log(index, newData);
+        gestorfutbolService.saveMember(newData)
+            .then(() => loadLazyData())
     };
 
     const tableProps = {
@@ -292,13 +293,16 @@ const MembersPage = ({props}) => {
     };
 
     const saveMember = (data) => {
-        gestorfutbolService.newMember(data);
-        setCaptureDialog(false);
+        gestorfutbolService.saveMember(data)
+            .then(() => {
+                    setCaptureDialog(false);
+                    loadLazyData();
+                }
+            );
     };
 
     const hideDialog = () => {
         setCaptureDialog(false);
-        console.log(selectedMember);
     };
 
     const cancelFormButton = {
@@ -322,6 +326,7 @@ const MembersPage = ({props}) => {
             llinatge2: selectedMember.llinatge2,
             patrocinador: selectedMember.patrocinador,
             estatPagament: selectedMember.estatPagament,
+            campanya: activeCampaign
         },
         enableReinitialize: true,
         validate: (data) => {
