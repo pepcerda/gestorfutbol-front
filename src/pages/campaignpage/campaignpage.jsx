@@ -18,6 +18,15 @@ import {confirmDialog, ConfirmDialog} from "primereact/confirmdialog";
 
 const CampaignContext = createContext();
 
+const calculateCampaignYears = (year) => {
+    if(year === undefined) {
+        let now = new Date();
+        return `${now.getFullYear()} - ${(now.getFullYear() + 1)}`
+    } else {
+        return `${year.getFullYear()} - ${year.getFullYear()+1}`
+    }
+}
+
 const CampaignDataForm = ({props}) => {
     const {t, i18n} = useTranslation("common");
     const {selectedCampaign, setSelectedCampaign, formikCampaign} = useContext(CampaignContext);
@@ -35,6 +44,7 @@ const CampaignDataForm = ({props}) => {
         id: "titol",
         label: `${t('t.title')}`,
         value: formikCampaign.values.titol,
+        disabled: true,
         onChange: (e) => {
             formikCampaign.setFieldValue('titol', e.target.value);
         },
@@ -50,6 +60,7 @@ const CampaignDataForm = ({props}) => {
         dateFormat: "yy",
         onChange: (e) => {
             formikCampaign.setFieldValue('any', e.target.value);
+            formikCampaign.setFieldValue('titol', `${t('t.campanya.nova')} ${calculateCampaignYears(e.target.value)}`)
         },
         classNameError: `${isFormFieldInvalid('any') ? 'formcalendar-invalid' : ''}`,
         labelClassName: `${isFormFieldInvalid('any') ? 'form-text-invalid' : ''}`
@@ -68,18 +79,6 @@ const CampaignDataForm = ({props}) => {
         labelClassName: `${isFormFieldInvalid('importSocis') ? 'form-text-invalid' : ''}`
     }
 
-    const activaProps = {
-        id: "activa",
-        label: `${t('t.activa')}`,
-        value: formikCampaign.values.activa,
-        checked: formikCampaign.values.activa,
-        onChange: (e) => {
-            formikCampaign.setFieldValue('activa', e.checked);
-        },
-        classNameError: `${isFormFieldInvalid('activa') ? 'invalid-inputtext' : ''}`,
-        labelClassName: `${isFormFieldInvalid('activa') ? 'form-text-invalid' : ''}`
-    }
-
     return (
         <>
             <div className="row">
@@ -96,9 +95,6 @@ const CampaignDataForm = ({props}) => {
                     <FormInputNumber props={importSocisProps}></FormInputNumber>
                     {getFormErrorMessage('importSocis')}
                 </div>
-                <div className="col-12 col-md-2 form-group text-center text-md-start mt-3 mt-md-0">
-                    <FormCheckbox props={activaProps}></FormCheckbox>
-                </div>
             </div>
 
         </>
@@ -111,18 +107,18 @@ const CampaignDataForm = ({props}) => {
 
 const CampaignPage = ({props}) => {
 
+    const {t, i18n} = useTranslation("common");
+
     let emptyCampaign = {
-        titol: "",
+        titol: `${t('t.campanya.nova')} ${calculateCampaignYears()}`,
         any: new Date(),
-        importSocis: null,
-        activa: true
+        importSocis: null
     }
 
 
     const {user} = useKindeAuth();
     const [campaigns, setCampaigns] = useState([]);
     const [selectedCampaign, setSelectedCampaign] = useState(emptyCampaign);
-    const {t, i18n} = useTranslation("common");
     const navigate = useNavigate();
     const [totalRecords, setTotalRecords] = useState(0);
     const [captureDialog, setCaptureDialog] = useState(false);
@@ -150,7 +146,6 @@ const CampaignPage = ({props}) => {
         {field: "titol", header: `${t('t.title')}`},
         {field: "any", header: `${t('t.year')}`},
         {field: "importSocis", header: `${t('t.amount')}`},
-        {field: "activa", header: `${t('t.activa')}`, body: activaBodyTemplate},
         {field: "socis", header: `${t('t.members')}`}
     ];
 
@@ -177,14 +172,14 @@ const CampaignPage = ({props}) => {
         });
     };
 
-    const acceptNewActiveCampaign = (data) => {
+/*    const acceptNewActiveCampaign = (data) => {
         saveCampaign(data);
     };
 
     const rejectNewActiveCampaign = () => {
-    };
+    };*/
 
-    const confirmNewActiveCampaign = (event) => {
+/*    const confirmNewActiveCampaign = (event) => {
         confirmDialog({
             target: event.currentTarget,
             message: `${t('t.confirm.new.active.campaign')}`,
@@ -195,7 +190,7 @@ const CampaignPage = ({props}) => {
             accept: () => acceptNewActiveCampaign(event),
             reject: rejectNewActiveCampaign
         });
-    };
+    };*/
 
     const deleteButton = {
         icon: "pi pi-trash",
@@ -297,8 +292,7 @@ const CampaignPage = ({props}) => {
         initialValues: {
             titol: selectedCampaign.titol,
             any: selectedCampaign.any,
-            importSocis: selectedCampaign.importSocis,
-            activa: selectedCampaign.activa
+            importSocis: selectedCampaign.importSocis
         },
         enableReinitialize: true,
         validate: (data) => {
@@ -312,17 +306,10 @@ const CampaignPage = ({props}) => {
             if (!data.importSocis) {
                 errors.importSocis = t('t.empty.field');
             }
-            if (!data.activa) {
-                errors.activa = t('t.empty.field');
-            }
             return errors;
         },
         onSubmit: (data) => {
-            if(data.activa) {
-                confirmNewActiveCampaign(data);
-            } else {
                 saveCampaign(data);
-            }
         }
     });
 

@@ -30,5 +30,6 @@
   "t.donation": "Donació",
   "t.donation.date": "Data de donació",
   "t.new.sponsor": "Nou patrocinador",
-  "t.confirm.new.active.campaign": "Si marcau el check al donar d'alta la campanya, la campanya activa passarà a ser aquesta. Esteu segurs?"
+  "t.confirm.new.active.campaign": "Si marcau el check al donar d'alta la campanya, la campanya activa passarà a ser aquesta. Esteu segurs?",
+  "t.campanya.nova": "Campanya "
 }

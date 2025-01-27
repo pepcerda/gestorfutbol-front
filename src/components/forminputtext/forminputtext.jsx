@@ -11,7 +11,7 @@ const FormInputText = ({props}) => {
             <InputText id={props.id} aria-describedby={props.ariadescribedby}
                        className={`form-control form-inputtext mx-auto mx-md-0 ${props.className} ${props.classNameError}`}
                        placeholder={props.placeholder} value={props.value} onChange={props.onChange}
-                       keyfilter={props.keyfilter} onInput={props.onInput} validateOnly={props.validateOnly}/>
+                       keyfilter={props.keyfilter} onInput={props.onInput} validateOnly={props.validateOnly} disabled={props.disabled}/>
         </>);
 }
 

@@ -11,6 +11,8 @@ import TableComponent from "../../components/tablecomponent/tablecomponent";
 import {Dialog} from "primereact/dialog";
 import SelectOneMenu from "../../components/selectonemenu/selectonemenu";
 import FormInputText from "../../components/forminputtext/forminputtext";
+import {TabMenu} from "primereact/tabmenu";
+import TabMenuComponent from "../../components/tabmenucomponent/tabmenucomponent";
 
 const MemberContext = createContext();
 
@@ -126,8 +128,10 @@ const MembersPage = ({props}) => {
     const [totalRecords, setTotalRecords] = useState(0);
     const [captureDialog, setCaptureDialog] = useState(false);
     const [deleteFlag, setDeleteFlag] = useState(false);
+    const [campaigns, setCampaigns] = useState(null);
     const [activeCampaign, setActiveCampaign] = useState(null);
     let emptyMember = {
+        id: null,
         nom: "",
         llinatge1: "",
         llinatge2: "",
@@ -143,6 +147,20 @@ const MembersPage = ({props}) => {
         sortOrder: null,
         sortField: null,
     });
+
+    const [activeIndex, setActiveIndex] = useState(0)
+    const [tabMenuItems, setTabMenuItems] = useState(null);
+
+    const tabMenu = {
+        model: tabMenuItems,
+        activeIndex: activeIndex,
+        onTabChange: (e) => {
+            setActiveIndex(e.index);
+            let result = campaigns[e.index];
+            setActiveCampaign(result.id);
+            setSelectedMember(emptyMember);
+        }
+    }
 
     const patrocinadorBodyTemplate = (member) => {
         const checkBoxTaula = {
@@ -222,7 +240,7 @@ const MembersPage = ({props}) => {
     const deleteButton = {
         icon: "pi pi-trash",
         className: "circular-btn",
-        disabled: selectedMember === null,
+        disabled: selectedMember.id === null,
         onClick: confirm,
     };
 
@@ -237,21 +255,37 @@ const MembersPage = ({props}) => {
     };
 
     useEffect(() => {
-        gestorfutbolService.getActiveCampaign().then((data) => {
-            setActiveCampaign(data.data);
-            loadLazyData();
-        })
+        let results;
+        gestorfutbolService.getAllCampaigns().then((data) => {
+            results = data.data;
+            setCampaigns(results);
+        }).then(() => {
+            setTabMenuItems(results.map(r => {
+                    return {label: r.titol}
+                }
+            ))
+        }).then(() => {
+            let year = new Date().getFullYear();
+            let campaign = results.find(c =>
+                new Date(c.any).getFullYear() === year
+            )
+            setActiveCampaign(campaign.id);
+        });
+    }, [])
 
 
+    useEffect(() => {
+        loadLazyData();
         setDeleteFlag(false);
     }, [lazyState, deleteFlag, activeCampaign]);
 
     const loadLazyData = () => {
-        const apiFilter = {
+        let apiFilter = {
             pageNum: lazyState.page,
             pageSize: lazyState.rows,
             campanyaActiva: activeCampaign
         };
+
         gestorfutbolService.getMembers(apiFilter).then((data) => {
             setTotalRecords(data.data.total);
             let results = data.data.result;
@@ -355,6 +389,7 @@ const MembersPage = ({props}) => {
         <div className="container p-2 p-xl-4">
             <ConfirmPopup/>
             <PageTitle props={{title: `${t("t.members")}`}}></PageTitle>
+            <TabMenuComponent props={tabMenu}></TabMenuComponent>
             <div className="row gap-3 justify-content-center justify-content-xl-end">
                 <BasicButton props={newButton}></BasicButton>
                 {/*           <BasicButton props={editButton}></BasicButton>*/}

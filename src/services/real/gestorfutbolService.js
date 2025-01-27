@@ -2,6 +2,12 @@ import axios from "axios";
 import opcionsPagament from '../mock/opcionsPagament.json';
 
 export const gestorfutbolService = {
+
+    getAllCampaigns() {
+        var response = axios.get(process.env.REACT_APP_URL_BACK + "/campanyas");
+        return response;
+    },
+
     getCampaigns(filter) {
         const axiosConfig = {
             headers: {
@@ -11,11 +17,6 @@ export const gestorfutbolService = {
         }
 
         var response = axios.post(process.env.REACT_APP_URL_BACK + "/campanyas", JSON.stringify(filter), axiosConfig);
-        return response;
-    },
-
-    getActiveCampaign() {
-        var response = axios.get(process.env.REACT_APP_URL_BACK + "/campanya-activa");
         return response;
     },
 

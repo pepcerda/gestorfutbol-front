@@ -4,12 +4,12 @@ import opcionsPagament from './opcionsPagament.json';
 import sponsors from './sponsors.json';
 
 export const gestorfutbolService = {
-    getCampaigns(apiFilter) {
+    getAllCampaigns() {
         return Promise.resolve(campaign);
     },
 
-    getActiveCampaign() {
-
+    getCampaigns(apiFilter) {
+        return Promise.resolve(campaign);
     },
 
     newCampaign(campaign) {
