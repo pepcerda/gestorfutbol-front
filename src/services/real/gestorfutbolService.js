@@ -82,7 +82,7 @@ export const gestorfutbolService = {
         return response;
     },
 
-    newSponsor(sponsor) {
+    saveSponsor(sponsor) {
         const axiosConfig = {
             headers: {
                 'Accept': 'application/json',

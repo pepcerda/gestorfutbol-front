@@ -259,19 +259,23 @@ const MembersPage = ({props}) => {
         gestorfutbolService.getAllCampaigns().then((data) => {
             results = data.data;
             setCampaigns(results);
-        }).then(() => {
-            setTabMenuItems(results.map(r => {
+        })
+    }, [])
+
+    useEffect(() => {
+        if(campaigns !== null) {
+            setTabMenuItems(campaigns.map(r => {
                     return {label: r.titol}
                 }
             ))
-        }).then(() => {
             let year = new Date().getFullYear();
-            let campaign = results.find(c =>
+            let campaign = campaigns.find(c =>
                 new Date(c.any).getFullYear() === year
             )
             setActiveCampaign(campaign.id);
-        });
-    }, [])
+        }
+
+    }, [campaigns])
 
 
     useEffect(() => {

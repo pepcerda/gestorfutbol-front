@@ -1,5 +1,5 @@
 import './sponsorspage.css';
-import {gestorfutbolService} from "../../services/mock/gestorfutbolService";
+import {gestorfutbolService} from "../../services/real/gestorfutbolService";
 import {createContext, useContext, useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {ConfirmPopup, confirmPopup} from "primereact/confirmpopup";
@@ -12,6 +12,7 @@ import FormInputText from "../../components/forminputtext/forminputtext";
 import FormCalendar from "../../components/formcalendar/formcalendar";
 import FormInputNumber from "../../components/forminputnumber/forminputnumber";
 import moment from "moment";
+import TabMenuComponent from "../../components/tabmenucomponent/tabmenucomponent";
 
 const SponsorContext = createContext();
 
@@ -108,20 +109,24 @@ const SponsorDataForm = ({props}) => {
 };
 
 const SponsorsPage = ({props}) => {
+
+
+    const [sponsors, setSponsors] = useState([]);
+    const {t, i18n} = useTranslation("common");
+    const [totalRecords, setTotalRecords] = useState(0);
+    const [captureDialog, setCaptureDialog] = useState(false);
+    const [deleteFlag, setDeleteFlag] = useState(false);
+    const [campaigns, setCampaigns] = useState(null);
+    const [activeCampaign, setActiveCampaign] = useState(null);
     let emptySponsor = {
         id: 0,
         cif: "",
         nom: "",
         donacio: 0,
-        dataDonacio: new Date()
+        dataDonacio: new Date(),
+        campanya: activeCampaign
     };
-
-    const [sponsors, setSponsors] = useState([]);
     const [selectedSponsor, setSelectedSponsor] = useState(emptySponsor);
-    const {t, i18n} = useTranslation("common");
-    const [totalRecords, setTotalRecords] = useState(0);
-    const [captureDialog, setCaptureDialog] = useState(false);
-    const [deleteFlag, setDeleteFlag] = useState(false);
     const [lazyState, setlazyState] = useState({
         first: 0,
         rows: 10,
@@ -129,6 +134,20 @@ const SponsorsPage = ({props}) => {
         sortOrder: null,
         sortField: null,
     });
+
+    const [activeIndex, setActiveIndex] = useState(0)
+    const [tabMenuItems, setTabMenuItems] = useState(null);
+
+    const tabMenu = {
+        model: tabMenuItems,
+        activeIndex: activeIndex,
+        onTabChange: (e) => {
+            setActiveIndex(e.index);
+            let result = campaigns[e.index];
+            setActiveCampaign(result.id);
+            setSelectedSponsor(emptySponsor);
+        }
+    }
 
     const tableColumns = [
         {field: "id", header: `${t("t.id")}`},
@@ -177,20 +196,43 @@ const SponsorsPage = ({props}) => {
     };
 
     useEffect(() => {
+        let results;
+        gestorfutbolService.getAllCampaigns().then((data) => {
+            results = data.data;
+            console.log(data.data.results);
+            setCampaigns(results);
+        })
+    }, [])
+
+    useEffect(() => {
+        if (campaigns !== null) {
+            setTabMenuItems(campaigns.map(r => {
+                    return {label: r.titol}
+                }
+            ))
+            let year = new Date().getFullYear();
+            let campaign = campaigns.find(c =>
+                new Date(c.any).getFullYear() === year
+            )
+            setActiveCampaign(campaign.id);
+        }
+
+    }, [campaigns])
+
+    useEffect(() => {
         loadLazyData();
         setDeleteFlag(false);
-    }, [lazyState, deleteFlag]);
+    }, [lazyState, deleteFlag, activeCampaign]);
 
     const loadLazyData = () => {
         var apiFilter = {
             pageNum: lazyState.page,
             pageSize: lazyState.rows,
+            campanyaActiva: activeCampaign
         };
-        //TODO:Llamar primero para conocer cual es la capaña que está activa
-        //gestorfutbolService.getActiveCampaign()
         gestorfutbolService.getSponsors(apiFilter).then((data) => {
             setTotalRecords(data.data.total);
-            let results = data.data.results;
+            let results = data.data.result;
             setSponsors(results);
         });
     };
@@ -231,13 +273,15 @@ const SponsorsPage = ({props}) => {
     };
 
     const saveSponsor = (data) => {
-        gestorfutbolService.newSponsor(data);
-        setCaptureDialog(false);
+        gestorfutbolService.saveSponsor(data).then(() => {
+                setCaptureDialog(false);
+                loadLazyData();
+            }
+        );
     };
 
     const hideDialog = () => {
         setCaptureDialog(false);
-        console.log(selectedSponsor);
     };
 
     const cancelFormButton = {
@@ -259,7 +303,8 @@ const SponsorsPage = ({props}) => {
             cif: selectedSponsor.cif,
             nom: selectedSponsor.nom,
             donacio: selectedSponsor.donacio,
-            dataDonacio: selectedSponsor.dataDonacio
+            dataDonacio: selectedSponsor.dataDonacio,
+            campanya: activeCampaign
         },
         enableReinitialize: true,
         validate: (data) => {
@@ -328,6 +373,7 @@ const SponsorsPage = ({props}) => {
         <div className="container p-2 p-xl-4">
             <ConfirmPopup/>
             <PageTitle props={{title: `${t("t.sponsors")}`}}></PageTitle>
+            <TabMenuComponent props={tabMenu}></TabMenuComponent>
             <div className="row gap-3 justify-content-center justify-content-xl-end">
                 <BasicButton props={newButton}></BasicButton>
                 {/*           <BasicButton props={editButton}></BasicButton>*/}
