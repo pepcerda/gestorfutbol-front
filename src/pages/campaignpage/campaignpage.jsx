@@ -27,6 +27,11 @@ const calculateCampaignYears = (year) => {
     }
 }
 
+const filterData = (data) => {
+    data.any = data.any.getFullYear();
+    return data;
+}
+
 const CampaignDataForm = ({props}) => {
     const {t, i18n} = useTranslation("common");
     const {selectedCampaign, setSelectedCampaign, formikCampaign} = useContext(CampaignContext);
@@ -62,7 +67,7 @@ const CampaignDataForm = ({props}) => {
             formikCampaign.setFieldValue('any', e.target.value);
             formikCampaign.setFieldValue('titol', `${t('t.campanya.nova')} ${calculateCampaignYears(e.target.value)}`)
         },
-        classNameError: `${isFormFieldInvalid('any') ? 'formcalendar-invalid' : ''}`,
+        classNameError: `${isFormFieldInvalid('any')? 'formcalendar-invalid' : ''}`,
         labelClassName: `${isFormFieldInvalid('any') ? 'form-text-invalid' : ''}`
     };
 
@@ -144,7 +149,6 @@ const CampaignPage = ({props}) => {
     const tableColumns = [
         {field: "id", header: `${t('t.id')}`},
         {field: "titol", header: `${t('t.title')}`},
-        {field: "any", header: `${t('t.year')}`},
         {field: "importSocis", header: `${t('t.amount')}`},
         {field: "socis", header: `${t('t.members')}`}
     ];
@@ -306,6 +310,15 @@ const CampaignPage = ({props}) => {
             if (!data.importSocis) {
                 errors.importSocis = t('t.empty.field');
             }
+            if(campaigns !== null) {
+                if(campaigns.find((c) => {
+                    let any = new Date(c.any).getFullYear();
+                    return any === data.any.getFullYear();
+                }) != undefined) {
+                    errors.any = t('t.duplicate.year');
+                }
+            }
+
             return errors;
         },
         onSubmit: (data) => {
