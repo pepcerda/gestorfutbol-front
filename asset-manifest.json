@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/gestorfutbol-front/static/css/main.1c16648c.css",
-    "main.js": "/gestorfutbol-front/static/js/main.2f9dfa2c.js",
+    "main.css": "/gestorfutbol-front/static/css/main.3ccf8bae.css",
+    "main.js": "/gestorfutbol-front/static/js/main.fd0268ef.js",
     "static/js/453.513dc70b.chunk.js": "/gestorfutbol-front/static/js/453.513dc70b.chunk.js",
     "static/media/InterVariable-Italic.woff2": "/gestorfutbol-front/static/media/InterVariable-Italic.e295f70fe3e2df296c7b.woff2",
     "static/media/InterVariable.woff2": "/gestorfutbol-front/static/media/InterVariable.a0e477f2f1f9d2376fde.woff2",
@@ -12,12 +12,12 @@
     "static/media/primeicons.ttf": "/gestorfutbol-front/static/media/primeicons.ea5358601d0a3fd6670b.ttf",
     "static/media/primeicons.woff2": "/gestorfutbol-front/static/media/primeicons.78172950b335ccdb94e2.woff2",
     "index.html": "/gestorfutbol-front/index.html",
-    "main.1c16648c.css.map": "/gestorfutbol-front/static/css/main.1c16648c.css.map",
-    "main.2f9dfa2c.js.map": "/gestorfutbol-front/static/js/main.2f9dfa2c.js.map",
+    "main.3ccf8bae.css.map": "/gestorfutbol-front/static/css/main.3ccf8bae.css.map",
+    "main.fd0268ef.js.map": "/gestorfutbol-front/static/js/main.fd0268ef.js.map",
     "453.513dc70b.chunk.js.map": "/gestorfutbol-front/static/js/453.513dc70b.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.1c16648c.css",
-    "static/js/main.2f9dfa2c.js"
+    "static/css/main.3ccf8bae.css",
+    "static/js/main.fd0268ef.js"
   ]
 }
