@@ -2,6 +2,16 @@
 
 }
 
+.download-button {
+    background: none;
+    color: gray;
+    border: none;
+}
+
+.download-button:hover {
+    background: none;
+}
+
 @media (min-width: 576px) {
 
 }

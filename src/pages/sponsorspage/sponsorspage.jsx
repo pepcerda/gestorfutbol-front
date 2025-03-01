@@ -13,6 +13,7 @@ import FormCalendar from "../../components/formcalendar/formcalendar";
 import FormInputNumber from "../../components/forminputnumber/forminputnumber";
 import moment from "moment";
 import TabMenuComponent from "../../components/tabmenucomponent/tabmenucomponent";
+import { saveAs } from 'file-saver';
 
 const SponsorContext = createContext();
 
@@ -149,12 +150,29 @@ const SponsorsPage = ({props}) => {
         }
     }
 
+    const donwloadPdfButton = (id) => {
+        const props = {
+            icon: "pi pi-file",
+            onClick: () => {
+                gestorfutbolService.getReceipt(id)
+                    .then(r => {
+                       handleDownload(r.data)
+                    } )
+            },
+            className: "download-button"
+        }
+        return (
+            <BasicButton props={props}></BasicButton>
+        )
+    }
+
     const tableColumns = [
         {field: "id", header: `${t("t.id")}`},
         {field: "cif", header: `${t("t.cif")}`, editor: (options) => textEditor(options)},
         {field: "nom", header: `${t("t.name")}`, editor: (options) => textEditor(options)},
         {field: "donacio", header: `${t("t.donation")}`, editor: (options) => numberEditor(options)},
         {field: "dataDonacio", header: `${t("t.donation.date")}`, editor: (options) => calendarEditor(options)},
+        {header: `${t("t.rebut")}`, body: (rowData) => donwloadPdfButton(rowData.id)},
         {rowEditor: true}
     ];
 
@@ -223,6 +241,27 @@ const SponsorsPage = ({props}) => {
         loadLazyData();
         setDeleteFlag(false);
     }, [lazyState, deleteFlag, activeCampaign]);
+
+    const handleDownload = (base64Pdf) => {
+        try {
+            // Eliminar cualquier prefijo de la cadena Base64
+            const base64 = base64Pdf.split(',')[1] || base64Pdf;
+
+            // Convertir Base64 a Blob
+            const byteCharacters = atob(base64);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: 'application/pdf' });
+
+            // Guardar el archivo PDF
+            saveAs(blob, 'documento.pdf');
+        } catch (error) {
+            console.error('Error al decodificar la cadena Base64:', error);
+        }
+    };
 
     const loadLazyData = () => {
         var apiFilter = {

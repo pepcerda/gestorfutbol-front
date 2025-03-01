@@ -2,6 +2,15 @@
 
 }
 
+.tabmenucomponent .p-highlight a{
+    border-color: var(--main-color) !important;
+}
+
+.tabmenucomponent a {
+    color: var(--main-color) !important;
+
+}
+
 @media (min-width: 576px) {
 
 }

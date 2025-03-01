@@ -90,6 +90,12 @@ const MemberDataForm = ({props}) => {
         options: opcionsPagament,
         optionLabel: "nom",
         optionValue: "valor",
+        classNameError: `${
+            isFormFieldInvalid("estatPagament") ? "invalid-select" : ""
+        }`,
+        labelClassName: `${
+            isFormFieldInvalid("estatPagament") ? "form-text-invalid" : ""
+        }`,
     };
 
     return (

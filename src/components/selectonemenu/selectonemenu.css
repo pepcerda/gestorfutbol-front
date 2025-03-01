@@ -16,12 +16,17 @@
     padding: 0 !important;
 }
 
+.selectonemenu.p-focus{
+    border-color: var(--secondary-color) !important;
+    box-shadow: 0 0 0 .25rem var(--secondary-color) !important;
+}
+
 .invalid-select {
     border-color: var(--error-color) !important;
     border-width: 2px !important;
 }
 
-.invalid-select:focus {
+.invalid-select  {
     box-shadow: 0 0 0 .25rem var(--error-color-outline) !important;
 }
 

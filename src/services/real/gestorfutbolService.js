@@ -97,5 +97,10 @@ export const gestorfutbolService = {
     deleteSponsor(id) {
         var response = axios.delete(process.env.REACT_APP_URL_BACK + "/patrocinador/" + id);
         return response;
+    },
+
+    getReceipt(id) {
+        var response = axios.get(process.env.REACT_APP_URL_BACK + "/patrocinador/rebut/" + id);
+        return response;
     }
 }
