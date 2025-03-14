@@ -1,23 +1,23 @@
 {
   "files": {
-    "main.css": "/gestorfutbol-front/static/css/main.3ccf8bae.css",
-    "main.js": "/gestorfutbol-front/static/js/main.fd0268ef.js",
-    "static/js/453.513dc70b.chunk.js": "/gestorfutbol-front/static/js/453.513dc70b.chunk.js",
-    "static/media/InterVariable-Italic.woff2": "/gestorfutbol-front/static/media/InterVariable-Italic.e295f70fe3e2df296c7b.woff2",
-    "static/media/InterVariable.woff2": "/gestorfutbol-front/static/media/InterVariable.a0e477f2f1f9d2376fde.woff2",
-    "static/media/file.png": "/gestorfutbol-front/static/media/file.41dc5f0c9dac62a9f8ab.png",
-    "static/media/primeicons.svg": "/gestorfutbol-front/static/media/primeicons.e1441b135b3ca9ad643c.svg",
-    "static/media/primeicons.eot": "/gestorfutbol-front/static/media/primeicons.d44157bdfa026dc877af.eot",
-    "static/media/primeicons.woff": "/gestorfutbol-front/static/media/primeicons.10d3152104f2208ac82a.woff",
-    "static/media/primeicons.ttf": "/gestorfutbol-front/static/media/primeicons.ea5358601d0a3fd6670b.ttf",
-    "static/media/primeicons.woff2": "/gestorfutbol-front/static/media/primeicons.78172950b335ccdb94e2.woff2",
-    "index.html": "/gestorfutbol-front/index.html",
-    "main.3ccf8bae.css.map": "/gestorfutbol-front/static/css/main.3ccf8bae.css.map",
-    "main.fd0268ef.js.map": "/gestorfutbol-front/static/js/main.fd0268ef.js.map",
-    "453.513dc70b.chunk.js.map": "/gestorfutbol-front/static/js/453.513dc70b.chunk.js.map"
+    "main.css": "/static/css/main.718a5958.css",
+    "main.js": "/static/js/main.1b268485.js",
+    "static/js/453.ba86adc0.chunk.js": "/static/js/453.ba86adc0.chunk.js",
+    "static/media/InterVariable-Italic.woff2": "/static/media/InterVariable-Italic.e295f70fe3e2df296c7b.woff2",
+    "static/media/InterVariable.woff2": "/static/media/InterVariable.a0e477f2f1f9d2376fde.woff2",
+    "static/media/file.png": "/static/media/file.41dc5f0c9dac62a9f8ab.png",
+    "static/media/primeicons.svg": "/static/media/primeicons.e1441b135b3ca9ad643c.svg",
+    "static/media/primeicons.eot": "/static/media/primeicons.d44157bdfa026dc877af.eot",
+    "static/media/primeicons.woff": "/static/media/primeicons.10d3152104f2208ac82a.woff",
+    "static/media/primeicons.ttf": "/static/media/primeicons.ea5358601d0a3fd6670b.ttf",
+    "static/media/primeicons.woff2": "/static/media/primeicons.78172950b335ccdb94e2.woff2",
+    "index.html": "/index.html",
+    "main.718a5958.css.map": "/static/css/main.718a5958.css.map",
+    "main.1b268485.js.map": "/static/js/main.1b268485.js.map",
+    "453.ba86adc0.chunk.js.map": "/static/js/453.ba86adc0.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.3ccf8bae.css",
-    "static/js/main.fd0268ef.js"
+    "static/css/main.718a5958.css",
+    "static/js/main.1b268485.js"
   ]
 }
