@@ -233,7 +233,7 @@ const CampaignPage = ({props}) => {
             pageSize: lazyState.rows,
         }
         gestorfutbolService.getCampaigns(apiFilter).then((data) => {
-            setTotalRecords(data.data.total)
+                setTotalRecords(data.data.total)
             let results = data.data.result;
             setCampaigns(results);
         });

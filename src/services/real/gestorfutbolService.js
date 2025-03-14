@@ -1,10 +1,10 @@
-import axios from "axios";
 import opcionsPagament from '../mock/opcionsPagament.json';
+import apiClient from "./apiClient";
 
 export const gestorfutbolService = {
 
     getAllCampaigns() {
-        var response = axios.get(process.env.REACT_APP_URL_BACK + "/campanyas");
+        var response = apiClient.get("/campanyas");
         return response;
     },
 
@@ -16,7 +16,7 @@ export const gestorfutbolService = {
             }
         }
 
-        var response = axios.post(process.env.REACT_APP_URL_BACK + "/campanyas", JSON.stringify(filter), axiosConfig);
+        var response = apiClient.post("/campanyas", JSON.stringify(filter), axiosConfig);
         return response;
     },
 
@@ -28,12 +28,13 @@ export const gestorfutbolService = {
             }
         }
 
-        var response = axios.post(process.env.REACT_APP_URL_BACK + "/campanya", JSON.stringify(campaign), axiosConfig);
+        var response = apiClient.post("/campanya", JSON.stringify(campaign), axiosConfig);
+        console.log(response)
         return response;
     },
 
     deleteCampaign(id) {
-        var response = axios.delete(process.env.REACT_APP_URL_BACK + "/campanya/" + id);
+        var response = apiClient.delete("/campanya/" + id);
         return response;
     },
 
@@ -45,7 +46,7 @@ export const gestorfutbolService = {
             }
         }
 
-        var response = axios.post(process.env.REACT_APP_URL_BACK + "/socis", JSON.stringify(filter), axiosConfig);
+        var response = apiClient.post("/socis", JSON.stringify(filter), axiosConfig);
         return response;
     },
 
@@ -57,12 +58,12 @@ export const gestorfutbolService = {
             }
         }
 
-        var response = axios.post(process.env.REACT_APP_URL_BACK + "/soci", JSON.stringify(member), axiosConfig);
+        var response = apiClient.post("/soci", JSON.stringify(member), axiosConfig);
         return response;
     },
 
     deleteMember(id) {
-        var response = axios.delete(process.env.REACT_APP_URL_BACK + "/soci/" + id);
+        var response = apiClient.delete("/soci/" + id);
         return response;
     },
 
@@ -78,7 +79,7 @@ export const gestorfutbolService = {
             }
         }
 
-        var response = axios.post(process.env.REACT_APP_URL_BACK + "/patrocinadors", JSON.stringify(filter), axiosConfig);
+        var response = apiClient.post("/patrocinadors", JSON.stringify(filter), axiosConfig);
         return response;
     },
 
@@ -90,17 +91,17 @@ export const gestorfutbolService = {
             }
         }
 
-        var response = axios.post(process.env.REACT_APP_URL_BACK + "/patrocinador", JSON.stringify(sponsor), axiosConfig);
+        var response = apiClient.post("/patrocinador", JSON.stringify(sponsor), axiosConfig);
         return response;
     },
 
     deleteSponsor(id) {
-        var response = axios.delete(process.env.REACT_APP_URL_BACK + "/patrocinador/" + id);
+        var response = apiClient.delete("/patrocinador/" + id);
         return response;
     },
 
     getReceipt(id) {
-        var response = axios.get(process.env.REACT_APP_URL_BACK + "/patrocinador/rebut/" + id);
+        var response = apiClient.get("/patrocinador/rebut/" + id);
         return response;
     }
 }

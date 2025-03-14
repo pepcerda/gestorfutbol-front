@@ -29,7 +29,7 @@ i18next
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-    <Router basename='/gestorfutbol-front'>
+    <Router>
         <I18nextProvider i18n={i18next}>
             <App/>
         </I18nextProvider>
