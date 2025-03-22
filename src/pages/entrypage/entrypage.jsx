@@ -34,7 +34,6 @@ const EntryPage = ({ props }) => {
         <div className="d-flex justify-content-center flex-column gap-3">
           {viewWidth <= 576 ? <></> : <Title></Title>}
           <BasicButton props={authButton}></BasicButton>
-          {process.env.NODE_ENV} + {process.env.REACT_APP_KINDE_REDIRECT_URL}
         </div>
       </div>
     </div>
