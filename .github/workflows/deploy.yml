@@ -34,4 +34,4 @@ jobs:
 
       - name: Deploy to Amazon ECS
         run: |
-          aws ecs update-service --cluster gestorfutbol --service gestorfutbol --force-new-deployment
+          aws ecs update-service --cluster gestorfutbol --service frontend --force-new-deployment
