@@ -32,7 +32,8 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-            docker build --env-file .env -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/jcerdar/gestorfutbol-frontend:latest .
+            export $(cat .env | xargs) && \
+            docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/jcerdar/gestorfutbol-frontend:latest .
             docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/jcerdar/gestorfutbol-frontend:latest
 
       - name: Deploy to Amazon ECS
