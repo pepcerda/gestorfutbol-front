@@ -12,7 +12,7 @@ const ProtectedPage = ({props}) => {
     const {t, i18n} = useTranslation("common");
 
     if (isLoading) {
-        return <div>prova{process.env.REACT_APP_KINDE_REDIRECT_URL}{t('t.loading')}</div>;
+        return <div>{t('t.loading')}</div>;
     }
 
     if (!isLoading && !isAuthenticated) {
