@@ -177,6 +177,14 @@ const MembersPage = ({props}) => {
         return <FormCheckbox props={checkBoxTaula}></FormCheckbox>;
     };
 
+    const estatPagamentBodyTemplate = (member) => {
+        let estat = opcionsPagament.find(o => {
+            return o.valor === member.estatPagament;
+        });
+
+        return estat.nom;
+    };
+
     const allowEdit = (rowData) => {
         return true;
     }
@@ -200,7 +208,7 @@ const MembersPage = ({props}) => {
             onChange: (e) => options.editorCallback(e.value),
             options: opcionsPagament,
             optionLabel: "nom",
-            optionValue: "nom",
+            optionValue: "valor",
             className: "selectonemenu-large"
         };
         return (
@@ -219,7 +227,12 @@ const MembersPage = ({props}) => {
             header: `${t("t.sponsor")}`,
             body: patrocinadorBodyTemplate,
         },
-        {field: "estatPagament", header: `${t("t.payment.state")}`, editor: (options) => opcionsEditor(options)},
+        {
+            field: "estatPagament",
+            header: `${t("t.payment.state")}`,
+            body: estatPagamentBodyTemplate,
+            editor: (options) => opcionsEditor(options)
+        },
         {rowEditor: true}
     ];
 
@@ -269,7 +282,7 @@ const MembersPage = ({props}) => {
     }, [])
 
     useEffect(() => {
-        if(campaigns !== null) {
+        if (campaigns !== null) {
             setTabMenuItems(campaigns.map(r => {
                     return {label: r.titol}
                 }
