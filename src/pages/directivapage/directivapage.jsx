@@ -51,7 +51,7 @@ const BaixaDirectivaForm = ({props}) => {
 
     return (
         <>
-            <p>Indiqui la data de baixa de l'actual directiva: </p>
+            <p>{t('t.select.termination.date')}</p>
             <div className="row">
                 <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
                     <FormCalendar props={dataBaixaProps}/>
@@ -68,7 +68,7 @@ const BaixaDirectivaForm = ({props}) => {
 
 const DirectiuDataForm = ({props}) => {
     const {t, i18n} = useTranslation("common");
-     const {formikDirectiva, rolsDirectiu} = useContext(DirectivaContext);
+    const {formikDirectiva, rolsDirectiu} = useContext(DirectivaContext);
     const [data, setData] = useState(formikDirectiva.values.directiva.directius);
 
 
@@ -95,11 +95,22 @@ const DirectiuDataForm = ({props}) => {
 
     };
 
+    let rolsProps = data.map((directiu, index) => {
+        return {
+            id: `rol-${index}`,
+            /*label: `${t('t.role')}`,*/
+            value: directiu.rol.rol,
+            className: "directiva-form-inputs",
+            disabled: true
+        }
+    })
+
     let nomProps = data.map((directiu, index) => {
         return {
             id: `nom-${index}`,
-            label: `${t("t.name")}`,
-            value: directiu.nom,
+            /*label: `${t("t.name")}`,*/
+            value: formikDirectiva.values.directiva.directius[index].nom,
+            className: "directiva-form-inputs",
             onChange: (e) => {
                 formikDirectiva.setFieldValue(`directiva.directius.${index}.nom`, e.target.value);
             },
@@ -115,8 +126,9 @@ const DirectiuDataForm = ({props}) => {
     let llinatge1Props = data.map((directiu, index) => {
         return {
             id: `llinatge1-${index}`,
-            label: `${t("t.surname1")}`,
-            value: directiu.llinatge1,
+            /*label: `${t("t.surname1")}`,*/
+            value: formikDirectiva.values.directiva.directius[index].llinatge1,
+            className: "directiva-form-inputs",
             onChange: (e) => {
                 formikDirectiva.setFieldValue(`directiva.directius.${index}.llinatge1`, e.target.value);
             },
@@ -132,8 +144,9 @@ const DirectiuDataForm = ({props}) => {
     let llinatge2Props = data.map((directiu, index) => {
         return {
             id: `llinatge2-${index}`,
-            label: `${t("t.surname2")}`,
-            value: directiu.llinatge2,
+            /*label: `${t("t.surname2")}`,*/
+            className: "directiva-form-inputs",
+            value: formikDirectiva.values.directiva.directius[index].llinatge2,
             onChange: (e) => {
                 formikDirectiva.setFieldValue(`directiva.directius.${index}.llinatge2`, e.target.value);
             }
@@ -143,8 +156,9 @@ const DirectiuDataForm = ({props}) => {
     let nifProps = data.map((directiu, index) => {
         return {
             id: `nif-${index}`,
-            label: `${t("t.nif")}`,
-            value: directiu.nif,
+            /*label: `${t("t.nif")}`,*/
+            value: formikDirectiva.values.directiva.directius[index].nif,
+            className: "directiva-form-inputs",
             onChange: (e) => {
                 formikDirectiva.setFieldValue(`directiva.directius.${index}.nif`, e.target.value);
             },
@@ -247,13 +261,33 @@ const DirectiuDataForm = ({props}) => {
                     {getFormErrorMessage('dataAlta')}
                 </div>
             </div>
-            <DataTable value={formikDirectiva.values.directiva.directius} editMode="cell" stripedRows scrollable
+            {data.map((d, idx) => {
+                return (
+                    <>
+                        {idx === 0 &&
+                        <div className="row">
+                            <div className="col-2"><span className="fw-bold">{t('t.role')}</span></div>
+                            <div className="col-2"><span className="fw-bold">{t('t.name')}</span></div>
+                            <div className="col-2"><span className="fw-bold">{t('t.surname1')}</span></div>
+                            <div className="col-2"><span className="fw-bold">{t('t.surname2')}</span></div>
+                            <div className="col-2"><span className="fw-bold">{t('t.nif')}</span></div>
+                        </div>}
+                        <div className="row my-1">
+                            <div className="col-2"><FormInputText props={rolsProps[idx]}></FormInputText></div>
+                            <div className="col-2"><FormInputText props={nomProps[idx]}></FormInputText></div>
+                            <div className="col-2"><FormInputText props={llinatge1Props[idx]}></FormInputText></div>
+                            <div className="col-2"><FormInputText props={llinatge2Props[idx]}></FormInputText></div>
+                            <div className="col-2"><FormInputText props={nifProps[idx]}></FormInputText></div>
+                        </div>
+                    </>)
+            })}
+            {/* <DataTable value={formikDirectiva.values.directiva.directius} editMode="cell" stripedRows scrollable
                        scrollHeight="55vh" className="table-component directiva-form-table">
                 {tableColumns.map(({field, header, editor, style}) => {
                     return <Column key={field} field={field} header={header} editor={editor}
                                    onCellEditComplete={onCellEditComplete} style={style}></Column>
                 })}
-            </DataTable>
+            </DataTable>*/}
             <BasicButton props={addButton}/>
         </>
     );
@@ -286,9 +320,6 @@ const DirectivaPage = ({props}) => {
     const [directiva, setDirectiva] = useState(emptyDirectiva);
 
 
-
-
-
     /********   HOOKS  ***********************/
 
     const createEmptyDirectiva = (rols) => {
@@ -312,7 +343,7 @@ const DirectivaPage = ({props}) => {
     useEffect(() => {
         gestorfutbolService.checkDirectiva()
             .then((data) => {
-                if(data.data) {
+                if (data.data) {
                     gestorfutbolService.listDirectiva()
                         .then((data) => {
                             setDirectiva(data.data);
@@ -325,32 +356,11 @@ const DirectivaPage = ({props}) => {
                             }
                             setDirectius(data.data.directius);
                         })
-                } else if(rolsDirectiu != null) {
+                } else if (rolsDirectiu != null) {
                     createEmptyDirectiva(rolsDirectiu);
                 }
             })
     }, [rolsDirectiu])
-
-/*    useEffect(() => {
-        gestorfutbolService.listDirectiva()
-            .then((data) => {
-                if (data.data.id === undefined) {
-                    let nousDirectius = [];
-                    if (rolsDirectiu != null) {
-                        createEmptyDirectiva(rolsDirectiu);
-                    }
-                } else {
-                    if (rolsDirectiu != null) {
-                        data.data.directius.forEach(d => {
-                                let rol = rolsDirectiu.find(r => r.id === d.rol);
-                                d.rol = rol.rol;
-                            }
-                        )
-                    }
-                    setDirectius(data.data.directius);
-                }
-            });
-    }, [rolsDirectiu]);*/
 
     const loadData = () => {
         gestorfutbolService.listDirectiva()
@@ -421,6 +431,7 @@ const DirectivaPage = ({props}) => {
         label: `${t('t.create.directive')}`,
         className: "rounded-border-btn",
         onClick: () => {
+            formikDirectiva.resetForm();
             setCaptureDialog(true);
         },
         type: "button"
@@ -465,7 +476,7 @@ const DirectivaPage = ({props}) => {
 
     const cancelFormButton = {
         icon: "pi pi-times",
-        className: "basicbutton-outlined me-2",
+        className: "basicbutton-outlined me-2 rounded-border-btnz",
         label: `${t("t.cancel")}`,
         type: "button",
         onClick: hideDialog,
@@ -473,7 +484,7 @@ const DirectivaPage = ({props}) => {
 
     const cancelFormBaixaButton = {
         icon: "pi pi-times",
-        className: "basicbutton-outlined me-2",
+        className: "basicbutton-outlined me-2 rounded-border-btn",
         label: `${t("t.cancel")}`,
         type: "button",
         onClick: hideDialogBaixa,
@@ -483,7 +494,14 @@ const DirectivaPage = ({props}) => {
         icon: "pi pi-check",
         label: `${t("t.save")}`,
         type: "submit",
+        className: "rounded-border-btn"
     };
+
+    const dataAltaDirectivaInput = {
+        disabled: true,
+        value: new Date(directiva.dataAlta).toLocaleDateString('es-ES'),
+        label: `${t('t.start.date')}`
+    }
 
     /********   CONFIGURACIÓ DE VARIABLES DE FORMULARI  ***********************/
 
@@ -491,7 +509,21 @@ const DirectivaPage = ({props}) => {
             initialValues: {
                 directiva: directiva
             },
-        enableReinitialize: true,
+            validate: (data) => {
+                let errors = {};
+                if(!data.directiva.dataAlta) {
+                    errors.dataAlta = t("t.empty.field");
+                }
+
+                data.directiva.directius.forEach((d, idx) => {
+                    if(!d.nom) {
+                        console.log(d)
+                        errors.directiva.directius[idx].nom = t("t.empty.field");
+                    }
+                })
+
+            },
+            enableReinitialize: true,
             onSubmit: (data) => {
                 saveDirectiva(data);
             },
@@ -509,7 +541,7 @@ const DirectivaPage = ({props}) => {
                 }
                 const dataBaixa = new Date(data.dataBaixa);
                 const dataAlta = new Date(directiva.dataAlta);
-                if(dataBaixa < dataAlta) {
+                if (dataBaixa < dataAlta) {
                     errors.dataBaixa = t('t.previous.date');
                 }
                 return errors;
@@ -538,6 +570,11 @@ const DirectivaPage = ({props}) => {
                 <>
                     <div className="row justify-content-center justify-content-xl-end">
                         <BasicButton props={modifyButton}></BasicButton>
+                    </div>
+                    <div className="row">
+                        <div className="col-3">
+                            <FormInputText props={dataAltaDirectivaInput}></FormInputText>
+                        </div>
                     </div>
                     <div className="row mt-3">
                         <DataTable value={directius} breakpoint="900px" stripedRows={true} className="table-component">

@@ -4,6 +4,10 @@
     min-width: 75vw;
 }
 
+.directiva-form-inputs {
+    max-width: 100% !important;
+}
+
 @media (min-width: 576px) {
 
 }
