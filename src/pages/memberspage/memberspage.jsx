@@ -13,6 +13,7 @@ import SelectOneMenu from "../../components/selectonemenu/selectonemenu";
 import FormInputText from "../../components/forminputtext/forminputtext";
 import {TabMenu} from "primereact/tabmenu";
 import TabMenuComponent from "../../components/tabmenucomponent/tabmenucomponent";
+import {ViewWidthContext} from "../../App";
 
 const MemberContext = createContext();
 
@@ -128,6 +129,7 @@ const MemberDataForm = ({props}) => {
 
 const MembersPage = ({props}) => {
 
+    const {viewWidth, setViewWidth} = useContext(ViewWidthContext);
     const opcionsPagament = gestorfutbolService.getOpcionsPagament();
     const [members, setMembers] = useState([]);
     const {t, i18n} = useTranslation("common");
@@ -174,7 +176,17 @@ const MembersPage = ({props}) => {
             disabled: true,
         };
 
-        return <FormCheckbox props={checkBoxTaula}></FormCheckbox>;
+        return (
+            <>
+                {viewWidth <= 900 ?
+                    (
+                        <span className="fw-bold">{t("t.sponsor")}</span>
+                    ) : (
+                        <></>
+                    )}
+                <FormCheckbox props={checkBoxTaula}></FormCheckbox>
+            </>)
+            ;
     };
 
     const estatPagamentBodyTemplate = (member) => {
@@ -182,7 +194,21 @@ const MembersPage = ({props}) => {
             return o.valor === member.estatPagament;
         });
 
-        return estat.nom;
+        if(estat != null) {
+            return (
+                <>
+                    {viewWidth <= 900 ?
+                        (
+                            <span className="fw-bold">{t("t.payment.state")}</span>
+                        ) : (
+                            <></>
+                        )
+                    }
+                    {estat.nom}
+                </>
+            );
+        }
+
     };
 
     const allowEdit = (rowData) => {
@@ -197,6 +223,17 @@ const MembersPage = ({props}) => {
         }
         return (
             <FormInputText props={textProps}/>
+        );
+    };
+
+    const checkEditor = (options) => {
+        const checkProps = {
+            value: options.value,
+            checked: options.value,
+            onChange: (e) => options.editorCallback(e.checked)
+        }
+        return (
+            <FormCheckbox props={checkProps}/>
         );
     };
 
@@ -226,6 +263,7 @@ const MembersPage = ({props}) => {
             field: "patrocinador",
             header: `${t("t.sponsor")}`,
             body: patrocinadorBodyTemplate,
+            editor: (options) => checkEditor(options)
         },
         {
             field: "estatPagament",
@@ -318,6 +356,9 @@ const MembersPage = ({props}) => {
 
     const onRowEditComplete = (e) => {
         let {newData, index} = e;
+        if(newData.patrocinador) {
+            newData.estatPagament = null;
+        }
         gestorfutbolService.saveMember(newData)
             .then(() => loadLazyData())
     };
@@ -325,6 +366,7 @@ const MembersPage = ({props}) => {
     const tableProps = {
         data: members,
         selectedData: selectedMember,
+        selectionMode: "single",
         onChangeSelectedDataEvent: (e) => {
             if (e.value != null) {
                 setSelectedMember(e.value);
@@ -346,7 +388,8 @@ const MembersPage = ({props}) => {
         sortField: lazyState.sortField,
         editMode: 'row',
         onRowEditComplete: onRowEditComplete,
-        rowEditor: true
+        rowEditor: true,
+        stripedRows: true
     };
 
     const saveMember = (data) => {

@@ -2,6 +2,7 @@ import campaign from './campaign.json';
 import members from './members.json';
 import opcionsPagament from './opcionsPagament.json';
 import sponsors from './sponsors.json';
+import apiClient from "../real/apiClient";
 
 export const gestorfutbolService = {
     getAllCampaigns() {
@@ -45,5 +46,24 @@ export const gestorfutbolService = {
 
     deleteSponsor(id) {
         console.log(id);
+    },
+
+    listRolsDirectiu() {
+        console.log(data)
+    },
+
+    getDirectius(filter) {
+        console.log(data)
+    },
+
+    saveDirectiu(directiu) {
+        console.log(data)
+    },
+
+    deleteDirectiu(id) {
+        console.log(data)
+    },
+    saveDirectiva(directiva) {
+        console.log(data)
     }
 }

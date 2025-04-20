@@ -36,13 +36,14 @@ const CampaignDataForm = ({props}) => {
     const {t, i18n} = useTranslation("common");
     const {selectedCampaign, setSelectedCampaign, formikCampaign} = useContext(CampaignContext);
 
-
     const isFormFieldInvalid = (name) => !!(formikCampaign.touched[name] && formikCampaign.errors[name]);
 
     const getFormErrorMessage = (name) => {
         return isFormFieldInvalid(name) ? <small className="form-text-invalid">{formikCampaign.errors[name]}</small> :
             <small className="form-text-invalid">&nbsp;</small>;
     }
+
+    console.log('CampaignForm rendered');
 
 
     const titleProps = {
@@ -119,7 +120,6 @@ const CampaignPage = ({props}) => {
         any: new Date(),
         importSocis: null
     }
-
 
     const {user} = useKindeAuth();
     const [campaigns, setCampaigns] = useState([]);
@@ -235,6 +235,7 @@ const CampaignPage = ({props}) => {
         gestorfutbolService.getCampaigns(apiFilter).then((data) => {
                 setTotalRecords(data.data.total)
             let results = data.data.result;
+                console.log(results);
             setCampaigns(results);
         });
     };
@@ -243,6 +244,7 @@ const CampaignPage = ({props}) => {
     const tableProps = {
         data: campaigns,
         selectedData: selectedCampaign,
+        selectionMode: "single",
         onChangeSelectedDataEvent: (e) => {
             if (e.value != null) {
                 setSelectedCampaign(e.value);
@@ -261,7 +263,8 @@ const CampaignPage = ({props}) => {
         first: lazyState.first,
         onSort: (e) => setlazyState(e),
         sortOrder: lazyState.sortOrder,
-        sortField: lazyState.sortField
+        sortField: lazyState.sortField,
+        stripedRows: true
     };
 
 
@@ -325,10 +328,6 @@ const CampaignPage = ({props}) => {
                 saveCampaign(data);
         }
     });
-
-    const header = () => {
-        return <h1>Prova</h1>
-    }
 
 
     return (

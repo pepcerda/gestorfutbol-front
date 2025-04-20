@@ -32,5 +32,15 @@
   "t.new.sponsor": "Nou patrocinador",
   "t.confirm.new.active.campaign": "Si marcau el check al donar d'alta la campanya, la campanya activa passarà a ser aquesta. Esteu segurs?",
   "t.campanya.nova": "Campanya ",
-  "t.rebut": "Rebut"
+  "t.rebut": "Rebut",
+  "t.suscribe.directive": "Actualment encara no ha creat l'organització de la directiva. Pot crear-la ara clicant al següent botó: ",
+  "t.create.directive": "Crear directiva",
+  "t.directive": "Directiva",
+  "t.start.date": "Data d'alta",
+  "t.nif": "NIF",
+  "t.role": "Rol",
+  "t.modify.directive": "Modificar directiva",
+  "t.confirm.directive.modif": "Al confirmar, es donarà de baixa la directiva anterior i li apareixerà una pantalla per donar d'alta la nova directiva. Està segur?",
+  "t.termination.date": "Data de baixa",
+  "t.previous.date": "La data de baixa no pot ser anterior a la data d'alta"
 }

@@ -27,9 +27,8 @@ export const gestorfutbolService = {
                 'Content-Type': 'application/json',
             }
         }
-
+        console.log(campaign)
         var response = apiClient.post("/campanya", JSON.stringify(campaign), axiosConfig);
-        console.log(response)
         return response;
     },
 
@@ -103,5 +102,75 @@ export const gestorfutbolService = {
     getReceipt(id) {
         var response = apiClient.get("/patrocinador/rebut/" + id);
         return response;
+    },
+
+    listRolsDirectiu() {
+        var response = apiClient.get("/rols-directius");
+        return response;
+    },
+
+    getDirectius(filter) {
+        const axiosConfig = {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        }
+
+        var response = apiClient.post("/directius", JSON.stringify(filter), axiosConfig);
+        return response;
+    },
+
+    saveDirectiu(directiu) {
+        const axiosConfig = {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        }
+
+        var response = apiClient.post("/directiu", JSON.stringify(directiu), axiosConfig);
+        return response;
+    },
+
+    deleteDirectiu(id) {
+        var response = apiClient.delete("/directiu/" + id);
+        return response;
+    },
+
+    listDirectiva() {
+        var response = apiClient.get("/directiva");
+        return response;
+    },
+
+    saveDirectiva(directiva) {
+        const axiosConfig = {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        }
+
+        var response = apiClient.post("/directiva", JSON.stringify(directiva), axiosConfig);
+        return response;
+    },
+
+    baixaDirectiva(dataBaixa) {
+        const axiosConfig = {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        }
+        console.log(dataBaixa)
+        var response = apiClient.post("/directiva-baixa", JSON.stringify(dataBaixa), axiosConfig);
+        return response;
+    },
+
+    checkDirectiva() {
+        var response = apiClient.get("/check-directiva");
+        return response;
     }
+
+
 }

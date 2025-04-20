@@ -13,7 +13,8 @@ import FormCalendar from "../../components/formcalendar/formcalendar";
 import FormInputNumber from "../../components/forminputnumber/forminputnumber";
 import moment from "moment";
 import TabMenuComponent from "../../components/tabmenucomponent/tabmenucomponent";
-import { saveAs } from 'file-saver';
+import {saveAs} from 'file-saver';
+import {Calendar} from "primereact/calendar";
 
 const SponsorContext = createContext();
 
@@ -23,6 +24,7 @@ const SponsorDataForm = ({props}) => {
         useContext(SponsorContext);
 
     const [selectCheck, setSelectedCheck] = useState(null);
+    const [fecha, setFecha] = useState(null)
 
     const isFormFieldInvalid = (name) =>
         !!(formikSponsor.touched[name] && formikSponsor.errors[name]);
@@ -156,8 +158,8 @@ const SponsorsPage = ({props}) => {
             onClick: () => {
                 gestorfutbolService.getReceipt(id)
                     .then(r => {
-                       handleDownload(r.data)
-                    } )
+                        handleDownload(r.data)
+                    })
             },
             className: "download-button"
         }
@@ -254,7 +256,7 @@ const SponsorsPage = ({props}) => {
                 byteNumbers[i] = byteCharacters.charCodeAt(i);
             }
             const byteArray = new Uint8Array(byteNumbers);
-            const blob = new Blob([byteArray], { type: 'application/pdf' });
+            const blob = new Blob([byteArray], {type: 'application/pdf'});
 
             // Guardar el archivo PDF
             saveAs(blob, 'documento.pdf');
@@ -279,7 +281,8 @@ const SponsorsPage = ({props}) => {
     const onRowEditComplete = (e) => {
         let {newData, index} = e;
         //Aquí faríem call a service, un put actualitzant dades de la fila modificada per id
-        //gestorfutbolService.editSponsor(newData);
+        gestorfutbolService.saveSponsor(newData)
+            .then(() => loadLazyData());
 
         console.log(index, newData);
     };
@@ -287,6 +290,7 @@ const SponsorsPage = ({props}) => {
     const tableProps = {
         data: sponsors,
         selectedData: selectedSponsor,
+        selectionMode: "single",
         onChangeSelectedDataEvent: (e) => {
             if (e.value != null) {
                 setSelectedSponsor(e.value);
@@ -308,7 +312,8 @@ const SponsorsPage = ({props}) => {
         sortField: lazyState.sortField,
         editMode: 'row',
         onRowEditComplete: onRowEditComplete,
-        rowEditor: true
+        rowEditor: true,
+        stripedRows: true
     };
 
     const saveSponsor = (data) => {
@@ -392,15 +397,15 @@ const SponsorsPage = ({props}) => {
 
     const calendarEditor = (options) => {
         let dateString = options.value;
-        let dateMomentObject = moment(dateString, 'DD/MM/YYYY');
+        let dateMomentObject = moment(dateString, 'YYYY-MM-DD');
         let dateObject = dateMomentObject.toDate();
 
         const calendarProps = {
             value: dateObject,
-            dateFormat: "dd/mm/yy",
+            dateFormat: "yy-mm-dd",
             view: "date",
             onChange: (e) => {
-                options.editorCallback(moment(e.target.value).format("DD/MM/YYYY").toString());
+                options.editorCallback(moment(e.target.value).format("YYYY-MM-DD").toString());
             },
         };
         return (

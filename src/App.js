@@ -10,6 +10,7 @@ import NotFoundPage from "./pages/notfoundpage/notfoundpage";
 import CampaignPage from "./pages/campaignpage/campaignpage";
 import MembersPage from './pages/memberspage/memberspage';
 import SponsorsPage from "./pages/sponsorspage/sponsorspage";
+import DirectivaPage from "./pages/directivapage/directivapage";
 
 export const ViewWidthContext = createContext();
 
@@ -38,6 +39,7 @@ function App() {
                             <Route path={"/campanya"} element={<CampaignPage/>}></Route>
                             <Route path={"/socis"} element={<MembersPage/>}></Route>
                             <Route path={"/patrocinadors"} element={<SponsorsPage/>}></Route>
+                            <Route path={"/directiva"} element={<DirectivaPage/>}></Route>
                             <Route path={"*"} element={<NotFoundPage/>}></Route>
                         </Route>
                     </Route>
