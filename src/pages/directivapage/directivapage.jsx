@@ -72,12 +72,25 @@ const DirectiuDataForm = ({props}) => {
     const [data, setData] = useState(formikDirectiva.values.directiva.directius);
 
 
-    const isFormFieldInvalid = (name) =>
-        !!(formikDirectiva.touched[name] && formikDirectiva.errors[name]);
+    const getNestedObject = (nestedObj, pathArr) => {
+        return pathArr.reduce((obj, key) => (obj && obj[key] !== undefined) ? obj[key] : undefined, nestedObj);
+    };
+
+
+    const isFormFieldInvalid = (name) => {
+        const path = name.split('.');
+        const touched = getNestedObject(formikDirectiva.touched, path);
+        const error = getNestedObject(formikDirectiva.errors, path);
+        return !!(touched && error);
+    };
+
 
     const getFormErrorMessage = (name) => {
+        const path = name.split('.');
+        const error = getNestedObject(formikDirectiva.errors, path);
+
         return isFormFieldInvalid(name) ? (
-            <small className="form-text-invalid">{formikDirectiva.errors[name]}</small>
+            <small className="form-text-invalid">{error}</small>
         ) : (
             <small className="form-text-invalid">&nbsp;</small>
         );
@@ -118,7 +131,7 @@ const DirectiuDataForm = ({props}) => {
                 isFormFieldInvalid(`directiva.directius.${index}.nom`) ? "invalid-inputtext" : ""
             }`,
             labelClassName: `${
-                isFormFieldInvalid(`directiva.directius.${index}.nom`) ? "form-text-invalid" : ""
+                    isFormFieldInvalid(`directiva.directius.${index}.nom`) ? "form-text-invalid" : ""
             }`
         }
     });
@@ -272,22 +285,15 @@ const DirectiuDataForm = ({props}) => {
                             <div className="col-2"><span className="fw-bold">{t('t.surname2')}</span></div>
                             <div className="col-2"><span className="fw-bold">{t('t.nif')}</span></div>
                         </div>}
-                        <div className="row my-1">
+                        <div className="row ">
                             <div className="col-2"><FormInputText props={rolsProps[idx]}></FormInputText></div>
-                            <div className="col-2"><FormInputText props={nomProps[idx]}></FormInputText></div>
-                            <div className="col-2"><FormInputText props={llinatge1Props[idx]}></FormInputText></div>
+                            <div className="col-2"><FormInputText props={nomProps[idx]}></FormInputText>{getFormErrorMessage(`directiva.directius.${idx}.nom`)}</div>
+                            <div className="col-2"><FormInputText props={llinatge1Props[idx]}></FormInputText>{getFormErrorMessage(`directiva.directius.${idx}.llinatge1`)}</div>
                             <div className="col-2"><FormInputText props={llinatge2Props[idx]}></FormInputText></div>
-                            <div className="col-2"><FormInputText props={nifProps[idx]}></FormInputText></div>
+                            <div className="col-2"><FormInputText props={nifProps[idx]}></FormInputText>{getFormErrorMessage(`directiva.directius.${idx}.nif`)}</div>
                         </div>
                     </>)
             })}
-            {/* <DataTable value={formikDirectiva.values.directiva.directius} editMode="cell" stripedRows scrollable
-                       scrollHeight="55vh" className="table-component directiva-form-table">
-                {tableColumns.map(({field, header, editor, style}) => {
-                    return <Column key={field} field={field} header={header} editor={editor}
-                                   onCellEditComplete={onCellEditComplete} style={style}></Column>
-                })}
-            </DataTable>*/}
             <BasicButton props={addButton}/>
         </>
     );
@@ -510,17 +516,44 @@ const DirectivaPage = ({props}) => {
                 directiva: directiva
             },
             validate: (data) => {
-                let errors = {};
+                let errors = {
+                    directiva: {
+                        directius: []
+                    }
+                };
                 if(!data.directiva.dataAlta) {
                     errors.dataAlta = t("t.empty.field");
                 }
 
                 data.directiva.directius.forEach((d, idx) => {
-                    if(!d.nom) {
-                        console.log(d)
+                    errors.directiva.directius[idx] = errors.directiva.directius[idx] || {};
+
+                    if (!d.nom) {
                         errors.directiva.directius[idx].nom = t("t.empty.field");
                     }
+                    if (!d.llinatge1) {
+                        errors.directiva.directius[idx].llinatge1 = t("t.empty.field");
+                    }
+                    if (!d.nif) {
+                        errors.directiva.directius[idx].nif = t("t.empty.field");
+                    }
+
                 })
+
+                let buid = true;
+
+                errors.directiva.directius.forEach((d, idx) => {
+                    if(!(d.nom === undefined && d.llinatge1 === undefined && d.nif === undefined)) {
+                        buid = false;
+                    }
+                })
+
+                if(buid) {
+                    errors = {};
+                    return errors;
+                } else {
+                    return errors;
+                }
 
             },
             enableReinitialize: true,
@@ -589,7 +622,7 @@ const DirectivaPage = ({props}) => {
 
             <Dialog
                 visible={captureDialog}
-                header={t("t.new.directiu").toUpperCase()}
+                header={t("t.new.directive").toUpperCase()}
                 onHide={hideDialog}
 
             >

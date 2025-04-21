@@ -43,5 +43,7 @@
   "t.confirm.directive.modif": "Al confirmar, es donarà de baixa la directiva anterior i li apareixerà una pantalla per donar d'alta la nova directiva. Està segur?",
   "t.termination.date": "Data de baixa",
   "t.previous.date": "La data de baixa no pot ser anterior a la data d'alta",
-  "t.select.termination.date": "Indiqui la data de baixa de l'actual directiva:"
+  "t.select.termination.date": "Indiqui la data de baixa de l'actual directiva:",
+  "t.empty.field": "S'ha d'emplenar el camp",
+  "t.new.directive": "Nova Directiva"
 }
