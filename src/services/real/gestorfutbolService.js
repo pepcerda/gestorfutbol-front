@@ -27,7 +27,6 @@ export const gestorfutbolService = {
                 'Content-Type': 'application/json',
             }
         }
-        console.log(campaign)
         var response = apiClient.post("/campanya", JSON.stringify(campaign), axiosConfig);
         return response;
     },
@@ -162,13 +161,17 @@ export const gestorfutbolService = {
                 'Content-Type': 'application/json',
             }
         }
-        console.log(dataBaixa)
         var response = apiClient.post("/directiva-baixa", JSON.stringify(dataBaixa), axiosConfig);
         return response;
     },
 
     checkDirectiva() {
         var response = apiClient.get("/check-directiva");
+        return response;
+    },
+
+    listHistoricDirectiva() {
+        var response = apiClient.get("/directiva-historic")
         return response;
     }
 

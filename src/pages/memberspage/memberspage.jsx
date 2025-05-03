@@ -288,7 +288,8 @@ const MembersPage = ({props}) => {
             target: event.currentTarget,
             message: `${t("t.confirm.delete")}`,
             icon: "pi pi-info-circle",
-            acceptClassName: "p-button-danger",
+            acceptClassName: "rounded-border-btn basicbutton",
+            rejectClassName: "confirm-popup-reject",
             accept,
             reject,
         });

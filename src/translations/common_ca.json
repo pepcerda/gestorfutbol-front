@@ -8,10 +8,10 @@
   "t.activa": "Activa",
   "t.members": "Socis",
   "t.confirm.delete": "Està segur que desitja eliminar aquesta fila?",
-  "t.campaigns.title": "Campanyes",
+  "t.campaigns.title": "Temporades",
   "t.home": "Inici",
-  "t.campaigns": "Campanyes",
-  "t.new.campaign": "Nova campanya",
+  "t.campaigns": "Temporada",
+  "t.new.campaign": "Nova temporada",
   "t.import": "Import Socis",
   "t.cancel": "Cancel·la",
   "t.save": "Guarda",
@@ -45,5 +45,8 @@
   "t.previous.date": "La data de baixa no pot ser anterior a la data d'alta",
   "t.select.termination.date": "Indiqui la data de baixa de l'actual directiva:",
   "t.empty.field": "S'ha d'emplenar el camp",
-  "t.new.directive": "Nova Directiva"
+  "t.new.directive": "Nova Directiva",
+  "t.withdraw.directive": "Baixa directiva",
+  "t.view.records": "Consultar historial",
+  "t.temporada.nova": "Temporada "
 }

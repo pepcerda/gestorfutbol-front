@@ -192,7 +192,8 @@ const SponsorsPage = ({props}) => {
             target: event.currentTarget,
             message: `${t("t.confirm.delete")}`,
             icon: "pi pi-info-circle",
-            acceptClassName: "p-button-danger",
+            acceptClassName: "rounded-border-btn basicbutton",
+            rejectClassName: "confirm-popup-reject",
             accept,
             reject,
         });
@@ -273,6 +274,9 @@ const SponsorsPage = ({props}) => {
         };
         gestorfutbolService.getSponsors(apiFilter).then((data) => {
             setTotalRecords(data.data.total);
+            /*data.data.result.forEach(r => {
+                r.dataDonacio = new Date(r.dataDonacio).toLocaleDateString('es-ES')
+            })*/
             let results = data.data.result;
             setSponsors(results);
         });

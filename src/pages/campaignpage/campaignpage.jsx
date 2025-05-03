@@ -43,8 +43,6 @@ const CampaignDataForm = ({props}) => {
             <small className="form-text-invalid">&nbsp;</small>;
     }
 
-    console.log('CampaignForm rendered');
-
 
     const titleProps = {
         id: "titol",
@@ -116,7 +114,7 @@ const CampaignPage = ({props}) => {
     const {t, i18n} = useTranslation("common");
 
     let emptyCampaign = {
-        titol: `${t('t.campanya.nova')} ${calculateCampaignYears()}`,
+        titol: `${t('t.temporada.nova')} ${calculateCampaignYears()}`,
         any: new Date(),
         importSocis: null
     }
@@ -136,15 +134,6 @@ const CampaignPage = ({props}) => {
         sortOrder: null,
         sortField: null
     });
-
-    const activaBodyTemplate = (campaign) => {
-        const checkBoxTaula = {
-            checked: campaign.activa,
-            disabled: true,
-        };
-
-        return <FormCheckbox props={checkBoxTaula}></FormCheckbox>;
-    }
 
     const tableColumns = [
         {field: "id", header: `${t('t.id')}`},
@@ -169,32 +158,14 @@ const CampaignPage = ({props}) => {
         confirmPopup({
             target: event.currentTarget,
             message: `${t('t.confirm.delete')}`,
+            acceptClassName: "rounded-border-btn basicbutton",
+            rejectClassName: "confirm-popup-reject",
             acceptLabel: "Sí",
             rejectLabel: "No",
             accept,
             reject
         });
     };
-
-/*    const acceptNewActiveCampaign = (data) => {
-        saveCampaign(data);
-    };
-
-    const rejectNewActiveCampaign = () => {
-    };*/
-
-/*    const confirmNewActiveCampaign = (event) => {
-        confirmDialog({
-            target: event.currentTarget,
-            message: `${t('t.confirm.new.active.campaign')}`,
-            acceptLabel: "Sí",
-            rejectLabel: "No",
-            acceptClassName: 'basicbutton',
-            rejectClassName: 'basicbutton basicbutton-outlined',
-            accept: () => acceptNewActiveCampaign(event),
-            reject: rejectNewActiveCampaign
-        });
-    };*/
 
     const deleteButton = {
         icon: "pi pi-trash",
@@ -213,15 +184,6 @@ const CampaignPage = ({props}) => {
         }
     };
 
-    /*    const editButton = {
-            icon: "pi pi-pencil",
-            className: "circular-btn",
-            disabled: selectedCampaign === null,
-            onClick: () => {
-                navigate(`/trip/${selectedProduct.id}`)
-            }
-        }*/
-
     useEffect(() => {
         loadLazyData();
         setDeleteFlag(false);
@@ -235,7 +197,6 @@ const CampaignPage = ({props}) => {
         gestorfutbolService.getCampaigns(apiFilter).then((data) => {
                 setTotalRecords(data.data.total)
             let results = data.data.result;
-                console.log(results);
             setCampaigns(results);
         });
     };
@@ -337,7 +298,6 @@ const CampaignPage = ({props}) => {
             <PageTitle props={{title: `${t('t.campaigns.title')}`}}></PageTitle>
             <div className="row gap-3 justify-content-center justify-content-xl-end">
                 <BasicButton props={newButton}></BasicButton>
-                {/*           <BasicButton props={editButton}></BasicButton>*/}
                 <BasicButton props={deleteButton}></BasicButton>
 
             </div>

@@ -32,6 +32,16 @@ a{
     flex-direction: column;
 }
 
+.confirm-popup-reject {
+    color: var(--main-color) !important;
+    border: none;
+    background: none;
+}
+
+.confirm-popup-reject:hover {
+    background: var(--light-gray-color);
+}
+
 .form-text-invalid {
     color: var(--error-color) !important;
 }

@@ -17,9 +17,96 @@ import {DataTable} from "primereact/datatable";
 import {useMountEffect} from "primereact/hooks";
 import {Messages} from "primereact/messages";
 import {create} from "axios";
+import TabMenuComponent from "../../components/tabmenucomponent/tabmenucomponent";
 
 const DirectivaContext = createContext();
 const BaixaContext = createContext();
+
+const HistoricDirectiva = ({props}) => {
+    const {t, i18n} = useTranslation("common");
+    const [directivas, setDirectivas] = useState(null);
+    const [tabMenuItems, setTabMenuItems] = useState();
+    const [activeIndex, setActiveIndex] = useState(0)
+    const [directius, setDirectius] = useState();
+    const {rolsDirectiu} = useContext(DirectivaContext);
+
+
+    useEffect(() => {
+        gestorfutbolService.listHistoricDirectiva()
+            .then((data) => {
+                data.data.forEach(dir => {
+                    dir.directius.forEach(d => {
+                        let rol = rolsDirectiu.find(r => r.id === d.rol);
+                        d.rol = rol.rol;
+                    })
+                })
+                setDirectivas(data.data);
+            })
+    }, [])
+
+    useEffect(() => {
+        if (directivas) {
+            setTabMenuItems(directivas.map(d => {
+                let tab = "Directiva: ";
+                let data = new Date(d.dataAlta);
+                return {label: tab += data.toLocaleDateString('es-ES')};
+            }));
+            setDirectius(directivas[activeIndex].directius);
+        }
+    }, [directivas])
+
+    const tabMenu = {
+        model: tabMenuItems,
+        activeIndex: activeIndex,
+        onTabChange: (e) => {
+            setActiveIndex(e.index);
+            setDirectius(directivas[e.index].directius);
+        }
+    }
+
+    const tableColumns = [
+        {
+            field: 'rol',
+            header: `${t("t.role")}`
+        },
+        {
+            field: 'nom',
+            header: `${t("t.name")}`
+        },
+        {
+            field: 'llinatge1',
+            header: `${t("t.surname1")}`
+        },
+        {
+            field: 'llinatge2',
+            header: `${t("t.surname2")}`
+        },
+        {
+            field: 'nif',
+            header: `${t("t.nif")}`
+        },
+    ]
+
+    const tableProps = {
+        data: directius,
+        columns: tableColumns,
+        breakpoint: "900px",
+        stripedRows: true
+    };
+
+
+    return (
+        <>
+            <TabMenuComponent props={tabMenu}></TabMenuComponent>
+            <DataTable value={directius} breakpoint="900px" stripedRows={true} className="table-component">
+                {tableColumns.map(({field, header}) => {
+                    return <Column key={field} field={field} header={header}></Column>
+                })}
+            </DataTable>
+        </>
+    )
+
+}
 
 const BaixaDirectivaForm = ({props}) => {
     const {t, i18n} = useTranslation("common");
@@ -131,7 +218,7 @@ const DirectiuDataForm = ({props}) => {
                 isFormFieldInvalid(`directiva.directius.${index}.nom`) ? "invalid-inputtext" : ""
             }`,
             labelClassName: `${
-                    isFormFieldInvalid(`directiva.directius.${index}.nom`) ? "form-text-invalid" : ""
+                isFormFieldInvalid(`directiva.directius.${index}.nom`) ? "form-text-invalid" : ""
             }`
         }
     });
@@ -278,19 +365,25 @@ const DirectiuDataForm = ({props}) => {
                 return (
                     <>
                         {idx === 0 &&
-                        <div className="row">
-                            <div className="col-2"><span className="fw-bold">{t('t.role')}</span></div>
-                            <div className="col-2"><span className="fw-bold">{t('t.name')}</span></div>
-                            <div className="col-2"><span className="fw-bold">{t('t.surname1')}</span></div>
-                            <div className="col-2"><span className="fw-bold">{t('t.surname2')}</span></div>
-                            <div className="col-2"><span className="fw-bold">{t('t.nif')}</span></div>
-                        </div>}
+                            <div className="row">
+                                <div className="col-2"><span className="fw-bold">{t('t.role')}</span></div>
+                                <div className="col-2"><span className="fw-bold">{t('t.name')}</span></div>
+                                <div className="col-2"><span className="fw-bold">{t('t.surname1')}</span></div>
+                                <div className="col-2"><span className="fw-bold">{t('t.surname2')}</span></div>
+                                <div className="col-2"><span className="fw-bold">{t('t.nif')}</span></div>
+                            </div>}
                         <div className="row ">
                             <div className="col-2"><FormInputText props={rolsProps[idx]}></FormInputText></div>
-                            <div className="col-2"><FormInputText props={nomProps[idx]}></FormInputText>{getFormErrorMessage(`directiva.directius.${idx}.nom`)}</div>
-                            <div className="col-2"><FormInputText props={llinatge1Props[idx]}></FormInputText>{getFormErrorMessage(`directiva.directius.${idx}.llinatge1`)}</div>
+                            <div className="col-2"><FormInputText
+                                props={nomProps[idx]}></FormInputText>{getFormErrorMessage(`directiva.directius.${idx}.nom`)}
+                            </div>
+                            <div className="col-2"><FormInputText
+                                props={llinatge1Props[idx]}></FormInputText>{getFormErrorMessage(`directiva.directius.${idx}.llinatge1`)}
+                            </div>
                             <div className="col-2"><FormInputText props={llinatge2Props[idx]}></FormInputText></div>
-                            <div className="col-2"><FormInputText props={nifProps[idx]}></FormInputText>{getFormErrorMessage(`directiva.directius.${idx}.nif`)}</div>
+                            <div className="col-2"><FormInputText
+                                props={nifProps[idx]}></FormInputText>{getFormErrorMessage(`directiva.directius.${idx}.nif`)}
+                            </div>
                         </div>
                     </>)
             })}
@@ -310,6 +403,7 @@ const DirectivaPage = ({props}) => {
     const {t, i18n} = useTranslation("common");
     const [captureDialog, setCaptureDialog] = useState(false);
     const [captureDialogBaixa, setCaptureDialogBaixa] = useState(false);
+    const [consultaDialog, setConsultaDialog] = useState(false);
     let emptyDirectiu = {
         id: null,
         nom: "",
@@ -392,6 +486,10 @@ const DirectivaPage = ({props}) => {
         setCaptureDialogBaixa(false);
     }
 
+    const hideDialogConsulta = () => {
+        setConsultaDialog(false);
+    }
+
     const saveDirectiva = (data) => {
         data.directiva.directius.forEach((d) => d.rol = d.rol.id);
         gestorfutbolService.saveDirectiva(data.directiva)
@@ -425,7 +523,10 @@ const DirectivaPage = ({props}) => {
             target: event.currentTarget,
             message: `${t("t.confirm.directive.modif")}`,
             icon: "pi pi-info-circle",
-            acceptClassName: "p-button-danger",
+            acceptClassName: "rounded-border-btn basicbutton",
+            rejectClassName: "confirm-popup-reject",
+            acceptLabel: "Sí",
+            rejectLabel: "No",
             accept,
             reject,
         });
@@ -447,6 +548,14 @@ const DirectivaPage = ({props}) => {
         label: `${t('t.modify.directive')}`,
         className: "rounded-border-btn w-40 w-xl-20",
         onClick: confirm
+    };
+
+    const viewRecordsButton = {
+        label: `${t('t.view.records')}`,
+        className: "rounded-border-btn w-40 w-xl-20",
+        onClick: () => {
+            setConsultaDialog(true);
+        }
     };
 
     const tableColumns = [
@@ -521,7 +630,7 @@ const DirectivaPage = ({props}) => {
                         directius: []
                     }
                 };
-                if(!data.directiva.dataAlta) {
+                if (!data.directiva.dataAlta) {
                     errors.dataAlta = t("t.empty.field");
                 }
 
@@ -543,12 +652,12 @@ const DirectivaPage = ({props}) => {
                 let buid = true;
 
                 errors.directiva.directius.forEach((d, idx) => {
-                    if(!(d.nom === undefined && d.llinatge1 === undefined && d.nif === undefined)) {
+                    if (!(d.nom === undefined && d.llinatge1 === undefined && d.nif === undefined)) {
                         buid = false;
                     }
                 })
 
-                if(buid) {
+                if (buid) {
                     errors = {};
                     return errors;
                 } else {
@@ -601,8 +710,9 @@ const DirectivaPage = ({props}) => {
                 </>
                 :
                 <>
-                    <div className="row justify-content-center justify-content-xl-end">
+                    <div className="row justify-content-center justify-content-xl-end gap-2">
                         <BasicButton props={modifyButton}></BasicButton>
+                        <BasicButton props={viewRecordsButton}></BasicButton>
                     </div>
                     <div className="row">
                         <div className="col-3">
@@ -639,7 +749,7 @@ const DirectivaPage = ({props}) => {
 
             <Dialog
                 visible={captureDialogBaixa}
-                header={t("t.baixa.").toUpperCase()}
+                header={t("t.withdraw.directive").toUpperCase()}
                 onHide={hideDialogBaixa}
             >
                 <form onSubmit={formikBaixa.handleSubmit}>
@@ -653,6 +763,17 @@ const DirectivaPage = ({props}) => {
                         <BasicButton props={saveFormButton}/>
                     </div>
                 </form>
+            </Dialog>
+
+            <Dialog
+                visible={consultaDialog}
+                header={t("t.view.records").toUpperCase()}
+                onHide={hideDialogConsulta}
+            >
+                <DirectivaContext.Provider value={{rolsDirectiu}}>
+                    <HistoricDirectiva></HistoricDirectiva>
+                </DirectivaContext.Provider>
+
             </Dialog>
 
 
