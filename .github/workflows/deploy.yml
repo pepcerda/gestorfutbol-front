@@ -37,14 +37,14 @@ jobs:
             docker build -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/jcerdar/gestorfutbol-frontend:latest .
             docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/jcerdar/gestorfutbol-frontend:latest
 
-#     - name: Deploy to EC2 using Docker Compose
-#       run: |
-#         ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_SSH_KEY }} ec2-user@@${{ secrets.EC2_INSTANCE_IP }} << 'EOF'
-#         cd /opt/docker
-#         docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/jcerdar/gestorfutbol-frontend:latest
-#         docker-compose stop frontend
-#         docker-compose up -d --no-deps frontend
-#         EOF
+     - name: Deploy to EC2 using Docker Compose
+       run: |
+         ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_SSH_KEY }} ec2-user@@${{ secrets.EC2_INSTANCE_IP }} << 'EOF'
+         cd /opt/docker
+         docker pull ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/jcerdar/gestorfutbol-frontend:latest
+         docker-compose stop frontend
+         docker-compose up -d --no-deps frontend
+         EOF
 
 #     - name: Deploy to Amazon ECS
 #       run: |
