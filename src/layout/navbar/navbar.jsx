@@ -153,7 +153,7 @@ const Navbar = () => {
             template: () => {
                 return (
                     <NavLink
-                        to={"/configuration"}
+                        to={"/configuracio"}
                         className="p-menuitem-link">
                         {viewWidth <= process.env.REACT_APP_XL_VW ? (
                             <>

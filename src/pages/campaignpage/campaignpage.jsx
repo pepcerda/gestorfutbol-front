@@ -64,7 +64,7 @@ const CampaignDataForm = ({props}) => {
         dateFormat: "yy",
         onChange: (e) => {
             formikCampaign.setFieldValue('any', e.target.value);
-            formikCampaign.setFieldValue('titol', `${t('t.campanya.nova')} ${calculateCampaignYears(e.target.value)}`)
+            formikCampaign.setFieldValue('titol', `${t('t.temporada.nova')} ${calculateCampaignYears(e.target.value)}`)
         },
         classNameError: `${isFormFieldInvalid('any')? 'formcalendar-invalid' : ''}`,
         labelClassName: `${isFormFieldInvalid('any') ? 'form-text-invalid' : ''}`

@@ -173,6 +173,22 @@ export const gestorfutbolService = {
     listHistoricDirectiva() {
         var response = apiClient.get("/directiva-historic")
         return response;
+    },
+
+    getConfiguration() {
+        var response = apiClient.get("/configuracio")
+        return response;
+    },
+
+    saveConfiguration(configuracio) {
+        const axiosConfig = {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        }
+        var response = apiClient.post("/configuracio", JSON.stringify(configuracio), axiosConfig);
+        return response;
     }
 
 

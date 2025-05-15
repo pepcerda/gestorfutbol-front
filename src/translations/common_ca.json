@@ -48,5 +48,7 @@
   "t.new.directive": "Nova Directiva",
   "t.withdraw.directive": "Baixa directiva",
   "t.view.records": "Consultar historial",
-  "t.temporada.nova": "Temporada "
+  "t.temporada.nova": "Temporada ",
+  "t.config.saved": "La configuració s'ha guardat correctament",
+  "t.settings": "Configuració"
 }

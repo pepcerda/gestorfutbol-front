@@ -11,6 +11,7 @@ import CampaignPage from "./pages/campaignpage/campaignpage";
 import MembersPage from './pages/memberspage/memberspage';
 import SponsorsPage from "./pages/sponsorspage/sponsorspage";
 import DirectivaPage from "./pages/directivapage/directivapage";
+import ConfigurationPage from "./pages/configurationpage/configurationpage";
 
 export const ViewWidthContext = createContext();
 
@@ -18,6 +19,7 @@ function App() {
 
     const [viewWidth, setViewWidth] = useState(window.innerWidth);
     const {t, i18n} = useTranslation("common");
+    const [color, setColor] = useState("#000000")
 
     useEffect(() => {
         function handleResize() {
@@ -26,11 +28,17 @@ function App() {
 
         window.addEventListener("resize", handleResize);
     }, [viewWidth])
+
+    useEffect(() => {
+        console.log("Entro")
+        document.documentElement.style.setProperty('--main-color', color);
+    }, [color]);
+
     return (
         <KindeProvider domain={process.env.REACT_APP_KINDE_DOMAIN} redirectUri={process.env.REACT_APP_KINDE_REDIRECT_URL}
                        clientId={process.env.REACT_APP_KINDE_CLIENT_ID} logoutUri={process.env.REACT_APP_KINDE_LOGOUT_URL}
                        isDangerouslyUseLocalStorage={process.env.NODE_ENV === 'development'}>
-            <ViewWidthContext.Provider value={{viewWidth, setViewWidth}}>
+            <ViewWidthContext.Provider value={{viewWidth, setViewWidth, color, setColor}}>
                 <Routes>
                     <Route path={"/"} element={<ProtectedPage/>}>
                         <Route path={"/"} element={<BackofficePage/>}>
@@ -40,6 +48,7 @@ function App() {
                             <Route path={"/socis"} element={<MembersPage/>}></Route>
                             <Route path={"/patrocinadors"} element={<SponsorsPage/>}></Route>
                             <Route path={"/directiva"} element={<DirectivaPage/>}></Route>
+                            <Route path={"/configuracio"} element={<ConfigurationPage/>}></Route>
                             <Route path={"*"} element={<NotFoundPage/>}></Route>
                         </Route>
                     </Route>

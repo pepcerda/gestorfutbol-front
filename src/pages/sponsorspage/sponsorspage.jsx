@@ -91,11 +91,11 @@ const SponsorDataForm = ({props}) => {
             <div className="row">
                 <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
                     <FormInputText props={cifProps}></FormInputText>
-                    {getFormErrorMessage("nom")}
+                    {getFormErrorMessage("cif")}
                 </div>
                 <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
                     <FormInputText props={nomProps}></FormInputText>
-                    {getFormErrorMessage("llinatge1")}
+                    {getFormErrorMessage("nom")}
                 </div>
                 <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
                     <FormInputNumber props={donacioProps}></FormInputNumber>
@@ -235,7 +235,11 @@ const SponsorsPage = ({props}) => {
             let campaign = campaigns.find(c =>
                 new Date(c.any).getFullYear() === year
             )
-            setActiveCampaign(campaign.id);
+            if(campaign) {
+                setActiveCampaign(campaign.id);
+            } else {
+                setActiveCampaign(campaigns[0].id);
+            }
         }
 
     }, [campaigns])

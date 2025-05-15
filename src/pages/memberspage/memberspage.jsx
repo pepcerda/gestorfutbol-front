@@ -11,7 +11,6 @@ import TableComponent from "../../components/tablecomponent/tablecomponent";
 import {Dialog} from "primereact/dialog";
 import SelectOneMenu from "../../components/selectonemenu/selectonemenu";
 import FormInputText from "../../components/forminputtext/forminputtext";
-import {TabMenu} from "primereact/tabmenu";
 import TabMenuComponent from "../../components/tabmenucomponent/tabmenucomponent";
 import {ViewWidthContext} from "../../App";
 
@@ -330,7 +329,11 @@ const MembersPage = ({props}) => {
             let campaign = campaigns.find(c =>
                 new Date(c.any).getFullYear() === year
             )
-            setActiveCampaign(campaign.id);
+            if(campaign) {
+                setActiveCampaign(campaign.id);
+            } else {
+                setActiveCampaign(campaigns[0].id);
+            }
         }
 
     }, [campaigns])
