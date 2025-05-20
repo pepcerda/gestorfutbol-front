@@ -30,7 +30,6 @@ function App() {
     }, [viewWidth])
 
     useEffect(() => {
-        console.log("Entro")
         document.documentElement.style.setProperty('--main-color', color);
     }, [color]);
 

@@ -12,6 +12,7 @@ import {Toast} from "primereact/toast";
 import {ColorPicker} from "primereact/colorpicker";
 import {ViewWidthContext} from "../../App";
 import ColorPickerInput from "../../components/colorpickerinput/colorpickerinput";
+import { FileUpload } from 'primereact/fileupload';
 
 const ConfigurationPage = ({props}) => {
 
@@ -20,7 +21,8 @@ const ConfigurationPage = ({props}) => {
         id: 0,
         nom: "",
         cif: "",
-        colorPrincipal: "#000000"
+        colorPrincipal: "#000000",
+        logoBase64: ""
     }
 
     const {t, i18n} = useTranslation("common");
@@ -74,13 +76,28 @@ const ConfigurationPage = ({props}) => {
             }).then(() => show());
     };
 
+    const customBase64Uploader = async (event) => {
+        // convert file to base64 encoded
+        console.log(event)
+        const file = event.files[0];
+        const reader = new FileReader();
+        let blob = await fetch(file.objectURL).then((r) => r.blob()); //blob:url
+        reader.readAsDataURL(blob);
+
+        reader.onloadend = function () {
+            const base64data = reader.result;
+            formikConfig.setFieldValue("logoBase64", base64data); 
+        };
+    };
+
     /********   CONFIGURACIÓ DE VARIABLES DE FORMULARI  ***********************/
 
     const formikConfig = useFormik({
             initialValues: {
                 nom: configuration.nom,
                 cif: configuration.cif,
-                colorPrincipal: configuration.colorPrincipal
+                colorPrincipal: configuration.colorPrincipal,
+                logo: configuration.logo
             },
             validate: (data) => {
 
@@ -123,8 +140,7 @@ const ConfigurationPage = ({props}) => {
         value: formikConfig.values.colorPrincipal,
         onChange: (e) => {
             formikConfig.setFieldValue("colorPrincipal", `#${e.value}`);
-        },
-        inline: true
+        }
 
     }
 
@@ -154,6 +170,9 @@ const ConfigurationPage = ({props}) => {
                     </div>
                     <div className="col-12 form-group ">
                         <ColorPickerInput props={colorPrincipalProps}></ColorPickerInput>
+                    </div>
+                    <div className="col-12 form-group">
+                        <FileUpload mode="advanced" accept="image/*" customUpload uploadHandler={customBase64Uploader} />
                     </div>
                 </div>
                 <div className="p-dialog-footer pb-0 mt-5">
