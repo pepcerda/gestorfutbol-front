@@ -1,5 +1,4 @@
 import './configurationpage.css';
-import {ConfirmPopup} from "primereact/confirmpopup";
 import BasicButton from "../../components/basicbutton/basicbutton";
 import {useFormik} from "formik";
 import {gestorfutbolService} from "../../services/real/gestorfutbolService";
@@ -7,12 +6,11 @@ import {useContext, useEffect, useRef, useState} from "react";
 import {useTranslation} from "react-i18next";
 import FormInputText from "../../components/forminputtext/forminputtext";
 import PageTitle from "../../components/pagetitle/pagetitle";
-import data from "bootstrap/js/src/dom/data";
 import {Toast} from "primereact/toast";
-import {ColorPicker} from "primereact/colorpicker";
-import {ViewWidthContext} from "../../App";
+import {ConfigContext} from "../../App";
 import ColorPickerInput from "../../components/colorpickerinput/colorpickerinput";
-import { FileUpload } from 'primereact/fileupload';
+import FileUploader from "../../components/fileuploader/fileuploader";
+import {setFavicon} from "../../hooks/faviconHook";
 
 const ConfigurationPage = ({props}) => {
 
@@ -22,13 +20,15 @@ const ConfigurationPage = ({props}) => {
         nom: "",
         cif: "",
         colorPrincipal: "#000000",
-        logoBase64: ""
+        logo: "",
+        colorFons1: "#ee4f4f",
+        colorFons2: "#e8d1d1"
     }
 
     const {t, i18n} = useTranslation("common");
     const [configuration, setConfiguration] = useState(emptyConfiguration);
     const toast = useRef(null);
-    const {color, setColor} = useContext(ViewWidthContext);
+    const {color, setColor, logo, setLogo, nom, setNom, color1, setColor1, color2, setColor2} = useContext(ConfigContext);
 
     /********   HOOKS  ***********************/
 
@@ -37,8 +37,24 @@ const ConfigurationPage = ({props}) => {
             .then(data => {
                 setConfiguration(data.data);
                 setColor(data.data.colorPrincipal);
+                setColor1(data.data.colorFons1);
+                setColor2(data.data.colorFons2);
+
+                if(data.data.logo) {
+                    setLogo(process.env.REACT_APP_URI_BACK+ data.data.logo);
+                    setFavicon(process.env.REACT_APP_URI_BACK+ data.data.logo)
+                }
+
+                if(data.data.nom) {
+                    setNom(data.data.nom);
+                    document.title = data.data.nom;
+                }
             })
     }, []);
+
+    function isImageBase64(str) {
+        return /^data:image\/[a-zA-Z]+;base64,[A-Za-z0-9+/=]+$/.test(str);
+    }
 
 
     /********   FUNCIONS D'INTERACCIÓ DEL FRONTAL  ***********************/
@@ -59,16 +75,36 @@ const ConfigurationPage = ({props}) => {
             .then(data => {
                 setConfiguration(data.data);
                 setColor(data.data.colorPrincipal);
+                setColor1(data.data.colorFons1);
+                setColor2(data.data.colorFons2);
+
+                if(data.data.logo) {
+                    setLogo(process.env.REACT_APP_URI_BACK + data.data.logo);
+                    setFavicon(process.env.REACT_APP_URI_BACK + data.data.logo);
+                };
+
+
+                if(data.data.nom) {
+                    setNom(data.data.nom);
+                    document.title = data.data.nom;
+                };
+
+
             })
     }
 
     const saveConfig = (data) => {
+
+        console.log(isImageBase64(data.logo));
+
+        if(!isImageBase64(data.logo)) {
+            data.logo = null;
+        }
+
         let config = {
             id: configuration.id,
                 ...data
         };
-
-        console.log(data);
 
         gestorfutbolService.saveConfiguration(config)
             .then(data => {
@@ -78,7 +114,6 @@ const ConfigurationPage = ({props}) => {
 
     const customBase64Uploader = async (event) => {
         // convert file to base64 encoded
-        console.log(event)
         const file = event.files[0];
         const reader = new FileReader();
         let blob = await fetch(file.objectURL).then((r) => r.blob()); //blob:url
@@ -86,7 +121,7 @@ const ConfigurationPage = ({props}) => {
 
         reader.onloadend = function () {
             const base64data = reader.result;
-            formikConfig.setFieldValue("logoBase64", base64data); 
+            formikConfig.setFieldValue("logo", base64data);
         };
     };
 
@@ -97,7 +132,9 @@ const ConfigurationPage = ({props}) => {
                 nom: configuration.nom,
                 cif: configuration.cif,
                 colorPrincipal: configuration.colorPrincipal,
-                logo: configuration.logo
+                logo: configuration.logo,
+                colorFons1: configuration.colorFons1,
+                colorFons2: configuration.colorFons2
             },
             validate: (data) => {
 
@@ -141,13 +178,41 @@ const ConfigurationPage = ({props}) => {
         onChange: (e) => {
             formikConfig.setFieldValue("colorPrincipal", `#${e.value}`);
         }
+    }
 
+    const logoUploader = {
+        id: "logo-up",
+        mode: "basic",
+        label: `${t(`t.logo`)}`,
+        customUpload: true,
+        uploadHandler: customBase64Uploader
+    }
+
+    const colorFons1Props = {
+        id: "color-1",
+        label: `${t("t.color.fons.1")}`,
+        format: "hex",
+        value: formikConfig.values.colorFons1,
+        onChange: (e) => {
+            formikConfig.setFieldValue("colorFons1", `#${e.value}`);
+        }
+    }
+
+    const colorFons2Props = {
+        id: "color-2",
+        label: `${t("t.color.fons.2")}`,
+        format: "hex",
+        value: formikConfig.values.colorFons2,
+        onChange: (e) => {
+            formikConfig.setFieldValue("colorFons2", `#${e.value}`);
+        }
     }
 
     const saveFormButton = {
         icon: "pi pi-check",
         label: `${t("t.save")}`,
         type: "submit",
+        className: "basicbutton rounded-border-btn"
     };
 
     const show = () => {
@@ -171,8 +236,20 @@ const ConfigurationPage = ({props}) => {
                     <div className="col-12 form-group ">
                         <ColorPickerInput props={colorPrincipalProps}></ColorPickerInput>
                     </div>
-                    <div className="col-12 form-group">
-                        <FileUpload mode="advanced" accept="image/*" customUpload uploadHandler={customBase64Uploader} />
+                    <div className="row">
+                        <div className="col-2 form-group">
+                            <FileUploader props={logoUploader}/>
+                        </div>
+                        <div className="col-8">
+                            <span>Logo actual: </span>
+                            {logo && <img src={logo} alt="Logo aplicación" className="img-fluid logo"/>}
+                        </div>
+                    </div>
+                    <div className="col-12 form-group mt-3">
+                        <ColorPickerInput props={colorFons1Props}></ColorPickerInput>
+                    </div>
+                    <div className="col-12 form-group ">
+                        <ColorPickerInput props={colorFons2Props}></ColorPickerInput>
                     </div>
                 </div>
                 <div className="p-dialog-footer pb-0 mt-5">

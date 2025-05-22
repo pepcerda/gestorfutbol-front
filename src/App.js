@@ -12,14 +12,37 @@ import MembersPage from './pages/memberspage/memberspage';
 import SponsorsPage from "./pages/sponsorspage/sponsorspage";
 import DirectivaPage from "./pages/directivapage/directivapage";
 import ConfigurationPage from "./pages/configurationpage/configurationpage";
+import {gestorfutbolService} from "./services/real/gestorfutbolService";
+import {setFavicon} from "./hooks/faviconHook";
 
-export const ViewWidthContext = createContext();
+export const ConfigContext = createContext();
 
 function App() {
 
     const [viewWidth, setViewWidth] = useState(window.innerWidth);
     const {t, i18n} = useTranslation("common");
-    const [color, setColor] = useState("#000000")
+    const [color, setColor] = useState("#000000");
+    const [color1, setColor1] = useState("#ee4f4f");
+    const [color2, setColor2] = useState("#e8d1d1");
+    const [logo, setLogo] = useState(null);
+    const [nom, setNom] = useState(null);
+
+    useEffect(() => {
+
+        gestorfutbolService.getConfiguracioGeneral()
+            .then((data) => {
+                if(data.data) {
+                    console.log(data.data);
+                    setLogo(process.env.REACT_APP_URI_BACK + data.data.logo);
+                    setNom(data.data.nom);
+                    document.title = data.data.nom;
+                    setFavicon(process.env.REACT_APP_URI_BACK + data.data.logo);
+                    setColor(data.data.colorPrincipal);
+                    setColor1(data.data.colorFons1);
+                    setColor2(data.data.colorFons2);
+                }
+            });
+    }, []);
 
     useEffect(() => {
         function handleResize() {
@@ -31,13 +54,14 @@ function App() {
 
     useEffect(() => {
         document.documentElement.style.setProperty('--main-color', color);
-    }, [color]);
+        document.documentElement.style.setProperty('--gradient-bg', `linear-gradient(265deg, ${color1} 12.56%, ${color2} 63.38%)`);
+    }, [color, color1, color2]);
 
     return (
         <KindeProvider domain={process.env.REACT_APP_KINDE_DOMAIN} redirectUri={process.env.REACT_APP_KINDE_REDIRECT_URL}
                        clientId={process.env.REACT_APP_KINDE_CLIENT_ID} logoutUri={process.env.REACT_APP_KINDE_LOGOUT_URL}
                        isDangerouslyUseLocalStorage={process.env.NODE_ENV === 'development'}>
-            <ViewWidthContext.Provider value={{viewWidth, setViewWidth, color, setColor}}>
+            <ConfigContext.Provider value={{viewWidth, setViewWidth, color, setColor, logo, setLogo, nom, setNom, color1, setColor1, color2, setColor2}}>
                 <Routes>
                     <Route path={"/"} element={<ProtectedPage/>}>
                         <Route path={"/"} element={<BackofficePage/>}>
@@ -52,7 +76,7 @@ function App() {
                         </Route>
                     </Route>
                 </Routes>
-            </ViewWidthContext.Provider>
+            </ConfigContext.Provider>
         </KindeProvider>
     );
 }

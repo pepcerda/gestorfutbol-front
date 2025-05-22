@@ -12,11 +12,12 @@
     --light-gray-color: rgb(241, 241, 241);
     --error-color: #a92424;
     --error-color-outline: rgba(169,36,36,.25);
+    --gradient-bg: linear-gradient(265deg, #ee4f4f 12.56%, #e8d1d1 63.38%);
 }
 
 body {
     font-family: 'Open Sans', sans-serif !important;
-    background: linear-gradient(265deg, #ee4f4f 12.56%, #e8d1d1 63.38%);
+    background: var(--gradient-bg);
 }
 
 a{

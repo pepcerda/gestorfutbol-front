@@ -2,7 +2,7 @@ import './navbar.css';
 import {NavLink, redirect} from "react-router-dom";
 import {useContext, useEffect, useState} from "react";
 import {TabMenu} from "primereact/tabmenu";
-import {ViewWidthContext} from "../../App";
+import {ConfigContext} from "../../App";
 import {Menu} from "primereact/menu";
 import {useTranslation} from "react-i18next";
 import {ColorPicker} from "primereact/colorpicker";
@@ -33,7 +33,7 @@ const HorizontalBar = ({props}) => {
 }
 
 const Sidebar = ({props}) => {
-    const {viewWidth, setViewWidth} = useContext(ViewWidthContext);
+    const {viewWidth, setViewWidth} = useContext(ConfigContext);
 
     return (
         <div className="sidenav">
@@ -44,7 +44,7 @@ const Sidebar = ({props}) => {
 
 const Navbar = () => {
 
-    const {viewWidth, setViewWidth} = useContext(ViewWidthContext);
+    const {viewWidth, setViewWidth} = useContext(ConfigContext);
     const {t, i18n} = useTranslation("common");
 
     const items = [

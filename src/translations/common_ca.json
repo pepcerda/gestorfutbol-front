@@ -51,5 +51,6 @@
   "t.temporada.nova": "Temporada ",
   "t.config.saved": "La configuració s'ha guardat correctament",
   "t.settings": "Configuració",
-  "t.color.principal": "Color principal"
+  "t.color.principal": "Color principal",
+  "t.logo": "Logo"
 }

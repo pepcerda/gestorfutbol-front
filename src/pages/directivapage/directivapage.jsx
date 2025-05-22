@@ -1,6 +1,6 @@
 import './directivapage.css';
 import React, {createContext, useContext, useEffect, useRef, useState} from "react";
-import {ViewWidthContext} from "../../App";
+import {ConfigContext} from "../../App";
 import {gestorfutbolService} from "../../services/real/gestorfutbolService";
 import {useTranslation} from "react-i18next";
 import {confirmPopup, ConfirmPopup} from "primereact/confirmpopup";
@@ -397,7 +397,7 @@ const DirectivaPage = ({props}) => {
 
     /********   OBJECTES, PROPIETATS I ESTATS  ***********************/
 
-    const {viewWidth, setViewWidth} = useContext(ViewWidthContext);
+    const {viewWidth, setViewWidth} = useContext(ConfigContext);
     const [directius, setDirectius] = useState(null);
     const [rolsDirectiu, setRolsDirectiu] = useState(null);
     const {t, i18n} = useTranslation("common");

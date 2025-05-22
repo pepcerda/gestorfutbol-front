@@ -189,6 +189,11 @@ export const gestorfutbolService = {
         }
         var response = apiClient.post("/configuracio", JSON.stringify(configuracio), axiosConfig);
         return response;
+    },
+
+    getConfiguracioGeneral() {
+        var response = apiClient.get("/config-general")
+        return response;
     }
 
 

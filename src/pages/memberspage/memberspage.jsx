@@ -12,7 +12,7 @@ import {Dialog} from "primereact/dialog";
 import SelectOneMenu from "../../components/selectonemenu/selectonemenu";
 import FormInputText from "../../components/forminputtext/forminputtext";
 import TabMenuComponent from "../../components/tabmenucomponent/tabmenucomponent";
-import {ViewWidthContext} from "../../App";
+import {ConfigContext} from "../../App";
 
 const MemberContext = createContext();
 
@@ -128,7 +128,7 @@ const MemberDataForm = ({props}) => {
 
 const MembersPage = ({props}) => {
 
-    const {viewWidth, setViewWidth} = useContext(ViewWidthContext);
+    const {viewWidth, setViewWidth} = useContext(ConfigContext);
     const opcionsPagament = gestorfutbolService.getOpcionsPagament();
     const [members, setMembers] = useState([]);
     const {t, i18n} = useTranslation("common");

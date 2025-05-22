@@ -1,15 +1,19 @@
 import './headerbar.css';
-import logo from '../../resources/file.png';
+import logoRes from '../../resources/file.png';
 import {useContext, useEffect, useState} from "react";
-import {ViewWidthContext} from "../../App";
+import {ConfigContext} from "../../App";
 import {useKindeAuth} from "@kinde-oss/kinde-auth-react";
 import {useTranslation} from "react-i18next";
 import BasicButton from "../../components/basicbutton/basicbutton";
 
 
 const Logo = () => {
+    const {logo} = useContext(ConfigContext);
+
     return (
-        <img src={logo} alt="Logo aplicación" className="img-fluid logo"/>
+        <>
+        {logo ? <img src={logo} alt="Logo aplicación" className="img-fluid logo"/> : <img src={logoRes} alt="Logo aplicación" className="img-fluid logo"/> }
+        </>
     )
 }
 
@@ -20,7 +24,7 @@ const Title = () => {
 }
 
 const UserProfile = () => {
-    const {viewWidth, setViewWidth} = useContext(ViewWidthContext);
+    const {viewWidth, setViewWidth} = useContext(ConfigContext);
     const {user, login, register, isAuthenticated, isLoading, logout, getIdToken, getUser} = useKindeAuth();
     const {t, i18n} = useTranslation("common");
 
