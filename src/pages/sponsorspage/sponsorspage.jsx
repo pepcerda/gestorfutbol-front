@@ -15,6 +15,7 @@ import moment from "moment";
 import TabMenuComponent from "../../components/tabmenucomponent/tabmenucomponent";
 import {saveAs} from 'file-saver';
 import {Calendar} from "primereact/calendar";
+import FormTextArea from "../../components/formtextarea/formtextarea";
 
 const SponsorContext = createContext();
 
@@ -85,6 +86,15 @@ const SponsorDataForm = ({props}) => {
         labelClassName: `${isFormFieldInvalid('dataDonacio') ? 'form-text-invalid' : ''}`
     };
 
+    const observacioProps = {
+        id: "observacions",
+        label: `${t("t.observacions")}`,
+        value: formikSponsor.values.observacio,
+        onChange: (e) => {
+            formikSponsor.setFieldValue("observacio", e.target.value);
+        }
+    }
+
 
     return (
         <>
@@ -105,6 +115,9 @@ const SponsorDataForm = ({props}) => {
                     <FormCalendar props={dataDonacioProps}/>
                     <br/>
                     {getFormErrorMessage('dataDonacio')}
+                </div>
+                <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
+                    <FormTextArea props={observacioProps}></FormTextArea>
                 </div>
             </div>
         </>
@@ -127,6 +140,7 @@ const SponsorsPage = ({props}) => {
         nom: "",
         donacio: 0,
         dataDonacio: new Date(),
+        observacio: "",
         campanya: activeCampaign
     };
     const [selectedSponsor, setSelectedSponsor] = useState(emptySponsor);
@@ -168,12 +182,31 @@ const SponsorsPage = ({props}) => {
         )
     }
 
+    const dataDonacioBody = (rowData) => {
+
+
+        // Crear objeto Date
+        const fecha = new Date(rowData.dataDonacio);
+
+        // Obtener día, mes y año
+        const dia = String(fecha.getDate()).padStart(2, '0');
+        const mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Los meses van de 0 a 11
+        const anio = fecha.getFullYear();
+
+        // Formatear como dd/mm/yyyy
+        const fechaFormateada = `${dia}/${mes}/${anio}`;
+
+
+        return (fechaFormateada);
+    }
+
     const tableColumns = [
         {field: "id", header: `${t("t.id")}`},
         {field: "cif", header: `${t("t.cif")}`, editor: (options) => textEditor(options)},
         {field: "nom", header: `${t("t.name")}`, editor: (options) => textEditor(options)},
         {field: "donacio", header: `${t("t.donation")}`, editor: (options) => numberEditor(options)},
-        {field: "dataDonacio", header: `${t("t.donation.date")}`, editor: (options) => calendarEditor(options)},
+        {field: "dataDonacio", header: `${t("t.donation.date")}`, editor: (options) => calendarEditor(options), body: dataDonacioBody},
+        {field: "observacio", header: `${t("t.observacions")}`},
         {header: `${t("t.rebut")}`, body: (rowData) => donwloadPdfButton(rowData.id)},
         {rowEditor: true}
     ];
@@ -235,7 +268,7 @@ const SponsorsPage = ({props}) => {
             let campaign = campaigns.find(c =>
                 new Date(c.any).getFullYear() === year
             )
-            if(campaign) {
+            if (campaign) {
                 setActiveCampaign(campaign.id);
             } else {
                 setActiveCampaign(campaigns[0].id);
@@ -356,6 +389,7 @@ const SponsorsPage = ({props}) => {
             nom: selectedSponsor.nom,
             donacio: selectedSponsor.donacio,
             dataDonacio: selectedSponsor.dataDonacio,
+            observacio: selectedSponsor.observacio,
             campanya: activeCampaign
         },
         enableReinitialize: true,
