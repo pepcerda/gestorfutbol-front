@@ -52,5 +52,9 @@
   "t.config.saved": "La configuració s'ha guardat correctament",
   "t.settings": "Configuració",
   "t.color.principal": "Color principal",
-  "t.logo": "Logo"
+  "t.logo": "Logo",
+  "t.observacions": "Observacions",
+  "t.color.fons.1": "Color Fons 1",
+  "t.color.fons.2": "Color Fons 2",
+  "t.caixa.fixa": "Caixa Fixa"
 }

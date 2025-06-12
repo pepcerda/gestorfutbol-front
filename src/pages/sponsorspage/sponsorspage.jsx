@@ -16,6 +16,8 @@ import TabMenuComponent from "../../components/tabmenucomponent/tabmenucomponent
 import {saveAs} from 'file-saver';
 import {Calendar} from "primereact/calendar";
 import FormTextArea from "../../components/formtextarea/formtextarea";
+import SelectOneMenu from "../../components/selectonemenu/selectonemenu";
+import {ConfigContext} from "../../App";
 
 const SponsorContext = createContext();
 
@@ -25,7 +27,9 @@ const SponsorDataForm = ({props}) => {
         useContext(SponsorContext);
 
     const [selectCheck, setSelectedCheck] = useState(null);
-    const [fecha, setFecha] = useState(null)
+    const [fecha, setFecha] = useState(null);
+    const opcionsPagament = gestorfutbolService.getOpcionsPagament();
+
 
     const isFormFieldInvalid = (name) =>
         !!(formikSponsor.touched[name] && formikSponsor.errors[name]);
@@ -86,6 +90,25 @@ const SponsorDataForm = ({props}) => {
         labelClassName: `${isFormFieldInvalid('dataDonacio') ? 'form-text-invalid' : ''}`
     };
 
+    const estatPagamentProps = {
+        id: "estat-pagament",
+        label: `${t("t.payment.state")}`,
+        value: formikSponsor.values.estatPagament,
+        onChange: (e) => {
+            formikSponsor.setFieldValue("estatPagament", e.value);
+        },
+        options: opcionsPagament,
+        optionLabel: "nom",
+        optionValue: "valor",
+        classNameError: `${
+            isFormFieldInvalid("estatPagament") ? "invalid-select" : ""
+        }`,
+        labelClassName: `${
+            isFormFieldInvalid("estatPagament") ? "form-text-invalid" : ""
+        }`,
+    };
+
+
     const observacioProps = {
         id: "observacions",
         label: `${t("t.observacions")}`,
@@ -93,7 +116,7 @@ const SponsorDataForm = ({props}) => {
         onChange: (e) => {
             formikSponsor.setFieldValue("observacio", e.target.value);
         }
-    }
+    };
 
 
     return (
@@ -119,6 +142,10 @@ const SponsorDataForm = ({props}) => {
                 <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
                     <FormTextArea props={observacioProps}></FormTextArea>
                 </div>
+                <div className="col-12 col-md-6 form-group text-center text-md-start mt-3">
+                    <SelectOneMenu props={estatPagamentProps}></SelectOneMenu>
+                    {getFormErrorMessage("estatPagament")}
+                </div>
             </div>
         </>
     );
@@ -126,8 +153,9 @@ const SponsorDataForm = ({props}) => {
 
 const SponsorsPage = ({props}) => {
 
-
+    const {viewWidth, setViewWidth} = useContext(ConfigContext);
     const [sponsors, setSponsors] = useState([]);
+    const opcionsPagament = gestorfutbolService.getOpcionsPagament();
     const {t, i18n} = useTranslation("common");
     const [totalRecords, setTotalRecords] = useState(0);
     const [captureDialog, setCaptureDialog] = useState(false);
@@ -141,6 +169,7 @@ const SponsorsPage = ({props}) => {
         donacio: 0,
         dataDonacio: new Date(),
         observacio: "",
+        estatPagament: null,
         campanya: activeCampaign
     };
     const [selectedSponsor, setSelectedSponsor] = useState(emptySponsor);
@@ -197,16 +226,80 @@ const SponsorsPage = ({props}) => {
         const fechaFormateada = `${dia}/${mes}/${anio}`;
 
 
-        return (fechaFormateada);
+        return (
+            <>
+                {viewWidth <= 900 ?
+                    (
+                        <span className="fw-bold">{t("t.donation.date")}</span>
+                    ) : (
+                        <></>
+                    )
+                }
+                <span>{fechaFormateada}</span>
+            </>
+        );;
     }
+
+    const dataDonacioBodyTemplate = (sponsor) => {
+
+        if (sponsor.dataDonacio != null) {
+            return (
+                <>
+                    {viewWidth <= 900 ?
+                        (
+                            <span className="fw-bold">{t("t.donation.date")}</span>
+                        ) : (
+                            <></>
+                        )
+                    }
+                    <span>{sponsor.dataDonacio}</span>
+                </>
+            );
+        }
+
+    };
+
+    const estatPagamentBodyTemplate = (sponsor) => {
+        let estat = opcionsPagament.find(o => {
+            return o.valor === sponsor.estatPagament;
+        });
+
+        if (estat != null) {
+            return (
+                <>
+                    {viewWidth <= 900 ?
+                        (
+                            <span className="fw-bold">{t("t.payment.state")}</span>
+                        ) : (
+                            <></>
+                        )
+                    }
+                    <span className={`${estat.valor === 'P' ? 'text-bg-success' : 'text-bg-danger'} px-3 py-2 rounded-pill`}>{estat.nom}</span>
+                </>
+            );
+        }
+
+    };
+
 
     const tableColumns = [
         {field: "id", header: `${t("t.id")}`},
         {field: "cif", header: `${t("t.cif")}`, editor: (options) => textEditor(options)},
         {field: "nom", header: `${t("t.name")}`, editor: (options) => textEditor(options)},
         {field: "donacio", header: `${t("t.donation")}`, editor: (options) => numberEditor(options)},
-        {field: "dataDonacio", header: `${t("t.donation.date")}`, editor: (options) => calendarEditor(options), body: dataDonacioBody},
+        {
+            field: "dataDonacio",
+            header: `${t("t.donation.date")}`,
+            editor: (options) => calendarEditor(options),
+            body: dataDonacioBody
+        },
         {field: "observacio", header: `${t("t.observacions")}`},
+        {
+            field: "estatPagament",
+            header: `${t("t.payment.state")}`,
+            body: estatPagamentBodyTemplate,
+            editor: (options) => opcionsEditor(options)
+        },
         {header: `${t("t.rebut")}`, body: (rowData) => donwloadPdfButton(rowData.id)},
         {rowEditor: true}
     ];
@@ -341,6 +434,7 @@ const SponsorsPage = ({props}) => {
             setSelectedSponsor(emptySponsor);
         },
         columns: tableColumns,
+        paginator: true,
         rows: lazyState.rows,
         rowsPerPageOptions: [5, 10, 25, 50],
         breakpoint: "900px",
@@ -390,6 +484,7 @@ const SponsorsPage = ({props}) => {
             donacio: selectedSponsor.donacio,
             dataDonacio: selectedSponsor.dataDonacio,
             observacio: selectedSponsor.observacio,
+            estatPagament: selectedSponsor.estatPagament,
             campanya: activeCampaign
         },
         enableReinitialize: true,
@@ -406,6 +501,9 @@ const SponsorsPage = ({props}) => {
             }
             if (!data.dataDonacio) {
                 errors.dataDonacio = t("t.empty.field");
+            }
+            if (!data.estatPagament) {
+                errors.estatPagament = t("t.empty.field");
             }
             return errors;
         },
@@ -454,6 +552,24 @@ const SponsorsPage = ({props}) => {
             <FormCalendar props={calendarProps}/>
         );
     };
+
+    const opcionsEditor = (options) => {
+
+        const optionsProps = {
+            id: "estatPagament_editor",
+            value: options.rowData.estatPagament,
+            onChange: (e) => options.editorCallback(e.value),
+            options: opcionsPagament,
+            optionLabel: "nom",
+            optionValue: "valor",
+            className: "selectonemenu-large"
+        };
+        return (
+            !options.rowData.patrocinador ? <SelectOneMenu props={optionsProps}/> : <></>
+
+        );
+    };
+
 
     return (
         <div className="container p-2 p-xl-4">

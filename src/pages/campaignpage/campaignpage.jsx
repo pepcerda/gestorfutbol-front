@@ -225,7 +225,8 @@ const CampaignPage = ({props}) => {
         onSort: (e) => setlazyState(e),
         sortOrder: lazyState.sortOrder,
         sortField: lazyState.sortField,
-        stripedRows: true
+        stripedRows: true,
+        paginator: true
     };
 
 

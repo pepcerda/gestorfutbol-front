@@ -14,6 +14,7 @@ import DirectivaPage from "./pages/directivapage/directivapage";
 import ConfigurationPage from "./pages/configurationpage/configurationpage";
 import {gestorfutbolService} from "./services/real/gestorfutbolService";
 import {setFavicon} from "./hooks/faviconHook";
+import CaixaFixaPage from "./pages/caixafixapage/caixafixapage";
 
 export const ConfigContext = createContext();
 
@@ -72,6 +73,7 @@ function App() {
                             <Route path={"/patrocinadors"} element={<SponsorsPage/>}></Route>
                             <Route path={"/directiva"} element={<DirectivaPage/>}></Route>
                             <Route path={"/configuracio"} element={<ConfigurationPage/>}></Route>
+                            <Route path={"/factures"} element={<CaixaFixaPage/>}></Route>
                             <Route path={"*"} element={<NotFoundPage/>}></Route>
                         </Route>
                     </Route>

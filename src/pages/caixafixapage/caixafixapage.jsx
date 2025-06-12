@@ -1,152 +1,44 @@
-import "./memberspage.css";
-import {useTranslation} from "react-i18next";
-import {createContext, useContext, useEffect, useState} from "react";
-import FormCheckbox from "../../components/formcheckbox/formcheckbox";
+import './caixafixapage.css';
+import {useContext, useEffect, useState} from "@types/react";
+import {ConfigContext} from "../../App";
 import {gestorfutbolService} from "../../services/real/gestorfutbolService";
+import {useTranslation} from "react-i18next";
+import FormCheckbox from "../../components/formcheckbox/formcheckbox";
+import FormInputText from "../../components/forminputtext/forminputtext";
+import SelectOneMenu from "../../components/selectonemenu/selectonemenu";
 import {ConfirmPopup, confirmPopup} from "primereact/confirmpopup";
 import {useFormik} from "formik";
 import PageTitle from "../../components/pagetitle/pagetitle";
+import TabMenuComponent from "../../components/tabmenucomponent/tabmenucomponent";
 import BasicButton from "../../components/basicbutton/basicbutton";
 import TableComponent from "../../components/tablecomponent/tablecomponent";
 import {Dialog} from "primereact/dialog";
-import SelectOneMenu from "../../components/selectonemenu/selectonemenu";
-import FormInputText from "../../components/forminputtext/forminputtext";
-import TabMenuComponent from "../../components/tabmenucomponent/tabmenucomponent";
-import {ConfigContext} from "../../App";
 
-const MemberContext = createContext();
 
-const MemberDataForm = ({props}) => {
-    const {t, i18n} = useTranslation("common");
-    const {selectedMember, setSelectedMember, formikMember} =
-        useContext(MemberContext);
 
-    const [selectCheck, setSelectedCheck] = useState(null);
-    const opcionsPagament = gestorfutbolService.getOpcionsPagament();
-
-    const isFormFieldInvalid = (name) =>
-        !!(formikMember.touched[name] && formikMember.errors[name]);
-
-    const getFormErrorMessage = (name) => {
-        return isFormFieldInvalid(name) ? (
-            <small className="form-text-invalid">{formikMember.errors[name]}</small>
-        ) : (
-            <small className="form-text-invalid">&nbsp;</small>
-        );
-    };
-
-    const nomProps = {
-        id: "nom",
-        label: `${t("t.name")}`,
-        value: formikMember.values.nom,
-        onChange: (e) => {
-            formikMember.setFieldValue("nom", e.target.value);
-        },
-        classNameError: `${isFormFieldInvalid("nom") ? "invalid-inputtext" : ""}`,
-        labelClassName: `${isFormFieldInvalid("nom") ? "form-text-invalid" : ""}`,
-    };
-
-    const llinatge1Props = {
-        id: "llinatge1",
-        label: `${t("t.surname1")}`,
-        value: formikMember.values.llinatge1,
-        onChange: (e) => {
-            formikMember.setFieldValue("llinatge1", e.target.value);
-        },
-        classNameError: `${
-            isFormFieldInvalid("llinatge1") ? "invalid-inputtext" : ""
-        }`,
-        labelClassName: `${
-            isFormFieldInvalid("llinatge1") ? "form-text-invalid" : ""
-        }`,
-    };
-
-    const llinatge2Props = {
-        id: "llinatge2",
-        label: `${t("t.surname2")}`,
-        value: formikMember.values.llinatge2,
-        onChange: (e) => {
-            formikMember.setFieldValue("llinatge2", e.target.value);
-        },
-    };
-
-    const patrocinadorProps = {
-        id: "patrocinador",
-        label: `${t("t.sponsor")}`,
-        value: formikMember.values.patrocinador,
-        checked: formikMember.values.patrocinador,
-        onChange: (e) => {
-            formikMember.setFieldValue("patrocinador", e.checked);
-        },
-    };
-
-    const estatPagamentProps = {
-        id: "estat-pagament",
-        label: `${t("t.payment.state")}`,
-        value: formikMember.values.estatPagament,
-        onChange: (e) => {
-            formikMember.setFieldValue("estatPagament", e.value);
-        },
-        options: opcionsPagament,
-        optionLabel: "nom",
-        optionValue: "valor",
-        classNameError: `${
-            isFormFieldInvalid("estatPagament") ? "invalid-select" : ""
-        }`,
-        labelClassName: `${
-            isFormFieldInvalid("estatPagament") ? "form-text-invalid" : ""
-        }`,
-    };
-
-    return (
-        <>
-            <div className="row">
-                <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
-                    <FormInputText props={nomProps}></FormInputText>
-                    {getFormErrorMessage("nom")}
-                </div>
-                <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
-                    <FormInputText props={llinatge1Props}></FormInputText>
-                    {getFormErrorMessage("llinatge1")}
-                </div>
-                <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
-                    <FormInputText props={llinatge2Props}></FormInputText>
-                </div>
-                <div
-                    className="col-12 col-md-6 form-group d-flex align-items-center align-items-md-start flex-column mt-3">
-                    <FormCheckbox props={patrocinadorProps}></FormCheckbox>
-                </div>
-                {!formikMember.values.patrocinador ?
-                    <div className="col-12 col-md-6 form-group text-center text-md-start mt-3">
-                        <SelectOneMenu props={estatPagamentProps}></SelectOneMenu>
-                        {getFormErrorMessage("estatPagament")}
-                    </div> : <></>}
-            </div>
-        </>
-    );
-};
-
-const MembersPage = ({props}) => {
+/*const CaixaFixaPage = ({props})=> {
 
     const {viewWidth, setViewWidth} = useContext(ConfigContext);
     const opcionsPagament = gestorfutbolService.getOpcionsPagament();
-    const [members, setMembers] = useState([]);
+    const [factures, setFactures] = useState([]);
     const {t, i18n} = useTranslation("common");
     const [totalRecords, setTotalRecords] = useState(0);
     const [captureDialog, setCaptureDialog] = useState(false);
     const [deleteFlag, setDeleteFlag] = useState(false);
     const [campaigns, setCampaigns] = useState(null);
     const [activeCampaign, setActiveCampaign] = useState(null);
-    let emptyMember = {
+    let emptyFactura = {
         id: null,
         nom: "",
         llinatge1: "",
         llinatge2: "",
-        patrocinador: false,
-        estatPagament: null,
+        despesa: 0,
+        observacio: "",
+        factura: "",
+        estat: null,
         campanya: activeCampaign
     };
-    const [selectedMember, setSelectedMember] = useState(emptyMember);
+    const [selectedFactura, setSelectedFactura] = useState(emptyFactura);
     const [lazyState, setlazyState] = useState({
         first: 0,
         rows: 10,
@@ -165,32 +57,13 @@ const MembersPage = ({props}) => {
             setActiveIndex(e.index);
             let result = campaigns[e.index];
             setActiveCampaign(result.id);
-            setSelectedMember(emptyMember);
+            setSelectedFactura(emptyFactura);
         }
     }
 
-    const patrocinadorBodyTemplate = (member) => {
-        const checkBoxTaula = {
-            checked: member.patrocinador,
-            disabled: true,
-        };
-
-        return (
-            <>
-                {viewWidth <= 900 ?
-                    (
-                        <span className="fw-bold">{t("t.sponsor")}</span>
-                    ) : (
-                        <></>
-                    )}
-                <FormCheckbox props={checkBoxTaula}></FormCheckbox>
-            </>)
-            ;
-    };
-
-    const estatPagamentBodyTemplate = (member) => {
+    const estatPagamentBodyTemplate = (factura) => {
         let estat = opcionsPagament.find(o => {
-            return o.valor === member.estatPagament;
+            return o.valor === factura.estat;
         });
 
         if(estat != null) {
@@ -222,6 +95,17 @@ const MembersPage = ({props}) => {
         }
         return (
             <FormInputText props={textProps}/>
+        );
+    };
+
+    const numberEditor = (options) => {
+        const numberProps = {
+            value: options.value,
+            keyfilter: "int",
+            onChange: (e) => options.editorCallback(e.target.value)
+        }
+        return (
+            <FormInputText props={numberProps}/>
         );
     };
 
@@ -258,14 +142,10 @@ const MembersPage = ({props}) => {
         {field: "nom", header: `${t("t.name")}`, editor: (options) => textEditor(options)},
         {field: "llinatge1", header: `${t("t.surname1")}`, editor: (options) => textEditor(options)},
         {field: "llinatge2", header: `${t("t.surname2")}`, editor: (options) => textEditor(options)},
+        {field: "despesa", header: `${t("t.despesa")}`, editor: (options) => numberEditor(options)},
+        {field: "observacio", header: `${t("t.observacions")}`},
         {
-            field: "patrocinador",
-            header: `${t("t.sponsor")}`,
-            body: patrocinadorBodyTemplate,
-            editor: (options) => checkEditor(options)
-        },
-        {
-            field: "estatPagament",
+            field: "estat",
             header: `${t("t.payment.state")}`,
             body: estatPagamentBodyTemplate,
             editor: (options) => opcionsEditor(options)
@@ -463,7 +343,7 @@ const MembersPage = ({props}) => {
             <TabMenuComponent props={tabMenu}></TabMenuComponent>
             <div className="row gap-3 justify-content-center justify-content-xl-end">
                 <BasicButton props={newButton}></BasicButton>
-                {/*           <BasicButton props={editButton}></BasicButton>*/}
+                {/!*           <BasicButton props={editButton}></BasicButton>*!/}
                 <BasicButton props={deleteButton}></BasicButton>
             </div>
             <div className="row mt-3">
@@ -488,6 +368,12 @@ const MembersPage = ({props}) => {
             </Dialog>
         </div>
     );
-};
+}*/
 
-export default MembersPage;
+const CaixaFixaPage = ({props}) => {
+    return (
+        <div>CAixaFixaPage</div>
+    )
+}
+
+export default CaixaFixaPage;

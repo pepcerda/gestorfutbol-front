@@ -153,6 +153,26 @@ const Navbar = () => {
             template: () => {
                 return (
                     <NavLink
+                        to={"/factures"}
+                        className="p-menuitem-link">
+                        {viewWidth <= process.env.REACT_APP_XL_VW ? (
+                            <>
+                                <i className="pi pi-money-bill"></i>
+                            </>) : (
+                            <>
+                                <span className="p-menuitem-icon pi pi-fw pi-money-bill fs-2"></span>
+                                <span className="p-menuitem-text">{t("t.caixa.fixa")}</span>
+                            </>)}
+
+                    </NavLink>
+                );
+            },
+        },
+        {
+            className: "sidenav-item ",
+            template: () => {
+                return (
+                    <NavLink
                         to={"/configuracio"}
                         className="p-menuitem-link">
                         {viewWidth <= process.env.REACT_APP_XL_VW ? (
