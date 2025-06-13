@@ -1,5 +1,4 @@
 import './caixafixapage.css';
-import {useContext, useEffect, useState} from "@types/react";
 import {ConfigContext} from "../../App";
 import {gestorfutbolService} from "../../services/real/gestorfutbolService";
 import {useTranslation} from "react-i18next";
