@@ -254,7 +254,8 @@ const CampaignPage = ({props}) => {
     const saveFormButton = {
         icon: "pi pi-check",
         label: `${t('t.save')}`,
-        type: "submit"
+        type: "submit",
+        className: "p-2 rounded-2"
     }
 
     const formikCampaign = useFormik({

@@ -330,7 +330,9 @@ const MembersPage = ({props}) => {
                 new Date(c.any).getFullYear() === year
             )
             if(campaign) {
+                let index = campaigns.findIndex(c => c.id === campaign.id);
                 setActiveCampaign(campaign.id);
+                setActiveIndex(index);
             } else {
                 setActiveCampaign(campaigns[0].id);
             }
@@ -422,6 +424,7 @@ const MembersPage = ({props}) => {
         icon: "pi pi-check",
         label: `${t("t.save")}`,
         type: "submit",
+        className: "p-2 rounded-2"
     };
 
     const formikMember = useFormik({
