@@ -56,5 +56,9 @@
   "t.observacions": "Observacions",
   "t.color.fons.1": "Color Fons 1",
   "t.color.fons.2": "Color Fons 2",
-  "t.caixa.fixa": "Caixa Fixa"
+  "t.caixa.fixa": "Caixa Fixa",
+  "t.despesa": "Despesa",
+  "t.factura": "Factura",
+  "t.factures": "Factures",
+  "t.document": "Document"
 }

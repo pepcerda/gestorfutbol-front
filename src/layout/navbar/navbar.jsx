@@ -17,7 +17,7 @@ const HorizontalBar = ({props}) => {
     useEffect(() => {
         const eliminateAriaSelected = () => {
             const attributes = document.getElementsByClassName("sidenav-item");
-            for(var i = 0; i < attributes.length; i ++) {
+            for (var i = 0; i < attributes.length; i++) {
                 attributes.item(i).classList.remove("p-highlight");
             }
         }
@@ -53,19 +53,9 @@ const Navbar = () => {
 
             template: () => {
                 return (
-                    <NavLink
-                        to={"/home"}
-                        className="p-menuitem-link"
-                        >
-                        {viewWidth <= process.env.REACT_APP_XL_VW ? (
-                            <>
-                                <i className="pi pi-home"></i>
-                            </>
-                        ) : (
-                            <>
-                                <span className="p-menuitem-icon pi pi-fw pi-home fs-2"></span>
-                                <span className="p-menuitem-text">{t("t.home")}</span>
-                            </>)}
+                    <NavLink to={"/home"} className="p-menuitem-link">
+                        <span className="p-menuitem-icon pi pi-fw pi-home fs-2"></span>
+                        <span className="p-menuitem-text">{t("t.home")}</span>
                     </NavLink>
                 );
             },
@@ -74,16 +64,9 @@ const Navbar = () => {
             className: "sidenav-item ",
             template: () => {
                 return (
-                    <NavLink
-                        to={"/campanya"}
-                        className="p-menuitem-link">
-                        {viewWidth <= process.env.REACT_APP_XL_VW ? (<>
-                            <i className="pi pi-book"></i>
-                        </>) : (
-                            <>
-                                <span className="p-menuitem-icon pi pi-fw pi-book fs-2"></span>
-                                <span className="p-menuitem-text">{t("t.campaigns")}</span>
-                            </>)}
+                    <NavLink to={"/campanya"} className="p-menuitem-link">
+                        <span className="p-menuitem-icon pi pi-fw pi-book fs-2"></span>
+                        <span className="p-menuitem-text">{t("t.campaigns")}</span>
                     </NavLink>
                 );
             },
@@ -92,18 +75,9 @@ const Navbar = () => {
             className: "sidenav-item ",
             template: () => {
                 return (
-                    <NavLink
-                        to={"/socis"}
-                        className="p-menuitem-link">
-                        {viewWidth <= process.env.REACT_APP_XL_VW ? (
-                            <>
-                                <i className="pi pi-users"></i>
-                            </>
-                        ) : (
-                            <>
-                                <span className="p-menuitem-icon pi pi-fw pi-users fs-2"></span>
-                                <span className="p-menuitem-text">{t("t.members")}</span>
-                            </>)}
+                    <NavLink to={"/socis"} className="p-menuitem-link">
+                        <span className="p-menuitem-icon pi pi-fw pi-users fs-2"></span>
+                        <span className="p-menuitem-text">{t("t.members")}</span>
                     </NavLink>
                 );
             },
@@ -112,18 +86,9 @@ const Navbar = () => {
             className: "sidenav-item ",
             template: () => {
                 return (
-                    <NavLink
-                        to={"/patrocinadors"}
-                        className="p-menuitem-link">
-                        {viewWidth <= process.env.REACT_APP_XL_VW ? (
-                            <>
-                                <i className="pi pi-calendar"></i>
-                            </>) : (
-                            <>
-                                <span className="p-menuitem-icon pi pi-fw pi-wallet fs-2"></span>
-                                <span className="p-menuitem-text">{t("t.sponsors")}</span>
-                            </>)}
-
+                    <NavLink to={"/patrocinadors"} className="p-menuitem-link">
+                        <span className="p-menuitem-icon pi pi-fw pi-wallet fs-2"></span>
+                        <span className="p-menuitem-text">{t("t.sponsors")}</span>
                     </NavLink>
                 );
             },
@@ -132,18 +97,9 @@ const Navbar = () => {
             className: "sidenav-item ",
             template: () => {
                 return (
-                    <NavLink
-                        to={"/directiva"}
-                        className="p-menuitem-link">
-                        {viewWidth <= process.env.REACT_APP_XL_VW ? (
-                            <>
-                                <i className="pi pi-users"></i>
-                            </>) : (
-                            <>
-                                <span className="p-menuitem-icon pi pi-fw pi-users fs-2"></span>
-                                <span className="p-menuitem-text">{t("t.directive")}</span>
-                            </>)}
-
+                    <NavLink to={"/directiva"} className="p-menuitem-link">
+                        <span className="p-menuitem-icon pi pi-fw pi-users fs-2"></span>
+                        <span className="p-menuitem-text">{t("t.directive")}</span>
                     </NavLink>
                 );
             },
@@ -152,18 +108,9 @@ const Navbar = () => {
             className: "sidenav-item ",
             template: () => {
                 return (
-                    <NavLink
-                        to={"/factures"}
-                        className="p-menuitem-link">
-                        {viewWidth <= process.env.REACT_APP_XL_VW ? (
-                            <>
-                                <i className="pi pi-money-bill"></i>
-                            </>) : (
-                            <>
-                                <span className="p-menuitem-icon pi pi-fw pi-money-bill fs-2"></span>
-                                <span className="p-menuitem-text">{t("t.caixa.fixa")}</span>
-                            </>)}
-
+                    <NavLink to={"/factures"} className="p-menuitem-link">
+                        <span className="p-menuitem-icon pi pi-fw pi-money-bill fs-2"></span>
+                        <span className="p-menuitem-text">{t("t.caixa.fixa")}</span>
                     </NavLink>
                 );
             },
@@ -172,29 +119,111 @@ const Navbar = () => {
             className: "sidenav-item ",
             template: () => {
                 return (
-                    <NavLink
-                        to={"/configuracio"}
-                        className="p-menuitem-link">
-                        {viewWidth <= process.env.REACT_APP_XL_VW ? (
-                            <>
-                                <i className="pi pi-cog"></i>
-                            </>
-                        ) : (
-                            <>
-                                <span className="p-menuitem-icon pi pi-fw pi-cog fs-2"></span>
-                                <span className="p-menuitem-text">{t("t.settings")}</span>
-                            </>)}
+                    <NavLink to={"/configuracio"} className="p-menuitem-link">
+                        <span className="p-menuitem-icon pi pi-fw pi-cog fs-2"></span>
+                        <span className="p-menuitem-text">{t("t.settings")}</span>
                     </NavLink>
                 );
             },
         }
     ];
 
+    const visibleItems = [
+        {
+            className: "sidenav-item",
+
+            template: () => {
+                return (
+                    <NavLink to={"/home"} className="p-menuitem-link">
+                        <>
+                            <i className="pi pi-home"></i>
+                        </>
+                    </NavLink>
+                );
+            },
+        },
+        {
+            className: "sidenav-item ",
+            template: () => {
+                return (
+                    <NavLink to={"/campanya"} className="p-menuitem-link">
+                        <i className="pi pi-book"></i>
+                    </NavLink>
+                );
+            },
+        },
+        {
+            className: "sidenav-item ",
+            template: () => {
+                return (
+                    <NavLink to={"/socis"} className="p-menuitem-link">
+                        <>
+                            <i className="pi pi-users"></i>
+                        </>
+                    </NavLink>
+                );
+            },
+        },
+        {
+            className: "sidenav-item ",
+            template: () => {
+                return (
+                    <NavLink to={"/patrocinadors"} className="p-menuitem-link">
+                        <i className="pi pi-calendar"></i>
+                    </NavLink>
+                );
+            },
+        },
+        {
+            className: "sidenav-item ",
+            template: () => {
+                return (
+                    <NavLink to={"/factures"} className="p-menuitem-link">
+                        <i className="pi pi-money-bill"></i>
+                    </NavLink>
+                );
+            },
+        }
+    ];
+
+    /*    {
+            className: "sidenav-item ",
+                template: () => {
+            return (
+                <NavLink to={"/directiva"} className="p-menuitem-link">
+                    <i className="pi pi-users"></i>
+                </NavLink>
+            );
+        },
+        },
+        {
+            className: "sidenav-item ",
+                template: () => {
+            return (
+                <NavLink
+                    to={"/configuracio"}
+                    className="p-menuitem-link">
+                    {viewWidth <= process.env.REACT_APP_XL_VW ? (
+                        <>
+                            <i className="pi pi-cog"></i>
+                        </>
+                    ) : (
+                        <>
+                            <span className="p-menuitem-icon pi pi-fw pi-cog fs-2"></span>
+                            <span className="p-menuitem-text">{t("t.settings")}</span>
+                        </>)}
+                </NavLink>
+            );
+        },
+        }*/
+
 
     return (
         <>
             {viewWidth <= process.env.REACT_APP_XL_VW ? (
-                <HorizontalBar props={items}></HorizontalBar>
+                <div className="row">
+                    <HorizontalBar props={visibleItems}></HorizontalBar>
+                </div>
             ) : (
                 <Sidebar props={items}></Sidebar>
             )}

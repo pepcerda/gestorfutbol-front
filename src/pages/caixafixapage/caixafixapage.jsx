@@ -1,5 +1,6 @@
 import './caixafixapage.css';
 import {ConfigContext} from "../../App";
+import {createContext, useContext, useEffect, useState} from "react";
 import {gestorfutbolService} from "../../services/real/gestorfutbolService";
 import {useTranslation} from "react-i18next";
 import FormCheckbox from "../../components/formcheckbox/formcheckbox";
@@ -12,10 +13,199 @@ import TabMenuComponent from "../../components/tabmenucomponent/tabmenucomponent
 import BasicButton from "../../components/basicbutton/basicbutton";
 import TableComponent from "../../components/tablecomponent/tablecomponent";
 import {Dialog} from "primereact/dialog";
+import FormInputNumber from "../../components/forminputnumber/forminputnumber";
+import FormCalendar from "../../components/formcalendar/formcalendar";
+import FormTextArea from "../../components/formtextarea/formtextarea";
+import FileUploader from "../../components/fileuploader/fileuploader";
 
 
+const FacturaContext = createContext();
 
-/*const CaixaFixaPage = ({props})=> {
+const FacturaDataForm = ({props}) => {
+    const {t, i18n} = useTranslation("common");
+    const {selectedFactura, setSelectedFactura, formikFactura} =
+        useContext(FacturaContext);
+
+    const [selectCheck, setSelectedCheck] = useState(null);
+    const [fecha, setFecha] = useState(null);
+    const opcionsPagament = gestorfutbolService.getOpcionsPagament();
+    const [fileName, setFileName] = useState(null);
+
+
+    const isFormFieldInvalid = (name) =>
+        !!(formikFactura.touched[name] && formikFactura.errors[name]);
+
+    const getFormErrorMessage = (name) => {
+        return isFormFieldInvalid(name) ? (
+            <small className="form-text-invalid">{formikFactura.errors[name]}</small>
+        ) : (
+            <small className="form-text-invalid">&nbsp;</small>
+        );
+    };
+
+    const customBase64Uploader = async (event) => {
+        // convert file to base64 encoded
+        const file = event.files[0];
+        const reader = new FileReader();
+        let blob = await fetch(file.objectURL).then((r) => r.blob()); //blob:url
+        reader.readAsDataURL(blob);
+
+        reader.onloadend = function () {
+            const base64data = reader.result;
+            formikFactura.setFieldValue("factura", base64data);
+            setFileName(file.name);
+            event.options.clear();
+        };
+
+
+    };
+    const nomProps = {
+        id: "nom",
+        label: `${t("t.name")}`,
+        value: formikFactura.values.nom,
+        onChange: (e) => {
+            formikFactura.setFieldValue("nom", e.target.value);
+        },
+        classNameError: `${isFormFieldInvalid("nom") ? "invalid-inputtext" : ""}`,
+        labelClassName: `${isFormFieldInvalid("nom") ? "form-text-invalid" : ""}`,
+    };
+
+    const llinatge1Props = {
+        id: "llinatge1",
+        label: `${t("t.surname1")}`,
+        value: formikFactura.values.llinatge1,
+        onChange: (e) => {
+            formikFactura.setFieldValue("llinatge1", e.target.value);
+        },
+        classNameError: `${
+            isFormFieldInvalid("llinatge1") ? "invalid-inputtext" : ""
+        }`,
+        labelClassName: `${
+            isFormFieldInvalid("llinatge1") ? "form-text-invalid" : ""
+        }`,
+    };
+
+    const llinatge2Props = {
+        id: "llinatge2",
+        label: `${t("t.surname2")}`,
+        value: formikFactura.values.llinatge2,
+        onChange: (e) => {
+            formikFactura.setFieldValue("llinatge2", e.target.value);
+        },
+    };
+
+    const despesaProps = {
+        id: "despesa",
+        label: `${t('t.despesa')}`,
+        value: formikFactura.values.despesa,
+        mode: "currency",
+        currency: "EUR",
+        onValueChange: (e) => {
+            formikFactura.setFieldValue('despesa', e.target.value);
+        },
+        classNameError: `${isFormFieldInvalid('despesa') ? 'invalid-inputnumber' : ''}`,
+        labelClassName: `${isFormFieldInvalid('despesa') ? 'form-text-invalid' : ''}`
+    };
+
+    /*    const dataDonacioProps = {
+            id: "dataDonacio",
+            label: `${t('t.donation.date')}`,
+            value: formikSponsor.values.dataDonacio,
+            view: "date",
+            dateFormat: "dd/mm/yy",
+            onChange: (e) => {
+                formikSponsor.setFieldValue('dataDonacio', e.target.value);
+            },
+            classNameError: `${isFormFieldInvalid('dataDonacio') ? 'formcalendar-invalid' : ''}`,
+            labelClassName: `${isFormFieldInvalid('dataDonacio') ? 'form-text-invalid' : ''}`
+        };*/
+
+    const estatProps = {
+        id: "estat",
+        label: `${t("t.payment.state")}`,
+        value: formikFactura.values.estat,
+        onChange: (e) => {
+            formikFactura.setFieldValue("estat", e.value);
+        },
+        options: opcionsPagament,
+        optionLabel: "nom",
+        optionValue: "valor",
+        classNameError: `${
+            isFormFieldInvalid("estat") ? "invalid-select" : ""
+        }`,
+        labelClassName: `${
+            isFormFieldInvalid("estat") ? "form-text-invalid" : ""
+        }`,
+    };
+
+
+    const observacioProps = {
+        id: "observacions",
+        label: `${t("t.observacions")}`,
+        value: formikFactura.values.observacio,
+        onChange: (e) => {
+            formikFactura.setFieldValue("observacio", e.target.value);
+        }
+    };
+
+    const facturaUploader = {
+        id: "logo-up",
+        mode: "basic",
+        label: `${t(`t.factura`)}`,
+        customUpload: true,
+        uploadHandler: customBase64Uploader,
+        accept: "image/*",
+        auto: true
+    }
+
+
+    return (
+        <>
+            <div className="row">
+                <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
+                    <FormInputText props={nomProps}></FormInputText>
+                    {getFormErrorMessage("nom")}
+                </div>
+                <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
+                    <FormInputText props={llinatge1Props}></FormInputText>
+                    {getFormErrorMessage("llinatge1")}
+                </div>
+                <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
+                    <FormInputText props={llinatge2Props}></FormInputText>
+                </div>
+                <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
+                    <FormInputNumber props={despesaProps}></FormInputNumber>
+                    {getFormErrorMessage('despesa')}
+                </div>
+                <div className="col-12 col-md-6 form-group text-center text-md-start mt-3">
+                    <SelectOneMenu props={estatProps}></SelectOneMenu>
+                    {getFormErrorMessage("estatPagament")}
+                </div>
+                <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
+                    <FormTextArea props={observacioProps}></FormTextArea>
+                </div>
+                <div className="row align-items-center align-content-center mt-3 mt-md-0">
+                    <div className="col-12 col-md-1 text-center text-md-start form-group">
+                        <FileUploader props={facturaUploader}/>
+                    </div>
+                    <div className="col-12 col-md-4 text-center text-md-start form-group mt-3 mt-md-0">
+                        {fileName && <span>{fileName}</span>}
+                    </div>
+                </div>
+
+                {/*<div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
+                    <FormCalendar props={dataDonacioProps}/>
+                    <br/>
+                    {getFormErrorMessage('dataDonacio')}
+                </div>*/}
+
+
+            </div>
+        </>
+    );
+};
+
+const CaixaFixaPage = ({props}) => {
 
     const {viewWidth, setViewWidth} = useContext(ConfigContext);
     const opcionsPagament = gestorfutbolService.getOpcionsPagament();
@@ -65,7 +255,7 @@ import {Dialog} from "primereact/dialog";
             return o.valor === factura.estat;
         });
 
-        if(estat != null) {
+        if (estat != null) {
             return (
                 <>
                     {viewWidth <= 900 ?
@@ -75,15 +265,18 @@ import {Dialog} from "primereact/dialog";
                             <></>
                         )
                     }
-                    <span className={`${estat.valor === 'P' ? 'text-bg-success' : 'text-bg-danger'} px-3 py-2 rounded-pill`}>{estat.nom}</span>
+                    <span
+                        className={`${estat.valor === 'P' ? 'text-bg-success' : 'text-bg-danger'} px-3 py-2 rounded-pill`}>{estat.nom}</span>
                 </>
             );
         }
 
     };
 
-    const allowEdit = (rowData) => {
-        return true;
+    const facturaBodyTemplate = (factura) => {
+        return (
+            <a href={process.env.REACT_APP_URI_BACK + factura.factura} target="_blank">{t('t.document')}</a>
+        )
     }
 
     const textEditor = (options) => {
@@ -94,6 +287,17 @@ import {Dialog} from "primereact/dialog";
         }
         return (
             <FormInputText props={textProps}/>
+        );
+    };
+
+    const textAreaEditor = (options) => {
+        const textProps = {
+            type: "text",
+            value: options.value,
+            onChange: (e) => options.editorCallback(e.target.value)
+        }
+        return (
+            <FormTextArea props={textProps}/>
         );
     };
 
@@ -122,8 +326,8 @@ import {Dialog} from "primereact/dialog";
     const opcionsEditor = (options) => {
 
         const optionsProps = {
-            id: "estatPagament_editor",
-            value: options.rowData.estatPagament,
+            id: "estat_editor",
+            value: options.rowData.estat,
             onChange: (e) => options.editorCallback(e.value),
             options: opcionsPagament,
             optionLabel: "nom",
@@ -142,18 +346,19 @@ import {Dialog} from "primereact/dialog";
         {field: "llinatge1", header: `${t("t.surname1")}`, editor: (options) => textEditor(options)},
         {field: "llinatge2", header: `${t("t.surname2")}`, editor: (options) => textEditor(options)},
         {field: "despesa", header: `${t("t.despesa")}`, editor: (options) => numberEditor(options)},
-        {field: "observacio", header: `${t("t.observacions")}`},
         {
             field: "estat",
             header: `${t("t.payment.state")}`,
             body: estatPagamentBodyTemplate,
             editor: (options) => opcionsEditor(options)
         },
+        {field: "observacio", header: `${t("t.observacions")}`, editor: (options) => textAreaEditor(options)},
+        {field: "factura", header: `${t("t.factura")}`, body: facturaBodyTemplate},
         {rowEditor: true}
     ];
 
     const accept = () => {
-        gestorfutbolService.deleteMember(selectedMember.id);
+        gestorfutbolService.deleteFactura(selectedFactura.id);
         setDeleteFlag(true);
     };
 
@@ -176,7 +381,7 @@ import {Dialog} from "primereact/dialog";
     const deleteButton = {
         icon: "pi pi-trash",
         className: "circular-btn",
-        disabled: selectedMember.id === null,
+        disabled: selectedFactura.id === null,
         onClick: confirm,
     };
 
@@ -184,8 +389,8 @@ import {Dialog} from "primereact/dialog";
         icon: "pi pi-plus",
         className: "circular-btn",
         onClick: () => {
-            setSelectedMember(emptyMember);
-            formikMember.resetForm();
+            setSelectedFactura(emptyFactura);
+            formikFactura.resetForm();
             setCaptureDialog(true);
         },
     };
@@ -208,8 +413,10 @@ import {Dialog} from "primereact/dialog";
             let campaign = campaigns.find(c =>
                 new Date(c.any).getFullYear() === year
             )
-            if(campaign) {
+            if (campaign) {
+                let index = campaigns.findIndex(c => c.id === campaign.id);
                 setActiveCampaign(campaign.id);
+                setActiveIndex(index);
             } else {
                 setActiveCampaign(campaigns[0].id);
             }
@@ -230,34 +437,31 @@ import {Dialog} from "primereact/dialog";
             campanyaActiva: activeCampaign
         };
 
-        gestorfutbolService.getMembers(apiFilter).then((data) => {
+        gestorfutbolService.getFacturas(apiFilter).then((data) => {
             setTotalRecords(data.data.total);
             let results = data.data.result;
-            setMembers(results);
+            setFactures(results);
         });
     };
 
     const onRowEditComplete = (e) => {
         let {newData, index} = e;
-        if(newData.patrocinador) {
-            newData.estatPagament = null;
-        }
-        gestorfutbolService.saveMember(newData)
+        gestorfutbolService.saveFactura(newData)
             .then(() => loadLazyData())
     };
 
     const tableProps = {
-        data: members,
-        selectedData: selectedMember,
+        data: factures,
+        selectedData: selectedFactura,
         selectionMode: "single",
         paginator: true,
         onChangeSelectedDataEvent: (e) => {
             if (e.value != null) {
-                setSelectedMember(e.value);
+                setSelectedFactura(e.value);
             }
         },
         onRowUnselect: () => {
-            setSelectedMember(emptyMember);
+            setSelectedFactura(emptyFactura);
         },
         columns: tableColumns,
         rows: lazyState.rows,
@@ -276,8 +480,8 @@ import {Dialog} from "primereact/dialog";
         stripedRows: true
     };
 
-    const saveMember = (data) => {
-        gestorfutbolService.saveMember(data)
+    const saveFactura = (data) => {
+        gestorfutbolService.saveFactura(data)
             .then(() => {
                     setCaptureDialog(false);
                     loadLazyData();
@@ -303,13 +507,15 @@ import {Dialog} from "primereact/dialog";
         type: "submit",
     };
 
-    const formikMember = useFormik({
+    const formikFactura = useFormik({
         initialValues: {
-            nom: selectedMember.nom,
-            llinatge1: selectedMember.llinatge1,
-            llinatge2: selectedMember.llinatge2,
-            patrocinador: selectedMember.patrocinador,
-            estatPagament: selectedMember.estatPagament,
+            nom: selectedFactura.nom,
+            llinatge1: selectedFactura.llinatge1,
+            llinatge2: selectedFactura.llinatge2,
+            despesa: selectedFactura.despesa,
+            observacio: selectedFactura.observacio,
+            factura: selectedFactura.factura,
+            estat: selectedFactura.estat,
             campanya: activeCampaign
         },
         enableReinitialize: true,
@@ -323,26 +529,30 @@ import {Dialog} from "primereact/dialog";
             }
             if (!data.llinatge2) {
             }
+            if (!data.despesa) {
+                errors.despesa = t("t.empty.field");
+            }
             if (!data.patrocinador) {
             }
-            if (!data.estatPagament) {
-                errors.estatPagament = t("t.empty.field");
+            if (!data.estat) {
+                errors.estat = t("t.empty.field");
             }
             return errors;
         },
         onSubmit: (data) => {
-            saveMember(data);
+            console.log("Entro");
+            saveFactura(data);
         },
     });
 
     return (
         <div className="container p-2 p-xl-4">
             <ConfirmPopup/>
-            <PageTitle props={{title: `${t("t.members")}`}}></PageTitle>
+            <PageTitle props={{title: `${t("t.factures")}`}}></PageTitle>
             <TabMenuComponent props={tabMenu}></TabMenuComponent>
             <div className="row gap-3 justify-content-center justify-content-xl-end">
                 <BasicButton props={newButton}></BasicButton>
-                {/!*           <BasicButton props={editButton}></BasicButton>*!/}
+                {/*           <BasicButton props={editButton}></BasicButton>*/}
                 <BasicButton props={deleteButton}></BasicButton>
             </div>
             <div className="row mt-3">
@@ -353,12 +563,12 @@ import {Dialog} from "primereact/dialog";
                 header={t("t.new.member").toUpperCase()}
                 onHide={hideDialog}
             >
-                <form onSubmit={formikMember.handleSubmit}>
-                    <MemberContext.Provider
-                        value={{selectedMember, setSelectedMember, formikMember}}
+                <form onSubmit={formikFactura.handleSubmit}>
+                    <FacturaContext.Provider
+                        value={{selectedFactura, setSelectedFactura, formikFactura}}
                     >
-                        <MemberDataForm/>
-                    </MemberContext.Provider>
+                        <FacturaDataForm/>
+                    </FacturaContext.Provider>
                     <div className="p-dialog-footer pb-0 mt-5">
                         <BasicButton props={cancelFormButton}/>
                         <BasicButton props={saveFormButton}/>
@@ -367,12 +577,12 @@ import {Dialog} from "primereact/dialog";
             </Dialog>
         </div>
     );
-}*/
+}
 
-const CaixaFixaPage = ({props}) => {
+/*const CaixaFixaPage = ({props}) => {
     return (
         <div>CAixaFixaPage</div>
     )
-}
+}*/
 
 export default CaixaFixaPage;

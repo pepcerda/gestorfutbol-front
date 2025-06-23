@@ -28,7 +28,18 @@ const ConfigurationPage = ({props}) => {
     const {t, i18n} = useTranslation("common");
     const [configuration, setConfiguration] = useState(emptyConfiguration);
     const toast = useRef(null);
-    const {color, setColor, logo, setLogo, nom, setNom, color1, setColor1, color2, setColor2} = useContext(ConfigContext);
+    const {
+        color,
+        setColor,
+        logo,
+        setLogo,
+        nom,
+        setNom,
+        color1,
+        setColor1,
+        color2,
+        setColor2
+    } = useContext(ConfigContext);
 
     /********   HOOKS  ***********************/
 
@@ -40,12 +51,12 @@ const ConfigurationPage = ({props}) => {
                 setColor1(data.data.colorFons1);
                 setColor2(data.data.colorFons2);
 
-                if(data.data.logo) {
-                    setLogo(process.env.REACT_APP_URI_BACK+ data.data.logo);
-                    setFavicon(process.env.REACT_APP_URI_BACK+ data.data.logo)
+                if (data.data.logo) {
+                    setLogo(process.env.REACT_APP_URI_BACK + data.data.logo);
+                    setFavicon(process.env.REACT_APP_URI_BACK + data.data.logo)
                 }
 
-                if(data.data.nom) {
+                if (data.data.nom) {
                     setNom(data.data.nom);
                     document.title = data.data.nom;
                 }
@@ -78,16 +89,18 @@ const ConfigurationPage = ({props}) => {
                 setColor1(data.data.colorFons1);
                 setColor2(data.data.colorFons2);
 
-                if(data.data.logo) {
+                if (data.data.logo) {
                     setLogo(process.env.REACT_APP_URI_BACK + data.data.logo);
                     setFavicon(process.env.REACT_APP_URI_BACK + data.data.logo);
-                };
+                }
+                ;
 
 
-                if(data.data.nom) {
+                if (data.data.nom) {
                     setNom(data.data.nom);
                     document.title = data.data.nom;
-                };
+                }
+                ;
 
 
             })
@@ -97,13 +110,13 @@ const ConfigurationPage = ({props}) => {
 
         console.log(isImageBase64(data.logo));
 
-        if(!isImageBase64(data.logo)) {
+        if (!isImageBase64(data.logo)) {
             data.logo = null;
         }
 
         let config = {
             id: configuration.id,
-                ...data
+            ...data
         };
 
         gestorfutbolService.saveConfiguration(config)
@@ -225,34 +238,32 @@ const ConfigurationPage = ({props}) => {
             <PageTitle props={{title: `${t("t.settings")}`}}></PageTitle>
             <form onSubmit={formikConfig.handleSubmit}>
                 <div className="row mt-4">
-                    <div className="col-12 form-group ">
+                    <div className="col-12 form-group text-center text-md-start mt-3 mt-md-0">
                         <FormInputText props={nomProps}></FormInputText>
                         {getFormErrorMessage("nom")}
                     </div>
-                    <div className="col-12 form-group ">
+                    <div className="col-12 form-group text-center text-md-start mt-3 mt-md-0">
                         <FormInputText props={cifProps}></FormInputText>
                         {getFormErrorMessage("cif")}
                     </div>
-                    <div className="col-12 form-group ">
+                    <div className="col-12 form-group text-center text-md-start mt-3 mt-md-0">
                         <ColorPickerInput props={colorPrincipalProps}></ColorPickerInput>
                     </div>
-                    <div className="row">
-                        <div className="col-2 form-group">
-                            <FileUploader props={logoUploader}/>
-                        </div>
-                        <div className="col-8">
-                            <span>Logo actual: </span>
-                            {logo && <img src={logo} alt="Logo aplicación" className="img-fluid logo"/>}
-                        </div>
-                    </div>
-                    <div className="col-12 form-group mt-3">
+                    <div className="col-12 form-group text-center text-md-start mt-3 mt-md-0">
                         <ColorPickerInput props={colorFons1Props}></ColorPickerInput>
                     </div>
-                    <div className="col-12 form-group ">
+                    <div className="col-12 form-group text-center text-md-start mt-3 mt-md-0">
                         <ColorPickerInput props={colorFons2Props}></ColorPickerInput>
                     </div>
+                    <div className="col-12 col-md-2 form-group text-center text-md-start mt-3 mt-md-0">
+                        <FileUploader props={logoUploader}/>
+                    </div>
+                    <div className="col-12 col-md-8 form-group text-center text-md-start mt-3 mt-md-0">
+                        <span>Logo actual: </span>
+                        {logo && <img src={logo} alt="Logo aplicación" className="img-fluid logo"/>}
+                    </div>
                 </div>
-                <div className="p-dialog-footer pb-0 mt-5">
+                <div className="p-dialog-footer pb-0 mt-5 text-center text-md-start">
                     <BasicButton props={saveFormButton}/>
                 </div>
             </form>

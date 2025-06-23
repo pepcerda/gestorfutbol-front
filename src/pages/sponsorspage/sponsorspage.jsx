@@ -293,13 +293,13 @@ const SponsorsPage = ({props}) => {
             editor: (options) => calendarEditor(options),
             body: dataDonacioBody
         },
-        {field: "observacio", header: `${t("t.observacions")}`},
         {
             field: "estatPagament",
             header: `${t("t.payment.state")}`,
             body: estatPagamentBodyTemplate,
             editor: (options) => opcionsEditor(options)
         },
+        {field: "observacio", header: `${t("t.observacions")}`, editor: (options) => textAreaEditor(options)},
         {header: `${t("t.rebut")}`, body: (rowData) => donwloadPdfButton(rowData.id)},
         {rowEditor: true}
     ];
@@ -535,6 +535,17 @@ const SponsorsPage = ({props}) => {
         }
         return (
             <FormInputText props={numberProps}/>
+        );
+    };
+
+    const textAreaEditor = (options) => {
+        const textProps = {
+            type: "text",
+            value: options.value,
+            onChange: (e) => options.editorCallback(e.target.value)
+        }
+        return (
+            <FormTextArea props={textProps}/>
         );
     };
 

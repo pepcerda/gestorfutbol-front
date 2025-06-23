@@ -8,8 +8,10 @@ const FileUploader = ({props}) => {
                 <label htmlFor={props.id}
                        className={`inputtext-label mb-2 ${props.labelClassName}`}>{props.label}</label>
                 : <></>}
-            <FileUpload mode={props.mode} accept="image/*" customUpload={props.customUpload}
-                        uploadHandler={props.uploadHandler} className={`fileuploader ${props.className}`}/>
+            <FileUpload mode={props.mode} accept={props.accept} customUpload={props.customUpload}
+                        uploadHandler={props.uploadHandler} className={`fileuploader ${props.className}`}
+                        onProgress={props.onProgress} onUpload={props.onUpload}
+                        auto={props.auto} uploadLabel={props.uploadLabel}/>
         </>
     );
 }

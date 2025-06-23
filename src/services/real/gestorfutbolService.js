@@ -194,7 +194,37 @@ export const gestorfutbolService = {
     getConfiguracioGeneral() {
         var response = apiClient.get("/config-general")
         return response;
+    },
+
+    getFacturas(filter) {
+        const axiosConfig = {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        }
+
+        var response = apiClient.post("/factures", JSON.stringify(filter), axiosConfig);
+        return response;
+    },
+
+    saveFactura(factura) {
+        const axiosConfig = {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        }
+        console.log(factura);
+        var response = apiClient.post("/factura", JSON.stringify(factura), axiosConfig);
+        return response;
+    },
+
+    deleteFactura(id) {
+        var response = apiClient.delete("/factura/" + id);
+        return response;
     }
+
 
 
 }
