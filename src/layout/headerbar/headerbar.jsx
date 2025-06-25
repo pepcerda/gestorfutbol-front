@@ -12,7 +12,7 @@ const Logo = () => {
 
     return (
         <>
-        {logo ? <img src={logo} alt="Logo aplicación" className="img-fluid logo"/> : <img src={logoRes} alt="Logo aplicación" className="img-fluid logo"/> }
+        {logo ? <img src={logo} alt="Logo aplicación" className="img-fluid logo-header"/> : <img src={logoRes} alt="Logo aplicación" className="img-fluid logo-header"/> }
         </>
     )
 }

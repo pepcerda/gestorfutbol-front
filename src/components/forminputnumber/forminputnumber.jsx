@@ -10,7 +10,7 @@ const FormInputNumber = ({props}) => {
                      className={`form-inputnumber mx-auto mx-md-0 p-0 ${props.className} ${props.classNameError}`}
                      placeholder={props.placeholder} value={props.value} onValueChange={props.onValueChange}
                      keyfilter={props.keyfilter} onInput={props.onInput} validateOnly={props.validateOnly}
-                     mode={props.mode} currency={props.currency}/>
+                     mode={props.mode} currency={props.currency} disabled={props.disabled}/>
     </>);
 }
 

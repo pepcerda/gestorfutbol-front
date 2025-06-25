@@ -23,7 +23,7 @@ const SponsorContext = createContext();
 
 const SponsorDataForm = ({props}) => {
     const {t, i18n} = useTranslation("common");
-    const {selectedSponsor, setSelectedSponsor, formikSponsor} =
+    const {selectedSponsor, setSelectedSponsor, formikSponsor, captureDialog} =
         useContext(SponsorContext);
 
     const [selectCheck, setSelectedCheck] = useState(null);
@@ -42,6 +42,12 @@ const SponsorDataForm = ({props}) => {
         );
     };
 
+    const dataDonacioCalc = (value) => {
+        let dateString = value;
+        let dateMomentObject = moment(dateString, 'YYYY-MM-DD');
+        return dateMomentObject.toDate();
+    }
+
     const cifProps = {
         id: "cif",
         label: `${t("t.cif")}`,
@@ -51,6 +57,7 @@ const SponsorDataForm = ({props}) => {
         },
         classNameError: `${isFormFieldInvalid("nom") ? "invalid-inputtext" : ""}`,
         labelClassName: `${isFormFieldInvalid("nom") ? "form-text-invalid" : ""}`,
+        disabled: captureDialog.consulta
     };
 
     const nomProps = {
@@ -62,6 +69,7 @@ const SponsorDataForm = ({props}) => {
         },
         classNameError: `${isFormFieldInvalid("nom") ? "invalid-inputtext" : ""}`,
         labelClassName: `${isFormFieldInvalid("nom") ? "form-text-invalid" : ""}`,
+        disabled: captureDialog.consulta
     };
 
     const donacioProps = {
@@ -74,20 +82,22 @@ const SponsorDataForm = ({props}) => {
             formikSponsor.setFieldValue('donacio', e.target.value);
         },
         classNameError: `${isFormFieldInvalid('donacio') ? 'invalid-inputnumber' : ''}`,
-        labelClassName: `${isFormFieldInvalid('donacio') ? 'form-text-invalid' : ''}`
+        labelClassName: `${isFormFieldInvalid('donacio') ? 'form-text-invalid' : ''}`,
+        disabled: captureDialog.consulta
     };
 
     const dataDonacioProps = {
         id: "dataDonacio",
         label: `${t('t.donation.date')}`,
-        value: formikSponsor.values.dataDonacio,
+        value: dataDonacioCalc(formikSponsor.values.dataDonacio),
         view: "date",
         dateFormat: "dd/mm/yy",
         onChange: (e) => {
             formikSponsor.setFieldValue('dataDonacio', e.target.value);
         },
         classNameError: `${isFormFieldInvalid('dataDonacio') ? 'formcalendar-invalid' : ''}`,
-        labelClassName: `${isFormFieldInvalid('dataDonacio') ? 'form-text-invalid' : ''}`
+        labelClassName: `${isFormFieldInvalid('dataDonacio') ? 'form-text-invalid' : ''}`,
+        disabled: captureDialog.consulta
     };
 
     const estatPagamentProps = {
@@ -106,6 +116,7 @@ const SponsorDataForm = ({props}) => {
         labelClassName: `${
             isFormFieldInvalid("estatPagament") ? "form-text-invalid" : ""
         }`,
+        disabled: captureDialog.consulta
     };
 
 
@@ -115,7 +126,8 @@ const SponsorDataForm = ({props}) => {
         value: formikSponsor.values.observacio,
         onChange: (e) => {
             formikSponsor.setFieldValue("observacio", e.target.value);
-        }
+        },
+        disabled: captureDialog.consulta
     };
 
 
@@ -135,9 +147,13 @@ const SponsorDataForm = ({props}) => {
                     {getFormErrorMessage('donacio')}
                 </div>
                 <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
-                    <FormCalendar props={dataDonacioProps}/>
-                    <br/>
-                    {getFormErrorMessage('dataDonacio')}
+                    {captureDialog.consulta ? (
+                        <>
+                            <FormCalendar props={dataDonacioProps}/>
+                            <br/>
+                            {getFormErrorMessage('dataDonacio')}
+                        </>
+                    ) : <FormInputText props={dataDonacioProps}></FormInputText>}
                 </div>
                 <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
                     <FormTextArea props={observacioProps}></FormTextArea>
@@ -158,7 +174,10 @@ const SponsorsPage = ({props}) => {
     const opcionsPagament = gestorfutbolService.getOpcionsPagament();
     const {t, i18n} = useTranslation("common");
     const [totalRecords, setTotalRecords] = useState(0);
-    const [captureDialog, setCaptureDialog] = useState(false);
+    const [captureDialog, setCaptureDialog] = useState({
+        visible: false,
+        consulta: false
+    });
     const [deleteFlag, setDeleteFlag] = useState(false);
     const [campaigns, setCampaigns] = useState(null);
     const [activeCampaign, setActiveCampaign] = useState(null);
@@ -237,27 +256,9 @@ const SponsorsPage = ({props}) => {
                 }
                 <span>{fechaFormateada}</span>
             </>
-        );;
+        );
+        ;
     }
-
-    const dataDonacioBodyTemplate = (sponsor) => {
-
-        if (sponsor.dataDonacio != null) {
-            return (
-                <>
-                    {viewWidth <= 900 ?
-                        (
-                            <span className="fw-bold">{t("t.donation.date")}</span>
-                        ) : (
-                            <></>
-                        )
-                    }
-                    <span>{sponsor.dataDonacio}</span>
-                </>
-            );
-        }
-
-    };
 
     const estatPagamentBodyTemplate = (sponsor) => {
         let estat = opcionsPagament.find(o => {
@@ -274,7 +275,8 @@ const SponsorsPage = ({props}) => {
                             <></>
                         )
                     }
-                    <span className={`${estat.valor === 'P' ? 'text-bg-success' : 'text-bg-danger'} px-3 py-2 rounded-pill`}>{estat.nom}</span>
+                    <span
+                        className={`${estat.valor === 'P' ? 'text-bg-success' : 'text-bg-danger'} px-3 py-2 rounded-pill`}>{estat.nom}</span>
                 </>
             );
         }
@@ -299,7 +301,6 @@ const SponsorsPage = ({props}) => {
             body: estatPagamentBodyTemplate,
             editor: (options) => opcionsEditor(options)
         },
-        {field: "observacio", header: `${t("t.observacions")}`, editor: (options) => textAreaEditor(options)},
         {header: `${t("t.rebut")}`, body: (rowData) => donwloadPdfButton(rowData.id)},
         {rowEditor: true}
     ];
@@ -338,15 +339,28 @@ const SponsorsPage = ({props}) => {
         onClick: () => {
             setSelectedSponsor(emptySponsor);
             formikSponsor.resetForm();
-            setCaptureDialog(true);
-        },
+            setCaptureDialog({
+                visible: true,
+                consulta: false
+            });
+        }
     };
+
+    const consultaButton = {
+        icon: "pi pi-eye",
+        className: "circular-btn",
+        onClick: () => {
+            setCaptureDialog({
+                visible: true,
+                consulta: true
+            });
+        }
+    }
 
     useEffect(() => {
         let results;
         gestorfutbolService.getAllCampaigns().then((data) => {
             results = data.data;
-            console.log(data.data.results);
             setCampaigns(results);
         })
     }, [])
@@ -420,7 +434,6 @@ const SponsorsPage = ({props}) => {
         gestorfutbolService.saveSponsor(newData)
             .then(() => loadLazyData());
 
-        console.log(index, newData);
     };
 
     const tableProps = {
@@ -455,14 +468,20 @@ const SponsorsPage = ({props}) => {
 
     const saveSponsor = (data) => {
         gestorfutbolService.saveSponsor(data).then(() => {
-                setCaptureDialog(false);
+                setCaptureDialog({
+                    visible: false,
+                    consulta: false
+                });
                 loadLazyData();
             }
         );
     };
 
     const hideDialog = () => {
-        setCaptureDialog(false);
+        setCaptureDialog({
+            visible: false,
+            consulta: false
+        });
     };
 
     const cancelFormButton = {
@@ -477,7 +496,8 @@ const SponsorsPage = ({props}) => {
         icon: "pi pi-check",
         label: `${t("t.save")}`,
         type: "submit",
-        className: "p-2 rounded-2"
+        className: "p-2 rounded-2",
+        visible: !captureDialog.consulta
     };
 
     const formikSponsor = useFormik({
@@ -592,6 +612,7 @@ const SponsorsPage = ({props}) => {
             <TabMenuComponent props={tabMenu}></TabMenuComponent>
             <div className="row gap-3 justify-content-center justify-content-xl-end">
                 <BasicButton props={newButton}></BasicButton>
+                <BasicButton props={consultaButton}></BasicButton>
                 {/*           <BasicButton props={editButton}></BasicButton>*/}
                 <BasicButton props={deleteButton}></BasicButton>
             </div>
@@ -599,13 +620,13 @@ const SponsorsPage = ({props}) => {
                 <TableComponent props={tableProps}></TableComponent>
             </div>
             <Dialog
-                visible={captureDialog}
+                visible={captureDialog.visible}
                 header={t("t.new.sponsor").toUpperCase()}
                 onHide={hideDialog}
             >
                 <form onSubmit={formikSponsor.handleSubmit}>
                     <SponsorContext.Provider
-                        value={{selectedSponsor, setSelectedSponsor, formikSponsor}}
+                        value={{selectedSponsor, setSelectedSponsor, formikSponsor, captureDialog}}
                     >
                         <SponsorDataForm/>
                     </SponsorContext.Provider>

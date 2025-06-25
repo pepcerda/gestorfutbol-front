@@ -8,7 +8,8 @@ const FormCalendar = ({props})=> {
       <>
           <label htmlFor={props.id} className={`calendar-label mb-2 ${props.labelClassName}`}>{props.label}</label>
           <Calendar id={props.id} value={props.value} onChange={props.onChange} dateFormat={props.dateFormat} view={props.view}
-                    placeholder={props.placeholder} className={`formcalendar  ${props.className} ${props.classNameError}`} showIcon/>
+                    placeholder={props.placeholder} className={`formcalendar  ${props.className} ${props.classNameError}`} showIcon
+                    disabled={props.disabled}/>
       </>);
 }
 

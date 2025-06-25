@@ -48,7 +48,7 @@ const Navbar = () => {
     const {t, i18n} = useTranslation("common");
 
     const items = [
-        {
+        /*{
             className: "sidenav-item",
 
             template: () => {
@@ -59,7 +59,7 @@ const Navbar = () => {
                     </NavLink>
                 );
             },
-        },
+        },*/
         {
             className: "sidenav-item ",
             template: () => {
@@ -129,19 +129,19 @@ const Navbar = () => {
     ];
 
     const visibleItems = [
-        {
-            className: "sidenav-item",
+            /*{
+                className: "sidenav-item",
 
-            template: () => {
-                return (
-                    <NavLink to={"/home"} className="p-menuitem-link">
-                        <>
-                            <i className="pi pi-home"></i>
-                        </>
-                    </NavLink>
-                );
-            },
-        },
+                template: () => {
+                    return (
+                        <NavLink to={"/home"} className="p-menuitem-link">
+                            <>
+                                <i className="pi pi-home"></i>
+                            </>
+                        </NavLink>
+                    );
+                },
+            },*/
         {
             className: "sidenav-item ",
             template: () => {

@@ -33,18 +33,17 @@ const EntryPage = ({props}) => {
         onClick: () => {
             login();
         },
+        className: 'auth-button'
     };
     return (
-        <div className="row gap-2 justify-content-center align-items-center align-content-center entrypage">
-            <div
-                className="entrypage-square d-flex flex-column flex-sm-row justify-content-center align-content-center gap-5">
-                <div className="d-flex justify-content-center align-items-center pl-5">
-                    <Logo></Logo>
-                </div>
-                <div className="d-flex justify-content-center flex-column gap-3">
-                    {viewWidth <= 576 ? <></> : <Title></Title>}
-                    <BasicButton props={authButton}></BasicButton>
-                </div>
+        <div
+            className="entrypage d-flex flex-column flex-sm-row justify-content-center align-content-center gap-5">
+            <div className="d-flex justify-content-center align-items-center pl-5">
+                <Logo></Logo>
+            </div>
+            <div className="d-flex justify-content-center flex-md-column gap-3">
+                {viewWidth <= 576 ? <></> : <Title></Title>}
+                <BasicButton props={authButton}></BasicButton>
             </div>
         </div>
     );

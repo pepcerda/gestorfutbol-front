@@ -14,7 +14,7 @@ const SelectOneMenu = ({props}) => {
                   panelClassName="selectonemenu-panel"
                   value={props.value} options={props.options} optionLabel={props.optionLabel}
                   optionValue={props.optionValue} onChange={props.onChange} keyfilter={props.keyfilter}
-                  placeholder={props.placeholder}/>
+                  placeholder={props.placeholder} disabled={props.disabled}/>
     </>);
 }
 

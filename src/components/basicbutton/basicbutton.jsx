@@ -5,7 +5,7 @@ import {useEffect} from "react";
 const BasicButton = ({props}) => {
 
     return (
-        <Button icon={props.icon} label={props.label} className={`basicbutton ${props.className}`}
+        <Button icon={props.icon} label={props.label} className={`basicbutton ${props.className}`} visible={props.visible}
                 onClick={props.onClick} disabled={props.disabled} outlined={props.outlined} type={props.type}></Button>
     );
 }
