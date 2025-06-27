@@ -147,7 +147,7 @@ const SponsorDataForm = ({props}) => {
                     {getFormErrorMessage('donacio')}
                 </div>
                 <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
-                    {captureDialog.consulta ? (
+                    {!captureDialog.consulta ? (
                         <>
                             <FormCalendar props={dataDonacioProps}/>
                             <br/>
@@ -346,6 +346,17 @@ const SponsorsPage = ({props}) => {
         }
     };
 
+    const editButton = {
+        icon: "pi pi-pencil",
+        className: "circular-btn",
+        onClick: () => {
+            setCaptureDialog({
+                visible: true,
+                consulta: false
+            });
+        }
+    };
+
     const consultaButton = {
         icon: "pi pi-eye",
         className: "circular-btn",
@@ -467,6 +478,9 @@ const SponsorsPage = ({props}) => {
     };
 
     const saveSponsor = (data) => {
+        if(selectedSponsor.id) {
+            data.id = selectedSponsor.id;
+        }
         gestorfutbolService.saveSponsor(data).then(() => {
                 setCaptureDialog({
                     visible: false,
@@ -613,7 +627,7 @@ const SponsorsPage = ({props}) => {
             <div className="row gap-3 justify-content-center justify-content-xl-end">
                 <BasicButton props={newButton}></BasicButton>
                 <BasicButton props={consultaButton}></BasicButton>
-                {/*           <BasicButton props={editButton}></BasicButton>*/}
+                <BasicButton props={editButton}></BasicButton>
                 <BasicButton props={deleteButton}></BasicButton>
             </div>
             <div className="row mt-3">
