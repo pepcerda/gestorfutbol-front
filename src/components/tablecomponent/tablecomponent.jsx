@@ -62,8 +62,8 @@ const TableComponent = ({props}) => {
                 {props.rowEditor && (
                     <Column
                         rowEditor={props.rowEditor}
-                        headerStyle={{ width: "10%", minWidth: "8rem" }}
-                        bodyStyle={{ textAlign: "center" }}
+                        headerStyle={{width: "10%", minWidth: "8rem"}}
+                        bodyStyle={{textAlign: "center"}}
                     />
                 )}
 

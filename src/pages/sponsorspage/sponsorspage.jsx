@@ -1,6 +1,6 @@
 import './sponsorspage.css';
 import {gestorfutbolService} from "../../services/real/gestorfutbolService";
-import {createContext, useContext, useEffect, useState} from "react";
+import React, {createContext, useContext, useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {ConfirmPopup, confirmPopup} from "primereact/confirmpopup";
 import {useFormik} from "formik";
@@ -18,8 +18,10 @@ import {Calendar} from "primereact/calendar";
 import FormTextArea from "../../components/formtextarea/formtextarea";
 import SelectOneMenu from "../../components/selectonemenu/selectonemenu";
 import {ConfigContext} from "../../App";
+import FileUploader from "../../components/fileuploader/fileuploader";
 
 const SponsorContext = createContext();
+const DuplicaContext = createContext();
 
 const SponsorDataForm = ({props}) => {
     const {t, i18n} = useTranslation("common");
@@ -29,6 +31,7 @@ const SponsorDataForm = ({props}) => {
     const [selectCheck, setSelectedCheck] = useState(null);
     const [fecha, setFecha] = useState(null);
     const opcionsPagament = gestorfutbolService.getOpcionsPagament();
+    const [fileName, setFileName] = useState(null);
 
 
     const isFormFieldInvalid = (name) =>
@@ -40,6 +43,22 @@ const SponsorDataForm = ({props}) => {
         ) : (
             <small className="form-text-invalid">&nbsp;</small>
         );
+    };
+
+    const customBase64Uploader = async (event) => {
+        // convert file to base64 encoded
+        const file = event.files[0];
+        const reader = new FileReader();
+        let blob = await fetch(file.objectURL).then((r) => r.blob()); //blob:url
+        reader.readAsDataURL(blob);
+
+        reader.onloadend = function () {
+            const base64data = reader.result;
+            formikSponsor.setFieldValue("logo", base64data);
+            setFileName(file.name);
+            event.options.clear();
+        };
+
     };
 
     const dataDonacioCalc = (value) => {
@@ -130,6 +149,17 @@ const SponsorDataForm = ({props}) => {
         disabled: captureDialog.consulta
     };
 
+    const logoUploader = {
+        id: "logo-up",
+        mode: "basic",
+        label: `${t(`t.logo`)}`,
+        customUpload: true,
+        uploadHandler: customBase64Uploader,
+        accept: "image/*",
+        auto: true,
+        chooseLabel: `${t('t.afegeix')}`
+    }
+
 
     return (
         <>
@@ -162,10 +192,75 @@ const SponsorDataForm = ({props}) => {
                     <SelectOneMenu props={estatPagamentProps}></SelectOneMenu>
                     {getFormErrorMessage("estatPagament")}
                 </div>
+                <div className="row align-items-center align-content-center mt-3 mt-md-0">
+                    <div className="col-12 col-md-1 text-center text-md-start form-group">
+                        <FileUploader props={logoUploader}/>
+                    </div>
+                    <div className="col-12 col-md-1 text-center text-md-start form-group mt-3 mt-md-0 ms-3 my-auto">
+                        {formikSponsor.values.logo && <>
+                            <p>{t('t.logo.original')}</p>
+                            <p><a href={process.env.REACT_APP_URI_BACK + formikSponsor.values.logo} target="_blank">{t('t.document')}</a></p>
+                        </>}
+                    </div>
+                    <div className="col-12 col-md-1 text-center text-md-start form-group mt-3 mt-md-0 ms-3">
+                        {fileName && <>
+                            <p>{t('t.logo.annexat')}</p>
+                            <p>{fileName}</p>
+                        </>}
+                    </div>
+                </div>
             </div>
         </>
     );
 };
+
+const DuplicaForm = ({props}) => {
+    const {t, i18n} = useTranslation("common");
+    const {formikDuplica, campaigns} = useContext(DuplicaContext);
+
+    const isFormFieldInvalid = (name) =>
+        !!(formikDuplica.touched[name] && formikDuplica.errors[name]);
+
+    const getFormErrorMessage = (name) => {
+        return isFormFieldInvalid(name) ? (
+            <small className="form-text-invalid">{formikDuplica.errors[name]}</small>
+        ) : (
+            <small className="form-text-invalid">&nbsp;</small>
+        );
+    };
+
+    const campanyesProps = {
+        id: "campanya",
+        label: `${t('t.campaign')}`,
+        value: formikDuplica.values.campanya,
+        onChange: (e) => {
+            formikDuplica.setFieldValue(`campanya`, e.value);
+        },
+        options: campaigns,
+        optionLabel: "titol",
+        optionValue: "id",
+        classNameError: `${
+            isFormFieldInvalid("campanya") ? "invalid-select" : ""
+        }`,
+        labelClassName: `${
+            isFormFieldInvalid("campanya") ? "form-text-invalid" : ""
+        }`
+    };
+
+    return (
+        <>
+            <p>{t('t.select.campaign')}</p>
+            <div className="row">
+                <div className="col-12 form-group text-center text-md-start mt-3 mt-md-0">
+                    <SelectOneMenu props={campanyesProps}></SelectOneMenu>
+                    {getFormErrorMessage("campanya")}
+                </div>
+            </div>
+        </>
+    );
+
+
+}
 
 const SponsorsPage = ({props}) => {
 
@@ -178,6 +273,7 @@ const SponsorsPage = ({props}) => {
         visible: false,
         consulta: false
     });
+    const [captureDialogDuplica, setCaptureDialogDuplica] = useState(false);
     const [deleteFlag, setDeleteFlag] = useState(false);
     const [campaigns, setCampaigns] = useState(null);
     const [activeCampaign, setActiveCampaign] = useState(null);
@@ -189,6 +285,7 @@ const SponsorsPage = ({props}) => {
         dataDonacio: new Date(),
         observacio: "",
         estatPagament: null,
+        logo: "",
         campanya: activeCampaign
     };
     const [selectedSponsor, setSelectedSponsor] = useState(emptySponsor);
@@ -283,6 +380,15 @@ const SponsorsPage = ({props}) => {
 
     };
 
+    const logoBodyTemplate = (sponsor) => {
+        if (sponsor.logo) {
+            return (
+                <a href={process.env.REACT_APP_URI_BACK + sponsor.logo} target="_blank">{t('t.document')}</a>
+            )
+        }
+
+    }
+
 
     const tableColumns = [
         {field: "id", header: `${t("t.id")}`},
@@ -301,6 +407,7 @@ const SponsorsPage = ({props}) => {
             body: estatPagamentBodyTemplate,
             editor: (options) => opcionsEditor(options)
         },
+        {field: "logo", header: `${t("t.logo")}`, body: logoBodyTemplate},
         {header: `${t("t.rebut")}`, body: (rowData) => donwloadPdfButton(rowData.id)},
         {rowEditor: true}
     ];
@@ -332,6 +439,16 @@ const SponsorsPage = ({props}) => {
         disabled: selectedSponsor === null,
         onClick: confirm,
     };
+
+    const duplicaButton = {
+        icon: "pi pi-clone",
+        className: "circular-btn",
+        disabled: campaigns !== null && campaigns.length === 1,
+        onClick: () => {
+            setCaptureDialogDuplica(true);
+        }
+    };
+
 
     const newButton = {
         icon: "pi pi-plus",
@@ -478,7 +595,7 @@ const SponsorsPage = ({props}) => {
     };
 
     const saveSponsor = (data) => {
-        if(selectedSponsor.id) {
+        if (selectedSponsor.id) {
             data.id = selectedSponsor.id;
         }
         gestorfutbolService.saveSponsor(data).then(() => {
@@ -491,11 +608,27 @@ const SponsorsPage = ({props}) => {
         );
     };
 
+    const duplicaSponsor = (data) => {
+
+        gestorfutbolService.duplicaSponsor(selectedSponsor, data.campanya)
+            .then(() => {
+                setCaptureDialogDuplica(false);
+                setActiveCampaign(data.campanya);
+                let index = campaigns.findIndex(c => c.id === data.campanya);
+                setActiveIndex(index);
+                loadLazyData();
+            })
+    }
+
     const hideDialog = () => {
         setCaptureDialog({
             visible: false,
             consulta: false
         });
+    };
+
+    const hideDialogDuplica = () => {
+        setCaptureDialogDuplica(false);
     };
 
     const cancelFormButton = {
@@ -504,6 +637,14 @@ const SponsorsPage = ({props}) => {
         label: `${t("t.cancel")}`,
         type: "button",
         onClick: hideDialog,
+    };
+
+    const cancelFormDuplicaButton = {
+        icon: "pi pi-times",
+        className: "basicbutton-outlined me-2",
+        label: `${t("t.cancel")}`,
+        type: "button",
+        onClick: hideDialogDuplica,
     };
 
     const saveFormButton = {
@@ -522,6 +663,7 @@ const SponsorsPage = ({props}) => {
             dataDonacio: selectedSponsor.dataDonacio,
             observacio: selectedSponsor.observacio,
             estatPagament: selectedSponsor.estatPagament,
+            logo: selectedSponsor.logo,
             campanya: activeCampaign
         },
         enableReinitialize: true,
@@ -548,6 +690,25 @@ const SponsorsPage = ({props}) => {
             saveSponsor(data);
         },
     });
+
+    const formikDuplica = useFormik({
+        initialValues: {
+            campanya: activeCampaign
+        },
+        enableReinitialize: true,
+        validate: (data) => {
+            let errors = {};
+            if (data.campanya === activeCampaign) {
+                errors.campanya = t("t.sponsor.repeated");
+            }
+
+            return errors;
+        },
+        onSubmit: (data) => {
+            duplicaSponsor(data);
+        },
+
+    })
 
 
     const textEditor = (options) => {
@@ -626,6 +787,7 @@ const SponsorsPage = ({props}) => {
             <TabMenuComponent props={tabMenu}></TabMenuComponent>
             <div className="row gap-3 justify-content-center justify-content-xl-end">
                 <BasicButton props={newButton}></BasicButton>
+                <BasicButton props={duplicaButton}></BasicButton>
                 <BasicButton props={consultaButton}></BasicButton>
                 <BasicButton props={editButton}></BasicButton>
                 <BasicButton props={deleteButton}></BasicButton>
@@ -644,6 +806,24 @@ const SponsorsPage = ({props}) => {
                     >
                         <SponsorDataForm/>
                     </SponsorContext.Provider>
+                    <div className="p-dialog-footer pb-0 mt-5">
+                        <BasicButton props={cancelFormButton}/>
+                        <BasicButton props={saveFormButton}/>
+                    </div>
+                </form>
+            </Dialog>
+
+            <Dialog
+                visible={captureDialogDuplica}
+                header={t("t.duplicate.sponsor").toUpperCase()}
+                onHide={hideDialogDuplica} className="campaign-dialog"
+            >
+                <form onSubmit={formikDuplica.handleSubmit}>
+                    <DuplicaContext.Provider
+                        value={{formikDuplica, campaigns}}
+                    >
+                        <DuplicaForm/>
+                    </DuplicaContext.Provider>
                     <div className="p-dialog-footer pb-0 mt-5">
                         <BasicButton props={cancelFormButton}/>
                         <BasicButton props={saveFormButton}/>

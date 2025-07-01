@@ -155,7 +155,8 @@ const FacturaDataForm = ({props}) => {
         customUpload: true,
         uploadHandler: customBase64Uploader,
         accept: "image/*",
-        auto: true
+        auto: true,
+        chooseLabel: `${t('t.afegeix')}`
     }
 
 
@@ -188,7 +189,8 @@ const FacturaDataForm = ({props}) => {
                     <div className="col-12 col-md-1 text-center text-md-start form-group">
                         <FileUploader props={facturaUploader}/>
                     </div>
-                    <div className="col-12 col-md-4 text-center text-md-start form-group mt-3 mt-md-0">
+                    <div className="col-12 col-md-4 text-center text-md-start form-group mt-3 mt-md-0 ms-3">
+                        {fileName && <span>{fileName}</span>}
                         {fileName && <span>{fileName}</span>}
                     </div>
                 </div>
@@ -505,6 +507,7 @@ const CaixaFixaPage = ({props}) => {
         icon: "pi pi-check",
         label: `${t("t.save")}`,
         type: "submit",
+        className: "p-2 rounded-2"
     };
 
     const formikFactura = useFormik({
@@ -560,7 +563,7 @@ const CaixaFixaPage = ({props}) => {
             </div>
             <Dialog
                 visible={captureDialog}
-                header={t("t.new.member").toUpperCase()}
+                header={t("t.nova.factura").toUpperCase()}
                 onHide={hideDialog}
             >
                 <form onSubmit={formikFactura.handleSubmit}>

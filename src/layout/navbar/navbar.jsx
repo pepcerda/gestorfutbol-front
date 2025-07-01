@@ -221,7 +221,7 @@ const Navbar = () => {
     return (
         <>
             {viewWidth <= process.env.REACT_APP_XL_VW ? (
-                <div className="row">
+                <div className="row navbar">
                     <HorizontalBar props={visibleItems}></HorizontalBar>
                 </div>
             ) : (

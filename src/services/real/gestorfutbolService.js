@@ -93,6 +93,19 @@ export const gestorfutbolService = {
         return response;
     },
 
+    duplicaSponsor(sponsor, idCampanya) {
+        console.log(idCampanya);
+        const axiosConfig = {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        }
+
+        var response = apiClient.post("/duplica-patrocinador/" + idCampanya, JSON.stringify(sponsor), axiosConfig);
+        return response;
+    },
+
     deleteSponsor(id) {
         var response = apiClient.delete("/patrocinador/" + id);
         return response;

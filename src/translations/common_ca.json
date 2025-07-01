@@ -60,5 +60,8 @@
   "t.despesa": "Despesa",
   "t.factura": "Factura",
   "t.factures": "Factures",
-  "t.document": "Document"
+  "t.document": "Document",
+  "t.afegeix": "Afegeix",
+  "t.nova.factura": "Nova factura",
+  "t.select.campaign": "Seleccioni la temporada de destí"
 }

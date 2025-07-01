@@ -1,5 +1,9 @@
 /*Clases para el componente móvil/tablet*/
 
+.navbar {
+    max-width: 100%;
+}
+
 .tabmenu ul{
     background: rgba(255, 255, 255, 0);
     padding: 0;
