@@ -19,10 +19,71 @@ import FormTextArea from "../../components/formtextarea/formtextarea";
 import SelectOneMenu from "../../components/selectonemenu/selectonemenu";
 import {ConfigContext} from "../../App";
 import FileUploader from "../../components/fileuploader/fileuploader";
+import {DataTable} from "primereact/datatable";
+import {Card} from "primereact/card";
+import {Sidebar} from "primereact/sidebar";
 
 const SponsorContext = createContext();
 const DuplicaContext = createContext();
+const FiltraContext = createContext();
 
+const FilterDataForm = ({props}) => {
+    const {t, i18n} = useTranslation("common");
+    const {formikFilters} = useContext(FiltraContext);
+    const opcionsPagament = gestorfutbolService.getOpcionsPagament();
+
+    const dataDonacioCalc = (value) => {
+        let dateString = value;
+        let dateMomentObject = moment(dateString, 'YYYY-MM-DD');
+        return dateMomentObject.toDate();
+    }
+
+    const cifProps = {
+        id: "cif",
+        label: `${t("t.cif")}`,
+        value: formikFilters.values.cif,
+        onChange: (e) => {
+            formikFilters.setFieldValue("cif", e.target.value);
+        }
+    };
+
+    const nomProps = {
+        id: "nom",
+        label: `${t("t.name")}`,
+        value: formikFilters.values.nom,
+        onChange: (e) => {
+            formikFilters.setFieldValue("nom", e.target.value);
+        }
+    };
+
+    const estatPagamentProps = {
+        id: "estat-pagament",
+        label: `${t("t.payment.state")}`,
+        value: formikFilters.values.estatPagament,
+        onChange: (e) => {
+            formikFilters.setFieldValue("estatPagament", e.value);
+        },
+        options: opcionsPagament,
+        optionLabel: "nom",
+        optionValue: "valor"
+    };
+
+    return (
+        <>
+            <div className="row">
+                <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
+                    <FormInputText props={cifProps}></FormInputText>
+                </div>
+                <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
+                    <FormInputText props={nomProps}></FormInputText>
+                </div>
+                <div className="col-12 col-md-6 form-group text-center text-md-start mt-3">
+                    <SelectOneMenu props={estatPagamentProps}></SelectOneMenu>
+                </div>
+            </div>
+        </>
+    );
+};
 const SponsorDataForm = ({props}) => {
     const {t, i18n} = useTranslation("common");
     const {selectedSponsor, setSelectedSponsor, formikSponsor, captureDialog} =
@@ -63,8 +124,12 @@ const SponsorDataForm = ({props}) => {
 
     const dataDonacioCalc = (value) => {
         let dateString = value;
-        let dateMomentObject = moment(dateString, 'YYYY-MM-DD');
-        return dateMomentObject.toDate();
+        let dateMomentObject = moment(dateString);
+        if (captureDialog.consulta) {
+            return dateMomentObject.format('DD-MM-YYYY');
+        } else {
+            return dateMomentObject.toDate();
+        }
     }
 
     const cifProps = {
@@ -199,7 +264,8 @@ const SponsorDataForm = ({props}) => {
                     <div className="col-12 col-md-1 text-center text-md-start form-group mt-3 mt-md-0 ms-3 my-auto">
                         {formikSponsor.values.logo && <>
                             <p>{t('t.logo.original')}</p>
-                            <p><a href={process.env.REACT_APP_URI_BACK + formikSponsor.values.logo} target="_blank">{t('t.document')}</a></p>
+                            <p><a href={process.env.REACT_APP_URI_BACK + formikSponsor.values.logo}
+                                  target="_blank">{t('t.document')}</a></p>
                         </>}
                     </div>
                     <div className="col-12 col-md-1 text-center text-md-start form-group mt-3 mt-md-0 ms-3">
@@ -294,11 +360,12 @@ const SponsorsPage = ({props}) => {
         rows: 10,
         page: 0,
         sortOrder: null,
-        sortField: null,
+        sortField: null
     });
 
     const [activeIndex, setActiveIndex] = useState(0)
     const [tabMenuItems, setTabMenuItems] = useState(null);
+    const [filterVisible, setFilterVisible] = useState(false);
 
     const tabMenu = {
         model: tabMenuItems,
@@ -320,7 +387,7 @@ const SponsorsPage = ({props}) => {
                         handleDownload(r.data)
                     })
             },
-            className: "download-button"
+            className: "download-button p-0"
         }
         return (
             <BasicButton props={props}></BasicButton>
@@ -391,8 +458,8 @@ const SponsorsPage = ({props}) => {
 
 
     const tableColumns = [
-        {field: "id", header: `${t("t.id")}`},
-        {field: "cif", header: `${t("t.cif")}`, editor: (options) => textEditor(options)},
+        {field: "id", header: `${t("t.id")}`, sortable: true},
+        {field: "cif", header: `${t("t.cif")}`, editor: (options) => textEditor(options), filter: true},
         {field: "nom", header: `${t("t.name")}`, editor: (options) => textEditor(options)},
         {field: "donacio", header: `${t("t.donation")}`, editor: (options) => numberEditor(options)},
         {
@@ -405,7 +472,8 @@ const SponsorsPage = ({props}) => {
             field: "estatPagament",
             header: `${t("t.payment.state")}`,
             body: estatPagamentBodyTemplate,
-            editor: (options) => opcionsEditor(options)
+            editor: (options) => opcionsEditor(options),
+            sortable: true
         },
         {field: "logo", header: `${t("t.logo")}`, body: logoBodyTemplate},
         {header: `${t("t.rebut")}`, body: (rowData) => donwloadPdfButton(rowData.id)},
@@ -483,6 +551,14 @@ const SponsorsPage = ({props}) => {
                 consulta: true
             });
         }
+    };
+
+    const filterButton = {
+        icon: "pi pi-filter",
+        className: "circular-btn",
+        onClick: () => {
+            setFilterVisible(!filterVisible);
+        }
     }
 
     useEffect(() => {
@@ -544,7 +620,10 @@ const SponsorsPage = ({props}) => {
         var apiFilter = {
             pageNum: lazyState.page,
             pageSize: lazyState.rows,
-            campanyaActiva: activeCampaign
+            campanyaActiva: activeCampaign,
+            sortField: lazyState.sortField,
+            sortOrder: lazyState.sortOrder,
+            filters: lazyState.filters
         };
         gestorfutbolService.getSponsors(apiFilter).then((data) => {
             setTotalRecords(data.data.total);
@@ -562,6 +641,11 @@ const SponsorsPage = ({props}) => {
         gestorfutbolService.saveSponsor(newData)
             .then(() => loadLazyData());
 
+    };
+
+    const onSort = (event) => {
+        event.page = lazyState.page;
+        setlazyState(event);
     };
 
     const tableProps = {
@@ -585,7 +669,7 @@ const SponsorsPage = ({props}) => {
         onPage: (e) => setlazyState(e),
         totalRecords: totalRecords,
         first: lazyState.first,
-        onSort: (e) => setlazyState(e),
+        onSort: onSort,
         sortOrder: lazyState.sortOrder,
         sortField: lazyState.sortField,
         editMode: 'row',
@@ -608,6 +692,35 @@ const SponsorsPage = ({props}) => {
         );
     };
 
+    const filterSponsor = (data) => {
+        let sponsorFilters = {};
+        if (data.cif) {
+            sponsorFilters.cif = {
+                value: data.cif,
+                matchMode: 'contains'
+            };
+        }
+        ;
+        if (data.nom) {
+            sponsorFilters.nom = {
+                value: data.nom,
+                matchMode: 'contains'
+            };
+        }
+        ;
+        if (data.estatPagament) {
+            sponsorFilters.estatPagament = {
+                value: data.estatPagament,
+                matchMode: 'equals'
+            }
+        }
+
+        setlazyState(prevState => ({
+            ...prevState,
+            filters: sponsorFilters
+        }));
+    }
+
     const duplicaSponsor = (data) => {
 
         gestorfutbolService.duplicaSponsor(selectedSponsor, data.campanya)
@@ -629,30 +742,6 @@ const SponsorsPage = ({props}) => {
 
     const hideDialogDuplica = () => {
         setCaptureDialogDuplica(false);
-    };
-
-    const cancelFormButton = {
-        icon: "pi pi-times",
-        className: "basicbutton-outlined me-2",
-        label: `${t("t.cancel")}`,
-        type: "button",
-        onClick: hideDialog,
-    };
-
-    const cancelFormDuplicaButton = {
-        icon: "pi pi-times",
-        className: "basicbutton-outlined me-2",
-        label: `${t("t.cancel")}`,
-        type: "button",
-        onClick: hideDialogDuplica,
-    };
-
-    const saveFormButton = {
-        icon: "pi pi-check",
-        label: `${t("t.save")}`,
-        type: "submit",
-        className: "p-2 rounded-2",
-        visible: !captureDialog.consulta
     };
 
     const formikSponsor = useFormik({
@@ -691,6 +780,24 @@ const SponsorsPage = ({props}) => {
         },
     });
 
+    const formikFilters = useFormik({
+        initialValues: {
+            cif: emptySponsor.cif,
+            nom: emptySponsor.nom,
+            donacio: emptySponsor.donacio,
+            estatPagament: emptySponsor.estatPagament
+        },
+        enableReinitialize: true,
+        validate: (data) => {
+            let errors = {};
+            return errors;
+        },
+        onSubmit: (data) => {
+            filterSponsor(data);
+        },
+    });
+
+
     const formikDuplica = useFormik({
         initialValues: {
             campanya: activeCampaign
@@ -708,7 +815,56 @@ const SponsorsPage = ({props}) => {
             duplicaSponsor(data);
         },
 
-    })
+    });
+
+    const cancelFormButton = {
+        icon: "pi pi-times",
+        className: "basicbutton-outlined me-2",
+        label: `${t("t.cancel")}`,
+        type: "button",
+        onClick: hideDialog,
+    };
+
+    const cancelFormDuplicaButton = {
+        icon: "pi pi-times",
+        className: "basicbutton-outlined me-2",
+        label: `${t("t.cancel")}`,
+        type: "button",
+        onClick: hideDialogDuplica,
+    };
+
+    const saveFormButton = {
+        icon: "pi pi-check",
+        label: `${t("t.save")}`,
+        type: "submit",
+        className: "p-2 rounded-2",
+        visible: !captureDialog.consulta
+    };
+
+    const cercaFormButton = {
+        icon: "pi pi-search",
+        label: `${t("t.search")}`,
+        type: "submit",
+        className: "p-2 rounded-2 mx-2",
+        onClick: () => {
+            if(viewWidth < process.env.REACT_APP_XL_VW)
+            setFilterVisible(false);
+        }
+    };
+
+    const netejaFormButton = {
+        className: "p-2 rounded-2 mx-2",
+        label: `${t("t.neteja")}`,
+        type: "button",
+        onClick: () => {
+            formikFilters.resetForm();
+            setlazyState(prevState => ({
+                ...prevState,
+                filters: null
+            }));
+            setFilterVisible(false);
+        }
+    };
 
 
     const textEditor = (options) => {
@@ -785,13 +941,51 @@ const SponsorsPage = ({props}) => {
             <ConfirmPopup/>
             <PageTitle props={{title: `${t("t.sponsors")}`}}></PageTitle>
             <TabMenuComponent props={tabMenu}></TabMenuComponent>
-            <div className="row gap-3 justify-content-center justify-content-xl-end">
-                <BasicButton props={newButton}></BasicButton>
-                <BasicButton props={duplicaButton}></BasicButton>
-                <BasicButton props={consultaButton}></BasicButton>
-                <BasicButton props={editButton}></BasicButton>
-                <BasicButton props={deleteButton}></BasicButton>
+            <div className="row justify-content-between align-items-start flex-wrap">
+                <div className="col-12 col-xl-auto mb-3 mb-xl-0">
+                    <BasicButton props={filterButton}/>
+                </div>
+
+                <div
+                    className="col-12 col-xl-auto d-flex flex-wrap gap-2 justify-content-center justify-content-xl-end">
+                    <BasicButton props={newButton}/>
+                    <BasicButton props={duplicaButton}/>
+                    <BasicButton props={consultaButton}/>
+                    <BasicButton props={editButton}/>
+                    <BasicButton props={deleteButton}/>
+                </div>
             </div>
+
+            {filterVisible && viewWidth > process.env.REACT_APP_XL_VW ? (
+                <Card className="mt-3">
+                    <form onSubmit={formikFilters.handleSubmit}>
+                        <FiltraContext.Provider
+                            value={{formikFilters}}
+                        >
+                            <FilterDataForm/>
+                        </FiltraContext.Provider>
+                        <div className="p-dialog-footer pb-0 mt-5">
+                            <BasicButton props={cercaFormButton}/>
+                            <BasicButton props={netejaFormButton}/>
+                        </div>
+                    </form>
+                </Card>
+            ) : <Sidebar visible={filterVisible} onHide={() => setFilterVisible(false)}>
+                <form onSubmit={formikFilters.handleSubmit}>
+                    <FiltraContext.Provider
+                        value={{formikFilters}}
+                    >
+                        <FilterDataForm/>
+                    </FiltraContext.Provider>
+                    <div className="p-dialog-footer pb-0 mt-5 text-center">
+                        <BasicButton props={cercaFormButton}/>
+                        <BasicButton props={netejaFormButton}/>
+                    </div>
+                </form>
+            </Sidebar>
+            }
+
+
             <div className="row mt-3">
                 <TableComponent props={tableProps}></TableComponent>
             </div>

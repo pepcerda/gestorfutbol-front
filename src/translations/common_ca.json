@@ -63,5 +63,9 @@
   "t.document": "Document",
   "t.afegeix": "Afegeix",
   "t.nova.factura": "Nova factura",
-  "t.select.campaign": "Seleccioni la temporada de destí"
+  "t.select.campaign": "Seleccioni la temporada de destí",
+  "t.campaign": "Temporada",
+  "t.duplicate.sponsor": "Duplica patrocinador",
+  "t.search": "Cerca",
+  "t.neteja": "Neteja"
 }

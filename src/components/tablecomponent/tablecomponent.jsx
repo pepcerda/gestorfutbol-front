@@ -44,8 +44,11 @@ const TableComponent = ({props}) => {
                 onRowEditComplete={props.onRowEditComplete}
                 showGridlines={props.showGridlines}
                 stripedRows={props.stripedRows}
+                onFilter={props.onFilter}
+                filterDisplay={props.filterDisplay}
             >
-                {props.columns.map((c, idx) => (
+                {props.columns
+                    .map((c, idx) => (
                     <Column
                         key={c.field}
                         field={c.field}
