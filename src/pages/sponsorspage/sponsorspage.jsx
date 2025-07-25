@@ -22,6 +22,8 @@ import FileUploader from "../../components/fileuploader/fileuploader";
 import {DataTable} from "primereact/datatable";
 import {Card} from "primereact/card";
 import {Sidebar} from "primereact/sidebar";
+import * as xlsx from 'xlsx';
+import * as module from 'file-saver';
 
 const SponsorContext = createContext();
 const DuplicaContext = createContext();
@@ -506,6 +508,10 @@ const SponsorsPage = ({props}) => {
         className: "circular-btn",
         disabled: selectedSponsor === null,
         onClick: confirm,
+        tooltip: `${t('t.elimina')}`,
+        tooltipOptions: {
+            position: "bottom"
+        }
     };
 
     const duplicaButton = {
@@ -514,6 +520,10 @@ const SponsorsPage = ({props}) => {
         disabled: campaigns !== null && campaigns.length === 1,
         onClick: () => {
             setCaptureDialogDuplica(true);
+        },
+        tooltip: `${t('t.duplica')}`,
+        tooltipOptions: {
+            position: "bottom"
         }
     };
 
@@ -528,6 +538,10 @@ const SponsorsPage = ({props}) => {
                 visible: true,
                 consulta: false
             });
+        },
+        tooltip: `${t('t.nou')}`,
+        tooltipOptions: {
+            position: "bottom"
         }
     };
 
@@ -539,6 +553,10 @@ const SponsorsPage = ({props}) => {
                 visible: true,
                 consulta: false
             });
+        },
+        tooltip: `${t('t.edita')}`,
+        tooltipOptions: {
+            position: "bottom"
         }
     };
 
@@ -550,6 +568,10 @@ const SponsorsPage = ({props}) => {
                 visible: true,
                 consulta: true
             });
+        },
+        tooltip: `${t('t.consulta')}`,
+        tooltipOptions: {
+            position: "bottom"
         }
     };
 
@@ -558,8 +580,51 @@ const SponsorsPage = ({props}) => {
         className: "circular-btn",
         onClick: () => {
             setFilterVisible(!filterVisible);
+        },
+        tooltip: `${t('t.filtra')}`,
+        tooltipOptions: {
+            position: "bottom"
         }
     }
+
+    const exportButton = {
+        icon: "pi pi-file-excel",
+        className: "circular-btn",
+        onClick: () => {
+            exportExcel()
+        },
+        tooltip: `${t('t.exporta')}`,
+        tooltipOptions: {
+            position: "bottom"
+        }
+    };
+
+    const exportExcel = () => {
+
+        gestorfutbolService.getAllSponsors(activeCampaign)
+            .then(data => {
+                const worksheet = xlsx.utils.json_to_sheet(data.data);
+                const workbook = {Sheets: {data: worksheet}, SheetNames: ['data']};
+                const excelBuffer = xlsx.write(workbook, {
+                    bookType: 'xlsx',
+                    type: 'array'
+                });
+
+                saveAsExcelFile(excelBuffer, 'patrocinadors');
+            })
+    };
+
+    const saveAsExcelFile = (buffer, fileName) => {
+        if (module && module.default) {
+            let EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+            let EXCEL_EXTENSION = '.xlsx';
+            const data = new Blob([buffer], {
+                type: EXCEL_TYPE
+            });
+
+            module.default.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
+        }
+    };
 
     useEffect(() => {
         let results;
@@ -847,8 +912,8 @@ const SponsorsPage = ({props}) => {
         type: "submit",
         className: "p-2 rounded-2 mx-2",
         onClick: () => {
-            if(viewWidth < process.env.REACT_APP_XL_VW)
-            setFilterVisible(false);
+            if (viewWidth < process.env.REACT_APP_XL_VW)
+                setFilterVisible(false);
         }
     };
 
@@ -942,8 +1007,9 @@ const SponsorsPage = ({props}) => {
             <PageTitle props={{title: `${t("t.sponsors")}`}}></PageTitle>
             <TabMenuComponent props={tabMenu}></TabMenuComponent>
             <div className="row justify-content-between align-items-start flex-wrap">
-                <div className="col-12 col-xl-auto mb-3 mb-xl-0">
+                <div className="col-12 col-xl-auto mb-3 mb-xl-0 d-flex flex-wrap gap-2 justify-content-center justify-content-xl-end">
                     <BasicButton props={filterButton}/>
+                    <BasicButton props={exportButton}/>
                 </div>
 
                 <div

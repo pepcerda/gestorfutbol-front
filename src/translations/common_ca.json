@@ -67,5 +67,15 @@
   "t.campaign": "Temporada",
   "t.duplicate.sponsor": "Duplica patrocinador",
   "t.search": "Cerca",
-  "t.neteja": "Neteja"
+  "t.neteja": "Neteja",
+  "t.tipo.socis": "Tipo Socis",
+  "t.tipo.soci": "Tipo Soci",
+  "t.general": "General",
+  "t.duplica": "Duplica",
+  "t.nou": "Nou",
+  "t.exporta": "Exporta",
+  "t.consulta": "Consulta",
+  "t.edita": "Edita",
+  "t.filtra": "Filtra",
+  "t.elimina": "Elimina"
 }

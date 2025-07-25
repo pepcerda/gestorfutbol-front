@@ -48,6 +48,11 @@ export const gestorfutbolService = {
         return response;
     },
 
+    getAllMembers(idCampanya) {
+        var response = apiClient.get("/socis/" + idCampanya);
+        return response;
+    },
+
     saveMember(member) {
         const axiosConfig = {
             headers: {
@@ -78,6 +83,11 @@ export const gestorfutbolService = {
         }
 
         var response = apiClient.post("/patrocinadors", JSON.stringify(filter), axiosConfig);
+        return response;
+    },
+
+    getAllSponsors(idCampanya) {
+        var response = apiClient.get("/patrocinadors/" + idCampanya);
         return response;
     },
 
@@ -235,6 +245,39 @@ export const gestorfutbolService = {
 
     deleteFactura(id) {
         var response = apiClient.delete("/factura/" + id);
+        return response;
+    },
+
+    getTipoSoci(filter) {
+        const axiosConfig = {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        }
+
+        var response = apiClient.post("/tipo-socis", JSON.stringify(filter), axiosConfig);
+        return response;
+    },
+
+    getAllTipoSocis(idCampanya) {
+        var response = apiClient.get("/tipo-socis/" + idCampanya);
+        return response;
+    },
+
+    saveTipoSoci(tipoSoci) {
+        const axiosConfig = {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        }
+        var response = apiClient.post("/tipo-soci", JSON.stringify(tipoSoci), axiosConfig);
+        return response;
+    },
+
+    deleteTipoSoci(id) {
+        var response = apiClient.delete("/tipo-soci/" + id);
         return response;
     }
 

@@ -1,6 +1,6 @@
 import "./memberspage.css";
 import {useTranslation} from "react-i18next";
-import {createContext, useContext, useEffect, useState} from "react";
+import React, {createContext, useContext, useEffect, useReducer, useState} from "react";
 import FormCheckbox from "../../components/formcheckbox/formcheckbox";
 import {gestorfutbolService} from "../../services/real/gestorfutbolService";
 import {ConfirmPopup, confirmPopup} from "primereact/confirmpopup";
@@ -13,16 +13,27 @@ import SelectOneMenu from "../../components/selectonemenu/selectonemenu";
 import FormInputText from "../../components/forminputtext/forminputtext";
 import TabMenuComponent from "../../components/tabmenucomponent/tabmenucomponent";
 import {ConfigContext} from "../../App";
+import * as xlsx from 'xlsx';
+import * as module from 'file-saver';
+
 
 const MemberContext = createContext();
 
 const MemberDataForm = ({props}) => {
     const {t, i18n} = useTranslation("common");
-    const {selectedMember, setSelectedMember, formikMember} =
+    const {selectedMember, setSelectedMember, formikMember, activeCampaign} =
         useContext(MemberContext);
 
     const [selectCheck, setSelectedCheck] = useState(null);
+    const [tipoSocis, setTipoSocis] = useState(null);
     const opcionsPagament = gestorfutbolService.getOpcionsPagament();
+
+    useEffect(() => {
+        gestorfutbolService.getAllTipoSocis(activeCampaign).then((data) => {
+            let results = data.data;
+            setTipoSocis(results);
+        })
+    }, [])
 
     const isFormFieldInvalid = (name) =>
         !!(formikMember.touched[name] && formikMember.errors[name]);
@@ -70,14 +81,22 @@ const MemberDataForm = ({props}) => {
         },
     };
 
-    const patrocinadorProps = {
-        id: "patrocinador",
-        label: `${t("t.sponsor")}`,
-        value: formikMember.values.patrocinador,
-        checked: formikMember.values.patrocinador,
+    const tipoSociProps = {
+        id: "tipo-soci",
+        label: `${t("t.tipo.soci")}`,
+        value: formikMember.values.tipoSoci.id,
         onChange: (e) => {
-            formikMember.setFieldValue("patrocinador", e.checked);
+            formikMember.setFieldValue("tipoSoci", tipoSocis[e.value - 1]);
         },
+        options: tipoSocis,
+        optionLabel: "nom",
+        optionValue: "id",
+        classNameError: `${
+            isFormFieldInvalid("tipoSoci") ? "invalid-select" : ""
+        }`,
+        labelClassName: `${
+            isFormFieldInvalid("tipoSoci") ? "form-text-invalid" : ""
+        }`,
     };
 
     const estatPagamentProps = {
@@ -112,15 +131,14 @@ const MemberDataForm = ({props}) => {
                 <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
                     <FormInputText props={llinatge2Props}></FormInputText>
                 </div>
-                <div
-                    className="col-12 col-md-6 form-group d-flex align-items-center align-items-md-start flex-column mt-3">
-                    <FormCheckbox props={patrocinadorProps}></FormCheckbox>
+                <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
+                    <SelectOneMenu props={tipoSociProps}></SelectOneMenu>
+                    {getFormErrorMessage("estatPagament")}
                 </div>
-                {!formikMember.values.patrocinador ?
-                    <div className="col-12 col-md-6 form-group text-center text-md-start mt-3">
-                        <SelectOneMenu props={estatPagamentProps}></SelectOneMenu>
-                        {getFormErrorMessage("estatPagament")}
-                    </div> : <></>}
+                <div className="col-12 col-md-6 form-group text-center text-md-start mt-3">
+                    <SelectOneMenu props={estatPagamentProps}></SelectOneMenu>
+                    {getFormErrorMessage("estatPagament")}
+                </div>
             </div>
         </>
     );
@@ -130,6 +148,7 @@ const MembersPage = ({props}) => {
 
     const {viewWidth, setViewWidth} = useContext(ConfigContext);
     const opcionsPagament = gestorfutbolService.getOpcionsPagament();
+    const [tipoSocis, setTipoSocis] = useState(null);
     const [members, setMembers] = useState([]);
     const {t, i18n} = useTranslation("common");
     const [totalRecords, setTotalRecords] = useState(0);
@@ -137,13 +156,19 @@ const MembersPage = ({props}) => {
     const [deleteFlag, setDeleteFlag] = useState(false);
     const [campaigns, setCampaigns] = useState(null);
     const [activeCampaign, setActiveCampaign] = useState(null);
+    const [, forceUpdate] = useReducer(x => x + 1, 0);
     let emptyMember = {
         id: null,
         nom: "",
         llinatge1: "",
         llinatge2: "",
-        patrocinador: false,
         estatPagament: null,
+        tipoSoci: {
+            id: null,
+            campanya: activeCampaign,
+            nom: "",
+            cuota: 0
+        },
         campanya: activeCampaign
     };
     const [selectedMember, setSelectedMember] = useState(emptyMember);
@@ -169,31 +194,12 @@ const MembersPage = ({props}) => {
         }
     }
 
-    const patrocinadorBodyTemplate = (member) => {
-        const checkBoxTaula = {
-            checked: member.patrocinador,
-            disabled: true,
-        };
-
-        return (
-            <>
-                {viewWidth <= 900 ?
-                    (
-                        <span className="fw-bold">{t("t.sponsor")}</span>
-                    ) : (
-                        <></>
-                    )}
-                <FormCheckbox props={checkBoxTaula}></FormCheckbox>
-            </>)
-            ;
-    };
-
     const estatPagamentBodyTemplate = (member) => {
         let estat = opcionsPagament.find(o => {
             return o.valor === member.estatPagament;
         });
 
-        if(estat != null) {
+        if (estat != null) {
             return (
                 <>
                     {viewWidth <= 900 ?
@@ -203,7 +209,8 @@ const MembersPage = ({props}) => {
                             <></>
                         )
                     }
-                    <span className={`${estat.valor === 'P' ? 'text-bg-success' : 'text-bg-danger'} px-3 py-2 rounded-pill`}>{estat.nom}</span>
+                    <span
+                        className={`${estat.valor === 'P' ? 'text-bg-success' : 'text-bg-danger'} px-3 py-2 rounded-pill`}>{estat.nom}</span>
                 </>
             );
         }
@@ -248,10 +255,33 @@ const MembersPage = ({props}) => {
             className: "selectonemenu-large"
         };
         return (
-            !options.rowData.patrocinador ? <SelectOneMenu props={optionsProps}/> : <></>
-
+             <SelectOneMenu props={optionsProps}/>
         );
     };
+
+    const tipoSocisEditor = (options) => {
+
+
+        const handleChange = (e) => {
+            options.rowData.tipoSoci = tipoSocis[e.value - 1];
+            forceUpdate();
+        };
+
+
+        const optionsProps = {
+            id: "tipoSoci_editor",
+            value: options.rowData.tipoSoci.id,
+            onChange: handleChange,
+            options: tipoSocis,
+            optionLabel: "nom",
+            optionValue: "id",
+            className: "selectonemenu-large"
+        };
+        return (
+            <SelectOneMenu props={optionsProps}/>
+        );
+    };
+
 
     const tableColumns = [
         {field: "id", header: `${t("t.id")}`},
@@ -259,16 +289,15 @@ const MembersPage = ({props}) => {
         {field: "llinatge1", header: `${t("t.surname1")}`, editor: (options) => textEditor(options)},
         {field: "llinatge2", header: `${t("t.surname2")}`, editor: (options) => textEditor(options)},
         {
-            field: "patrocinador",
-            header: `${t("t.sponsor")}`,
-            body: patrocinadorBodyTemplate,
-            editor: (options) => checkEditor(options)
-        },
-        {
             field: "estatPagament",
             header: `${t("t.payment.state")}`,
             body: estatPagamentBodyTemplate,
             editor: (options) => opcionsEditor(options)
+        },
+        {
+            field: "tipoSoci.nom",
+            header: `${t("t.tipo.soci")}`,
+            editor: (options) => tipoSocisEditor(options)
         },
         {rowEditor: true}
     ];
@@ -299,6 +328,10 @@ const MembersPage = ({props}) => {
         className: "circular-btn",
         disabled: selectedMember.id === null,
         onClick: confirm,
+        tooltip: `${t('t.elimina')}`,
+        tooltipOptions: {
+            position: "bottom"
+        }
     };
 
     const newButton = {
@@ -309,6 +342,49 @@ const MembersPage = ({props}) => {
             formikMember.resetForm();
             setCaptureDialog(true);
         },
+        tooltip: `${t('t.nou')}`,
+        tooltipOptions: {
+            position: "bottom"
+        }
+    };
+
+    const exportButton = {
+        icon: "pi pi-file-excel",
+        className: "circular-btn",
+        onClick: () => {
+            exportExcel()
+        },
+        tooltip: `${t('t.exporta')}`,
+        tooltipOptions: {
+            position: "bottom"
+        }
+    };
+
+    const exportExcel = () => {
+
+        gestorfutbolService.getAllMembers(activeCampaign)
+            .then(data => {
+                const worksheet = xlsx.utils.json_to_sheet(data.data);
+                const workbook = {Sheets: {data: worksheet}, SheetNames: ['data']};
+                const excelBuffer = xlsx.write(workbook, {
+                    bookType: 'xlsx',
+                    type: 'array'
+                });
+
+                saveAsExcelFile(excelBuffer, 'socis');
+            })
+    };
+
+    const saveAsExcelFile = (buffer, fileName) => {
+        if (module && module.default) {
+            let EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+            let EXCEL_EXTENSION = '.xlsx';
+            const data = new Blob([buffer], {
+                type: EXCEL_TYPE
+            });
+
+            module.default.saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
+        }
     };
 
     useEffect(() => {
@@ -316,7 +392,7 @@ const MembersPage = ({props}) => {
         gestorfutbolService.getAllCampaigns().then((data) => {
             results = data.data;
             setCampaigns(results);
-        })
+        });
     }, [])
 
     useEffect(() => {
@@ -329,7 +405,7 @@ const MembersPage = ({props}) => {
             let campaign = campaigns.find(c =>
                 new Date(c.any).getFullYear() === year
             )
-            if(campaign) {
+            if (campaign) {
                 let index = campaigns.findIndex(c => c.id === campaign.id);
                 setActiveCampaign(campaign.id);
                 setActiveIndex(index);
@@ -338,8 +414,16 @@ const MembersPage = ({props}) => {
             }
         }
 
-    }, [campaigns])
+    }, [campaigns]);
 
+    useEffect(() => {
+        if(activeCampaign) {
+            gestorfutbolService.getAllTipoSocis(activeCampaign).then((data) => {
+                let results = data.data;
+                setTipoSocis(results);
+            })
+        }
+    }, [activeCampaign]);
 
     useEffect(() => {
         loadLazyData();
@@ -362,9 +446,6 @@ const MembersPage = ({props}) => {
 
     const onRowEditComplete = (e) => {
         let {newData, index} = e;
-        if(newData.patrocinador) {
-            newData.estatPagament = null;
-        }
         gestorfutbolService.saveMember(newData)
             .then(() => loadLazyData())
     };
@@ -375,6 +456,7 @@ const MembersPage = ({props}) => {
         selectionMode: "single",
         paginator: true,
         onChangeSelectedDataEvent: (e) => {
+            console.log(e)
             if (e.value != null) {
                 setSelectedMember(e.value);
             }
@@ -400,6 +482,7 @@ const MembersPage = ({props}) => {
     };
 
     const saveMember = (data) => {
+        console.log(data);
         gestorfutbolService.saveMember(data)
             .then(() => {
                     setCaptureDialog(false);
@@ -432,8 +515,8 @@ const MembersPage = ({props}) => {
             nom: selectedMember.nom,
             llinatge1: selectedMember.llinatge1,
             llinatge2: selectedMember.llinatge2,
-            patrocinador: selectedMember.patrocinador,
             estatPagament: selectedMember.estatPagament,
+            tipoSoci: selectedMember.tipoSoci,
             campanya: activeCampaign
         },
         enableReinitialize: true,
@@ -446,8 +529,6 @@ const MembersPage = ({props}) => {
                 errors.llinatge1 = t("t.empty.field");
             }
             if (!data.llinatge2) {
-            }
-            if (!data.patrocinador) {
             }
             if (!data.estatPagament) {
                 errors.estatPagament = t("t.empty.field");
@@ -464,10 +545,16 @@ const MembersPage = ({props}) => {
             <ConfirmPopup/>
             <PageTitle props={{title: `${t("t.members")}`}}></PageTitle>
             <TabMenuComponent props={tabMenu}></TabMenuComponent>
-            <div className="row gap-3 justify-content-center justify-content-xl-end">
-                <BasicButton props={newButton}></BasicButton>
-                {/*           <BasicButton props={editButton}></BasicButton>*/}
-                <BasicButton props={deleteButton}></BasicButton>
+            <div className="row justify-content-between align-items-start flex-wrap">
+                <div className="col-12 col-xl-auto mb-3 mb-xl-0 d-flex flex-wrap gap-2 justify-content-center justify-content-xl-end">
+                    <BasicButton props={exportButton}/>
+                </div>
+
+                <div
+                    className="col-12 col-xl-auto d-flex flex-wrap gap-2 justify-content-center justify-content-xl-end">
+                    <BasicButton props={newButton}/>
+                    <BasicButton props={deleteButton}/>
+                </div>
             </div>
             <div className="row mt-3">
                 <TableComponent props={tableProps}></TableComponent>
@@ -479,7 +566,7 @@ const MembersPage = ({props}) => {
             >
                 <form onSubmit={formikMember.handleSubmit}>
                     <MemberContext.Provider
-                        value={{selectedMember, setSelectedMember, formikMember}}
+                        value={{selectedMember, setSelectedMember, formikMember, activeCampaign}}
                     >
                         <MemberDataForm/>
                     </MemberContext.Provider>

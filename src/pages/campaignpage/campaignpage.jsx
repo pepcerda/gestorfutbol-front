@@ -70,18 +70,6 @@ const CampaignDataForm = ({props}) => {
         labelClassName: `${isFormFieldInvalid('any') ? 'form-text-invalid' : ''}`
     };
 
-    const importSocisProps = {
-        id: "importSocis",
-        label: `${t('t.import')}`,
-        value: formikCampaign.values.importSocis,
-        mode: "currency",
-        currency: "EUR",
-        onValueChange: (e) => {
-            formikCampaign.setFieldValue('importSocis', e.target.value);
-        },
-        classNameError: `${isFormFieldInvalid('importSocis') ? 'invalid-inputnumber' : ''}`,
-        labelClassName: `${isFormFieldInvalid('importSocis') ? 'form-text-invalid' : ''}`
-    }
 
     return (
         <>
@@ -94,10 +82,6 @@ const CampaignDataForm = ({props}) => {
                     <FormCalendar props={calendar}/>
                     <br/>
                     {getFormErrorMessage('any')}
-                </div>
-                <div className="col-12 col-md-4 form-group text-center text-md-start mt-3 mt-md-0">
-                    <FormInputNumber props={importSocisProps}></FormInputNumber>
-                    {getFormErrorMessage('importSocis')}
                 </div>
             </div>
 
@@ -115,8 +99,7 @@ const CampaignPage = ({props}) => {
 
     let emptyCampaign = {
         titol: `${t('t.temporada.nova')} ${calculateCampaignYears()}`,
-        any: new Date(),
-        importSocis: null
+        any: new Date()
     }
 
     const {user} = useKindeAuth();
@@ -261,8 +244,7 @@ const CampaignPage = ({props}) => {
     const formikCampaign = useFormik({
         initialValues: {
             titol: selectedCampaign.titol,
-            any: selectedCampaign.any,
-            importSocis: selectedCampaign.importSocis
+            any: selectedCampaign.any
         },
         enableReinitialize: true,
         validate: (data) => {
@@ -272,9 +254,6 @@ const CampaignPage = ({props}) => {
             }
             if (!data.any) {
                 errors.any = t('t.empty.field');
-            }
-            if (!data.importSocis) {
-                errors.importSocis = t('t.empty.field');
             }
             if(campaigns !== null) {
                 if(campaigns.find((c) => {
