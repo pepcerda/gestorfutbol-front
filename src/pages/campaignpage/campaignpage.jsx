@@ -12,8 +12,6 @@ import {useFormik} from "formik";
 import FormCalendar from "../../components/formcalendar/formcalendar";
 import FormInputText from "../../components/forminputtext/forminputtext";
 import {Dialog} from "primereact/dialog";
-import FormCheckbox from "../../components/formcheckbox/formcheckbox";
-import FormInputNumber from "../../components/forminputnumber/forminputnumber";
 import {confirmDialog, ConfirmDialog} from "primereact/confirmdialog";
 
 const CampaignContext = createContext();
@@ -120,9 +118,7 @@ const CampaignPage = ({props}) => {
 
     const tableColumns = [
         {field: "id", header: `${t('t.id')}`},
-        {field: "titol", header: `${t('t.title')}`},
-        {field: "importSocis", header: `${t('t.amount')}`},
-        {field: "socis", header: `${t('t.members')}`}
+        {field: "titol", header: `${t('t.title')}`}
     ];
 
 

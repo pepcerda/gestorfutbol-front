@@ -1,0 +1,46 @@
+.datacard {
+
+}
+
+.green-card {
+    border: 2px solid #1ea97c !important;
+    border-radius: 5px;
+    box-shadow: none !important;
+    background: #d9f6df;
+}
+
+.red-card {
+    border: 2px solid #7F0101 !important;
+    border-radius: 5px;
+    box-shadow: none !important;
+    background: #F6C7C7;
+}
+
+.green-text-card {
+    color: var(--green-700);
+}
+
+.red-text-card {
+    color: var(--red-800);
+}
+
+
+@media (min-width: 576px) {
+
+}
+
+@media (min-width: 768px) {
+
+}
+
+@media (min-width: 992px) {
+
+}
+
+@media (min-width: 1200px) {
+
+}
+
+@media (min-width: 1400px) {
+
+}

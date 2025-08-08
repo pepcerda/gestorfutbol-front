@@ -77,5 +77,11 @@
   "t.consulta": "Consulta",
   "t.edita": "Edita",
   "t.filtra": "Filtra",
-  "t.elimina": "Elimina"
+  "t.elimina": "Elimina",
+  "t.inici": "Inici",
+  "t.ingressos": "Ingressos",
+  "t.despeses": "Despeses",
+  "t.utilitats": "Utilitats",
+  "t.calendari": "Calendari",
+  "t.classificacio": "Classificació"
 }

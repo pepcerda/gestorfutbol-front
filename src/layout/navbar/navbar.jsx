@@ -48,7 +48,7 @@ const Navbar = () => {
     const {t, i18n} = useTranslation("common");
 
     const items = [
-        /*{
+        {
             className: "sidenav-item",
 
             template: () => {
@@ -59,7 +59,7 @@ const Navbar = () => {
                     </NavLink>
                 );
             },
-        },*/
+        },
         {
             className: "sidenav-item ",
             template: () => {
@@ -129,7 +129,7 @@ const Navbar = () => {
     ];
 
     const visibleItems = [
-            /*{
+            {
                 className: "sidenav-item",
 
                 template: () => {
@@ -141,7 +141,7 @@ const Navbar = () => {
                         </NavLink>
                     );
                 },
-            },*/
+            },
         {
             className: "sidenav-item ",
             template: () => {

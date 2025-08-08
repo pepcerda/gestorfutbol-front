@@ -2,6 +2,19 @@
 
 }
 
+.utilitats-card {
+    padding: .5rem;
+}
+
+.utilitats-card > * {
+    color: black;
+}
+
+.utilitats-img {
+    max-width: 4rem;
+    max-height: 4rem;
+}
+
 @media (min-width: 576px) {
 
 }
