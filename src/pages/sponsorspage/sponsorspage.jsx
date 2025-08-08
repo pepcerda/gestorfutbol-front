@@ -24,6 +24,7 @@ import {Card} from "primereact/card";
 import {Sidebar} from "primereact/sidebar";
 import * as xlsx from 'xlsx';
 import * as module from 'file-saver';
+import {useLocation} from "react-router-dom";
 
 const SponsorContext = createContext();
 const DuplicaContext = createContext();
@@ -332,6 +333,7 @@ const DuplicaForm = ({props}) => {
 
 const SponsorsPage = ({props}) => {
 
+    const location = useLocation();
     const {viewWidth, setViewWidth} = useContext(ConfigContext);
     const [sponsors, setSponsors] = useState([]);
     const opcionsPagament = gestorfutbolService.getOpcionsPagament();
@@ -483,8 +485,10 @@ const SponsorsPage = ({props}) => {
     ];
 
     const accept = () => {
-        gestorfutbolService.deleteSponsor(selectedSponsor.id);
-        setDeleteFlag(true);
+        gestorfutbolService.deleteSponsor(selectedSponsor.id)
+            .then(() => {
+                setDeleteFlag(true);
+            });
     };
 
     const reject = () => {
@@ -654,6 +658,12 @@ const SponsorsPage = ({props}) => {
         }
 
     }, [campaigns])
+
+    useEffect(() => {
+        if(location.state?.filtre) {
+            filterSponsor(location.state.filtre)
+        }
+    }, [])
 
     useEffect(() => {
         loadLazyData();

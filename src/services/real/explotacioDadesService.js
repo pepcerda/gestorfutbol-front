@@ -30,6 +30,21 @@ export const explotacioDadesService = {
     getTotalImportPatrocinisiEstatNoPagat(idCampanya) {
         var response = apiClient.get("/total-patrocinis-no-pagat/" + idCampanya);
         return response;
-    }
+    },
+
+    getDadesExplotacioPatrocinis(idCampanya) {
+        var response = apiClient.get("/explotacio-patrocinis/" + idCampanya);
+        return response;
+    },
+
+    getDadesExplotacioSocis(idCampanya) {
+        var response = apiClient.get("/explotacio-socis/" + idCampanya);
+        return response;
+    },
+
+    getDadesExplotacioFactures(idCampanya) {
+        var response = apiClient.get("/explotacio-factures/" + idCampanya);
+        return response;
+    },
 
 }

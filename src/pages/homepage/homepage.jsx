@@ -1,5 +1,5 @@
 import './homepage.css';
-import {useEffect, useState} from "react";
+import {createContext, useContext, useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {gestorfutbolService} from "../../services/real/gestorfutbolService";
 import {explotacioDadesService} from "../../services/real/explotacioDadesService";
@@ -10,6 +10,9 @@ import DataCard from "../../components/datacard/datacard";
 import ffiblogo from "../../resources/utilitats/utilitatffib.png";
 import drivelogo from "../../resources/utilitats/utilitatsdrive.png";
 import intranet from "../../resources/utilitats/utilitatintranet.png"
+import {NavLink} from "react-router-dom";
+
+const CampanyaContext = createContext();
 
 const UtilitatsModul = ({props}) => {
     const {t, i18n} = useTranslation("common");
@@ -57,15 +60,46 @@ const UtilitatsModul = ({props}) => {
 }
 
 const IngressosModul = ({props}) => {
+
+    const emptyDadesPatrocinis = {
+        previsioRecaptacio: 0,
+        totalRecaptat: 0
+    };
+
+    const emptyDadesSocis = {
+        previsioRecaptacio: 0,
+        totalRecaptat: 0
+    }
+
     const {t, i18n} = useTranslation("common");
+    const {activeCampaign} = useContext(CampanyaContext)
+    const [dadesPatrocinis, setDadesPatrocinis] = useState(emptyDadesPatrocinis);
+    const [dadesSocis, setDadesSocis] = useState(emptyDadesSocis);
+
+    useEffect(() => {
+        if (activeCampaign) {
+            explotacioDadesService.getDadesExplotacioPatrocinis(activeCampaign)
+                .then((data) => {
+                    setDadesPatrocinis(data.data);
+                });
+            explotacioDadesService.getDadesExplotacioSocis(activeCampaign)
+                .then((data) => {
+                    setDadesSocis(data.data);
+                })
+        }
+
+    }, [activeCampaign])
+
 
     const patrocinadorsContent = () => {
         return (
             <>
-                <p>Total a recaptar: 30.000 €</p>
-                <p>Consulta pendents</p>
+                <p>{t('t.previsio.recaptacio')}: {dadesPatrocinis.previsioRecaptacio} €</p>
+                <p>{t('t.total.recaptacio')}: {dadesPatrocinis.totalRecaptat} €</p>
                 <br/>
-                <p>Total recaptat: 15.000 €</p>
+
+                <NavLink to={"/patrocinadors"} state={{filtre: {estatPagament: "D"}}}
+                         className="basicbutton rounded-border-btn text-light">Consulta pendents</NavLink>
             </>
         )
     }
@@ -79,10 +113,15 @@ const IngressosModul = ({props}) => {
     const socisContent = () => {
         return (
             <>
-                <p>Total a recaptar: 30.000 €</p>
-                <p>Consulta pendents</p>
-                <br/>
-                <p>Total recaptat: 15.000 €</p>
+                <>
+                    <p>{t('t.previsio.recaptacio')}: {dadesSocis.previsioRecaptacio} €</p>
+                    <p>{t('t.total.recaptacio')}: {dadesSocis.totalRecaptat} €</p>
+                    <br/>
+
+                    {/*<NavLink to={"/patrocinadors"} state={{filtre: {estatPagament: "D"}}}
+                             className="basicbutton rounded-border-btn text-light">Consulta pendents</NavLink>*/}
+
+                </>
             </>
         )
     }
@@ -105,15 +144,33 @@ const IngressosModul = ({props}) => {
 };
 
 const DespesesModul = ({props}) => {
+    const emptyDadesFactures = {
+        totalPagat: 0,
+        pendentPagar: 0
+    }
+
     const {t, i18n} = useTranslation("common");
+    const [dadesFactures, setDadesFactures] = useState(emptyDadesFactures);
+    const {activeCampaign} = useContext(CampanyaContext)
+
+    useEffect(() => {
+        if (activeCampaign) {
+            explotacioDadesService.getDadesExplotacioFactures(activeCampaign)
+                .then((data) => {
+                    setDadesFactures(data.data);
+                });
+        }
+
+    }, [activeCampaign])
+
 
     const facturesContent = () => {
         return (
             <>
-                <p>Total a recaptar: 30.000 €</p>
-                <p>Consulta pendents</p>
+                <p>{t('t.pendent.pagar')}: {dadesFactures.pendentPagar} €</p>
+                <p>{t('t.total.pagat')}: {dadesFactures.totalPagat} €</p>
                 <br/>
-                <p>Total recaptat: 15.000 €</p>
+                {/*<p>Consulta pendents</p>*/}
             </>
         )
     }
@@ -217,14 +274,17 @@ const HomePage = ({props}) => {
                     </div>
                 </form>
             </div>
-            <div className="row mt-5 gap-2 gap-md-0">
-                <div className="col-12 col-md-6">
-                    <DataCard props={ingressosCard}></DataCard>
+            <CampanyaContext.Provider value={{activeCampaign}}>
+                <div className="row mt-5 gap-2 gap-md-0">
+                    <div className="col-12 col-md-6">
+                        <DataCard props={ingressosCard}></DataCard>
+                    </div>
+                    <div className="col-12 col-md-6">
+                        <DataCard props={despesesCard}></DataCard>
+                    </div>
                 </div>
-                <div className="col-12 col-md-6">
-                    <DataCard props={despesesCard}></DataCard>
-                </div>
-            </div>
+            </CampanyaContext.Provider>
+
 
         </>);
 }

@@ -360,8 +360,10 @@ const CaixaFixaPage = ({props}) => {
     ];
 
     const accept = () => {
-        gestorfutbolService.deleteFactura(selectedFactura.id);
-        setDeleteFlag(true);
+        gestorfutbolService.deleteFactura(selectedFactura.id)
+            .then(() => {
+                setDeleteFlag(true);
+            })
     };
 
     const reject = () => {

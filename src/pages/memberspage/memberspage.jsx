@@ -303,8 +303,10 @@ const MembersPage = ({props}) => {
     ];
 
     const accept = () => {
-        gestorfutbolService.deleteMember(selectedMember.id);
-        setDeleteFlag(true);
+        gestorfutbolService.deleteMember(selectedMember.id)
+            .then(() => {
+                setDeleteFlag(true);
+            })
     };
 
     const reject = () => {

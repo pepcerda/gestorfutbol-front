@@ -83,5 +83,9 @@
   "t.despeses": "Despeses",
   "t.utilitats": "Utilitats",
   "t.calendari": "Calendari",
-  "t.classificacio": "Classificació"
+  "t.classificacio": "Classificació",
+  "t.previsio.recaptacio": "Previsió recaptació",
+  "t.total.recaptacio": "Total recaptació",
+  "t.pendent.pagar": "Pendent pagament",
+  "t.total.pagat": "Total pagat"
 }
