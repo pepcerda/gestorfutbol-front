@@ -741,7 +741,15 @@ const SponsorsPage = ({props}) => {
         rowsPerPageOptions: [5, 10, 25, 50],
         breakpoint: "900px",
         lazy: true,
-        onPage: (e) => setlazyState(e),
+        onPage: (e) => {
+            console.log(lazyState);
+            setlazyState(prevState => ({
+                ...prevState,
+                first: e.first,
+                page: e.page,
+                rows: e.rows
+            }));
+        },
         totalRecords: totalRecords,
         first: lazyState.first,
         onSort: onSort,

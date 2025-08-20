@@ -199,6 +199,7 @@ const TipoSocisPage = ({props}) => {
 
 
     useEffect(() => {
+        console.log("Entro")
         loadLazyData();
         setDeleteFlag(false);
     }, [lazyState, deleteFlag, activeCampaign]);
@@ -211,7 +212,7 @@ const TipoSocisPage = ({props}) => {
         };
 
         gestorfutbolService.getTipoSoci(apiFilter).then((data) => {
-            console.log(data)
+            console.log(apiFilter.campanyaActiva)
             setTotalRecords(data.data.total);
             let results = data.data.result;
             setTipoSocis(results);

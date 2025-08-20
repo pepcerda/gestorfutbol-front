@@ -31,6 +31,7 @@ const MemberDataForm = ({props}) => {
     useEffect(() => {
         gestorfutbolService.getAllTipoSocis(activeCampaign).then((data) => {
             let results = data.data;
+            console.log(data.data);
             setTipoSocis(results);
         })
     }, [])
@@ -86,7 +87,7 @@ const MemberDataForm = ({props}) => {
         label: `${t("t.tipo.soci")}`,
         value: formikMember.values.tipoSoci.id,
         onChange: (e) => {
-            formikMember.setFieldValue("tipoSoci", tipoSocis[e.value - 1]);
+            formikMember.setFieldValue("tipoSoci", tipoSocis.find(c => c.id === e.value));
         },
         options: tipoSocis,
         optionLabel: "nom",
@@ -133,7 +134,6 @@ const MemberDataForm = ({props}) => {
                 </div>
                 <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
                     <SelectOneMenu props={tipoSociProps}></SelectOneMenu>
-                    {getFormErrorMessage("estatPagament")}
                 </div>
                 <div className="col-12 col-md-6 form-group text-center text-md-start mt-3">
                     <SelectOneMenu props={estatPagamentProps}></SelectOneMenu>
@@ -163,6 +163,7 @@ const MembersPage = ({props}) => {
         llinatge1: "",
         llinatge2: "",
         estatPagament: null,
+        idSoci: null,
         tipoSoci: {
             id: null,
             campanya: activeCampaign,
@@ -284,7 +285,7 @@ const MembersPage = ({props}) => {
 
 
     const tableColumns = [
-        {field: "id", header: `${t("t.id")}`},
+        {field: "idSoci", header: `${t("t.num.soci")}`},
         {field: "nom", header: `${t("t.name")}`, editor: (options) => textEditor(options)},
         {field: "llinatge1", header: `${t("t.surname1")}`, editor: (options) => textEditor(options)},
         {field: "llinatge2", header: `${t("t.surname2")}`, editor: (options) => textEditor(options)},
@@ -442,6 +443,7 @@ const MembersPage = ({props}) => {
         gestorfutbolService.getMembers(apiFilter).then((data) => {
             setTotalRecords(data.data.total);
             let results = data.data.result;
+            console.log(results)
             setMembers(results);
         });
     };
@@ -527,9 +529,7 @@ const MembersPage = ({props}) => {
             if (!data.nom) {
                 errors.nom = t("t.empty.field");
             }
-            if (!data.llinatge1) {
-                errors.llinatge1 = t("t.empty.field");
-            }
+
             if (!data.llinatge2) {
             }
             if (!data.estatPagament) {

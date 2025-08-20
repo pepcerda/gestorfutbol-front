@@ -529,9 +529,6 @@ const CaixaFixaPage = ({props}) => {
             if (!data.nom) {
                 errors.nom = t("t.empty.field");
             }
-            if (!data.llinatge1) {
-                errors.llinatge1 = t("t.empty.field");
-            }
             if (!data.llinatge2) {
             }
             if (!data.despesa) {
