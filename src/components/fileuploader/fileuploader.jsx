@@ -11,7 +11,7 @@ const FileUploader = ({props}) => {
             <FileUpload mode={props.mode} accept={props.accept} customUpload={props.customUpload}
                         uploadHandler={props.uploadHandler} className={`fileuploader ${props.className}`}
                         onProgress={props.onProgress} onUpload={props.onUpload}
-                        auto={props.auto} uploadLabel={props.uploadLabel} chooseLabel={props.chooseLabel}/>
+                        auto={props.auto} uploadLabel={props.uploadLabel} chooseLabel={props.chooseLabel} disabled={props.disabled}/>
         </>
     );
 }

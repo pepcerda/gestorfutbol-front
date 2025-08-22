@@ -33,7 +33,6 @@ function App() {
         gestorfutbolService.getConfiguracioGeneral()
             .then((data) => {
                 if(data.data) {
-                    console.log(data.data);
                     setLogo(process.env.REACT_APP_URI_BACK + data.data.logo);
                     setNom(data.data.nom);
                     document.title = data.data.nom;

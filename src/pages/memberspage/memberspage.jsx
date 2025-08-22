@@ -15,9 +15,61 @@ import TabMenuComponent from "../../components/tabmenucomponent/tabmenucomponent
 import {ConfigContext} from "../../App";
 import * as xlsx from 'xlsx';
 import * as module from 'file-saver';
+import moment from "moment";
+import {Card} from "primereact/card";
+import {Sidebar} from "primereact/sidebar";
 
 
 const MemberContext = createContext();
+const FiltraContext = createContext();
+
+
+const FilterDataForm = ({props}) => {
+    const {t, i18n} = useTranslation("common");
+    const {formikFilters} = useContext(FiltraContext);
+    const opcionsPagament = gestorfutbolService.getOpcionsPagament();
+
+    const dataDonacioCalc = (value) => {
+        let dateString = value;
+        let dateMomentObject = moment(dateString, 'YYYY-MM-DD');
+        return dateMomentObject.toDate();
+    }
+
+    const nomProps = {
+        id: "nom",
+        label: `${t("t.name")}`,
+        value: formikFilters.values.nom,
+        onChange: (e) => {
+            formikFilters.setFieldValue("nom", e.target.value);
+        }
+    };
+
+    const estatPagamentProps = {
+        id: "estat-pagament",
+        label: `${t("t.payment.state")}`,
+        value: formikFilters.values.estatPagament,
+        onChange: (e) => {
+            formikFilters.setFieldValue("estatPagament", e.value);
+        },
+        options: opcionsPagament,
+        optionLabel: "nom",
+        optionValue: "valor"
+    };
+
+    return (
+        <>
+            <div className="row">
+                <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
+                    <FormInputText props={nomProps}></FormInputText>
+                </div>
+                <div className="col-12 col-md-6 form-group text-center text-md-start mt-3">
+                    <SelectOneMenu props={estatPagamentProps}></SelectOneMenu>
+                </div>
+            </div>
+        </>
+    );
+};
+
 
 const MemberDataForm = ({props}) => {
     const {t, i18n} = useTranslation("common");
@@ -31,7 +83,6 @@ const MemberDataForm = ({props}) => {
     useEffect(() => {
         gestorfutbolService.getAllTipoSocis(activeCampaign).then((data) => {
             let results = data.data;
-            console.log(data.data);
             setTipoSocis(results);
         })
     }, [])
@@ -183,6 +234,8 @@ const MembersPage = ({props}) => {
 
     const [activeIndex, setActiveIndex] = useState(0)
     const [tabMenuItems, setTabMenuItems] = useState(null);
+    const [filterVisible, setFilterVisible] = useState(false);
+
 
     const tabMenu = {
         model: tabMenuItems,
@@ -351,6 +404,18 @@ const MembersPage = ({props}) => {
         }
     };
 
+    const filterButton = {
+        icon: "pi pi-filter",
+        className: "circular-btn",
+        onClick: () => {
+            setFilterVisible(!filterVisible);
+        },
+        tooltip: `${t('t.filtra')}`,
+        tooltipOptions: {
+            position: "bottom"
+        }
+    }
+
     const exportButton = {
         icon: "pi pi-file-excel",
         className: "circular-btn",
@@ -363,9 +428,43 @@ const MembersPage = ({props}) => {
         }
     };
 
+    const cercaFormButton = {
+        icon: "pi pi-search",
+        label: `${t("t.search")}`,
+        type: "submit",
+        className: "p-2 rounded-2 mx-2",
+        onClick: () => {
+            if (viewWidth < process.env.REACT_APP_XL_VW)
+                setFilterVisible(false);
+        }
+    };
+
+    const netejaFormButton = {
+        className: "p-2 rounded-2 mx-2",
+        label: `${t("t.neteja")}`,
+        type: "button",
+        onClick: () => {
+            formikFilters.resetForm();
+            setlazyState(prevState => ({
+                ...prevState,
+                filters: null
+            }));
+            setFilterVisible(false);
+        }
+    };
+
     const exportExcel = () => {
 
-        gestorfutbolService.getAllMembers(activeCampaign)
+        let apiFilter = {
+            pageNum: lazyState.page,
+            pageSize: lazyState.rows,
+            campanyaActiva: activeCampaign,
+            sortField: lazyState.sortField,
+            sortOrder: lazyState.sortOrder,
+            filters: lazyState.filters
+        };
+
+        gestorfutbolService.getAllMembers(apiFilter)
             .then(data => {
                 const worksheet = xlsx.utils.json_to_sheet(data.data);
                 const workbook = {Sheets: {data: worksheet}, SheetNames: ['data']};
@@ -437,13 +536,15 @@ const MembersPage = ({props}) => {
         let apiFilter = {
             pageNum: lazyState.page,
             pageSize: lazyState.rows,
-            campanyaActiva: activeCampaign
+            campanyaActiva: activeCampaign,
+            sortField: lazyState.sortField,
+            sortOrder: lazyState.sortOrder,
+            filters: lazyState.filters
         };
 
         gestorfutbolService.getMembers(apiFilter).then((data) => {
             setTotalRecords(data.data.total);
             let results = data.data.result;
-            console.log(results)
             setMembers(results);
         });
     };
@@ -460,7 +561,6 @@ const MembersPage = ({props}) => {
         selectionMode: "single",
         paginator: true,
         onChangeSelectedDataEvent: (e) => {
-            console.log(e)
             if (e.value != null) {
                 setSelectedMember(e.value);
             }
@@ -494,6 +594,29 @@ const MembersPage = ({props}) => {
                 }
             );
     };
+
+    const filterMember = (data) => {
+        let sponsorFilters = {};
+        if (data.nom) {
+            sponsorFilters.nom = {
+                value: data.nom,
+                matchMode: 'contains'
+            };
+        };
+
+        if (data.estatPagament) {
+            sponsorFilters.estatPagament = {
+                value: data.estatPagament,
+                matchMode: 'equals'
+            }
+        };
+
+        setlazyState(prevState => ({
+            ...prevState,
+            filters: sponsorFilters
+        }));
+    }
+
 
     const hideDialog = () => {
         setCaptureDialog(false);
@@ -542,6 +665,22 @@ const MembersPage = ({props}) => {
         },
     });
 
+    const formikFilters = useFormik({
+        initialValues: {
+            nom: emptyMember.nom,
+            estatPagament: emptyMember.estatPagament
+        },
+        enableReinitialize: true,
+        validate: (data) => {
+            let errors = {};
+            return errors;
+        },
+        onSubmit: (data) => {
+            filterMember(data);
+        },
+    });
+
+
     return (
         <div className="container p-2 p-xl-4">
             <ConfirmPopup/>
@@ -549,6 +688,7 @@ const MembersPage = ({props}) => {
             <TabMenuComponent props={tabMenu}></TabMenuComponent>
             <div className="row justify-content-between align-items-start flex-wrap">
                 <div className="col-12 col-xl-auto mb-3 mb-xl-0 d-flex flex-wrap gap-2 justify-content-center justify-content-xl-end">
+                    <BasicButton props={filterButton}/>
                     <BasicButton props={exportButton}/>
                 </div>
 
@@ -558,6 +698,35 @@ const MembersPage = ({props}) => {
                     <BasicButton props={deleteButton}/>
                 </div>
             </div>
+
+            {filterVisible && viewWidth > process.env.REACT_APP_XL_VW ? (
+                <Card className="mt-3">
+                    <form onSubmit={formikFilters.handleSubmit}>
+                        <FiltraContext.Provider
+                            value={{formikFilters}}
+                        >
+                            <FilterDataForm/>
+                        </FiltraContext.Provider>
+                        <div className="p-dialog-footer pb-0 mt-5">
+                            <BasicButton props={cercaFormButton}/>
+                            <BasicButton props={netejaFormButton}/>
+                        </div>
+                    </form>
+                </Card>
+            ) : <Sidebar visible={filterVisible} onHide={() => setFilterVisible(false)}>
+                <form onSubmit={formikFilters.handleSubmit}>
+                    <FiltraContext.Provider
+                        value={{formikFilters}}
+                    >
+                        <FilterDataForm/>
+                    </FiltraContext.Provider>
+                    <div className="p-dialog-footer pb-0 mt-5 text-center">
+                        <BasicButton props={cercaFormButton}/>
+                        <BasicButton props={netejaFormButton}/>
+                    </div>
+                </form>
+            </Sidebar>
+            }
             <div className="row mt-3">
                 <TableComponent props={tableProps}></TableComponent>
             </div>

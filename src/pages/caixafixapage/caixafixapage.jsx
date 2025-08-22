@@ -1,6 +1,6 @@
 import './caixafixapage.css';
 import {ConfigContext} from "../../App";
-import {createContext, useContext, useEffect, useState} from "react";
+import React, {createContext, useContext, useEffect, useState} from "react";
 import {gestorfutbolService} from "../../services/real/gestorfutbolService";
 import {useTranslation} from "react-i18next";
 import FormCheckbox from "../../components/formcheckbox/formcheckbox";
@@ -23,7 +23,7 @@ const FacturaContext = createContext();
 
 const FacturaDataForm = ({props}) => {
     const {t, i18n} = useTranslation("common");
-    const {selectedFactura, setSelectedFactura, formikFactura} =
+    const {selectedFactura, setSelectedFactura, formikFactura, captureDialog} =
         useContext(FacturaContext);
 
     const [selectCheck, setSelectedCheck] = useState(null);
@@ -43,6 +43,18 @@ const FacturaDataForm = ({props}) => {
         );
     };
 
+    const esBase64Embebida = (cadena) => {
+
+
+        if (typeof cadena !== 'string') return false;
+
+        // Expresión regular para detectar el esquema data:image/...;base64,...
+        const base64DataUrlRegex = /^data:([a-z]+\/[a-z0-9\-\+\.]+);base64,[A-Za-z0-9+/]+={0,2}$/i;
+
+        return base64DataUrlRegex.test(cadena.trim());
+    };
+
+
     const customBase64Uploader = async (event) => {
         // convert file to base64 encoded
         const file = event.files[0];
@@ -53,12 +65,13 @@ const FacturaDataForm = ({props}) => {
         reader.onloadend = function () {
             const base64data = reader.result;
             formikFactura.setFieldValue("factura", base64data);
+            formikFactura.setFieldValue("facturaBlob", file.objectURL);
             setFileName(file.name);
-            event.options.clear();
+            event.options.clear();console.log(base64data);
         };
 
-
     };
+
     const nomProps = {
         id: "nom",
         label: `${t("t.name")}`,
@@ -68,6 +81,7 @@ const FacturaDataForm = ({props}) => {
         },
         classNameError: `${isFormFieldInvalid("nom") ? "invalid-inputtext" : ""}`,
         labelClassName: `${isFormFieldInvalid("nom") ? "form-text-invalid" : ""}`,
+        disabled: captureDialog.visible
     };
 
     const llinatge1Props = {
@@ -83,6 +97,7 @@ const FacturaDataForm = ({props}) => {
         labelClassName: `${
             isFormFieldInvalid("llinatge1") ? "form-text-invalid" : ""
         }`,
+        disabled: captureDialog.visible
     };
 
     const llinatge2Props = {
@@ -92,6 +107,8 @@ const FacturaDataForm = ({props}) => {
         onChange: (e) => {
             formikFactura.setFieldValue("llinatge2", e.target.value);
         },
+        disabled: captureDialog.visible
+
     };
 
     const despesaProps = {
@@ -104,21 +121,10 @@ const FacturaDataForm = ({props}) => {
             formikFactura.setFieldValue('despesa', e.target.value);
         },
         classNameError: `${isFormFieldInvalid('despesa') ? 'invalid-inputnumber' : ''}`,
-        labelClassName: `${isFormFieldInvalid('despesa') ? 'form-text-invalid' : ''}`
-    };
+        labelClassName: `${isFormFieldInvalid('despesa') ? 'form-text-invalid' : ''}`,
+        disabled: captureDialog.visible
 
-    /*    const dataDonacioProps = {
-            id: "dataDonacio",
-            label: `${t('t.donation.date')}`,
-            value: formikSponsor.values.dataDonacio,
-            view: "date",
-            dateFormat: "dd/mm/yy",
-            onChange: (e) => {
-                formikSponsor.setFieldValue('dataDonacio', e.target.value);
-            },
-            classNameError: `${isFormFieldInvalid('dataDonacio') ? 'formcalendar-invalid' : ''}`,
-            labelClassName: `${isFormFieldInvalid('dataDonacio') ? 'form-text-invalid' : ''}`
-        };*/
+    };
 
     const estatProps = {
         id: "estat",
@@ -136,6 +142,8 @@ const FacturaDataForm = ({props}) => {
         labelClassName: `${
             isFormFieldInvalid("estat") ? "form-text-invalid" : ""
         }`,
+        disabled: captureDialog.visible
+
     };
 
 
@@ -145,7 +153,8 @@ const FacturaDataForm = ({props}) => {
         value: formikFactura.values.observacio,
         onChange: (e) => {
             formikFactura.setFieldValue("observacio", e.target.value);
-        }
+        },
+        disabled: captureDialog.visible
     };
 
     const facturaUploader = {
@@ -156,7 +165,8 @@ const FacturaDataForm = ({props}) => {
         uploadHandler: customBase64Uploader,
         accept: "image/*",
         auto: true,
-        chooseLabel: `${t('t.afegeix')}`
+        chooseLabel: `${t('t.afegeix')}`,
+        disabled: captureDialog.visible
     }
 
 
@@ -185,22 +195,26 @@ const FacturaDataForm = ({props}) => {
                 <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
                     <FormTextArea props={observacioProps}></FormTextArea>
                 </div>
-                <div className="row align-items-center align-content-center mt-3 mt-md-0">
+                <div className="row align-items-center align-content-center mt-3 mt-md-0 gap-3">
                     <div className="col-12 col-md-1 text-center text-md-start form-group">
                         <FileUploader props={facturaUploader}/>
                     </div>
-                    <div className="col-12 col-md-4 text-center text-md-start form-group mt-3 mt-md-0 ms-3">
-                        {fileName && <span>{fileName}</span>}
-                        {fileName && <span>{fileName}</span>}
+                    {formikFactura.values.factura && !esBase64Embebida(formikFactura.values.factura) &&
+                        <div className="col-12 col-md-2 text-center text-md-start form-group mt-3 mt-md-0 ms-3 my-auto">
+                            <>
+                                <p>{t('t.factura.original')}</p>
+                                <p><a href={process.env.REACT_APP_URI_BACK + formikFactura.values.factura}
+                                      target="_blank">{t('t.document')}</a></p>
+                            </>
+                        </div>}
+                    <div className="col-12 col-md-2 text-center text-md-start form-group mt-3 mt-md-0 ms-3">
+                        {formikFactura.values.facturaBlob && <>
+                            <p>{t('t.factura.annexat')}</p>
+                            <p><a href={formikFactura.values.facturaBlob}
+                                  target="_blank">{t('t.document')}</a></p>
+                        </>}
                     </div>
                 </div>
-
-                {/*<div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
-                    <FormCalendar props={dataDonacioProps}/>
-                    <br/>
-                    {getFormErrorMessage('dataDonacio')}
-                </div>*/}
-
 
             </div>
         </>
@@ -214,7 +228,10 @@ const CaixaFixaPage = ({props}) => {
     const [factures, setFactures] = useState([]);
     const {t, i18n} = useTranslation("common");
     const [totalRecords, setTotalRecords] = useState(0);
-    const [captureDialog, setCaptureDialog] = useState(false);
+    const [captureDialog, setCaptureDialog] = useState({
+        visible: false,
+        consulta: false
+    });
     const [deleteFlag, setDeleteFlag] = useState(false);
     const [campaigns, setCampaigns] = useState(null);
     const [activeCampaign, setActiveCampaign] = useState(null);
@@ -395,8 +412,43 @@ const CaixaFixaPage = ({props}) => {
         onClick: () => {
             setSelectedFactura(emptyFactura);
             formikFactura.resetForm();
-            setCaptureDialog(true);
+            setCaptureDialog({
+                visible: true,
+                consulta: false
+            });
         },
+    };
+
+    const editButton = {
+        icon: "pi pi-pencil",
+        className: "circular-btn",
+        onClick: () => {
+            setCaptureDialog({
+                visible: true,
+                consulta: false
+            });
+        },
+        tooltip: `${t('t.edita')}`,
+        tooltipOptions: {
+            position: "bottom"
+        },
+        disabled: selectedFactura.id === null
+    };
+
+    const consultaButton = {
+        icon: "pi pi-eye",
+        className: "circular-btn",
+        onClick: () => {
+            setCaptureDialog({
+                visible: true,
+                consulta: true
+            });
+        },
+        tooltip: `${t('t.consulta')}`,
+        tooltipOptions: {
+            position: "bottom"
+        },
+        disabled: selectedFactura.id === null
     };
 
     useEffect(() => {
@@ -485,16 +537,25 @@ const CaixaFixaPage = ({props}) => {
     };
 
     const saveFactura = (data) => {
+        if (selectedFactura.id) {
+            data.id = selectedFactura.id;
+        }
         gestorfutbolService.saveFactura(data)
             .then(() => {
-                    setCaptureDialog(false);
+                setCaptureDialog({
+                    visible: false,
+                    consulta: false
+                });
                     loadLazyData();
                 }
             );
     };
 
     const hideDialog = () => {
-        setCaptureDialog(false);
+        setCaptureDialog({
+            visible: false,
+            consulta: false
+        });
     };
 
     const cancelFormButton = {
@@ -520,6 +581,7 @@ const CaixaFixaPage = ({props}) => {
             despesa: selectedFactura.despesa,
             observacio: selectedFactura.observacio,
             factura: selectedFactura.factura,
+            facturaBlob: null,
             estat: selectedFactura.estat,
             campanya: activeCampaign
         },
@@ -542,7 +604,6 @@ const CaixaFixaPage = ({props}) => {
             return errors;
         },
         onSubmit: (data) => {
-            console.log("Entro");
             saveFactura(data);
         },
     });
@@ -554,20 +615,21 @@ const CaixaFixaPage = ({props}) => {
             <TabMenuComponent props={tabMenu}></TabMenuComponent>
             <div className="row gap-3 justify-content-center justify-content-xl-end">
                 <BasicButton props={newButton}></BasicButton>
-                {/*           <BasicButton props={editButton}></BasicButton>*/}
+                <BasicButton props={editButton}></BasicButton>
+                <BasicButton props={consultaButton}></BasicButton>
                 <BasicButton props={deleteButton}></BasicButton>
             </div>
             <div className="row mt-3">
                 <TableComponent props={tableProps}></TableComponent>
             </div>
             <Dialog
-                visible={captureDialog}
+                visible={captureDialog.visible}
                 header={t("t.nova.factura").toUpperCase()}
                 onHide={hideDialog}
             >
                 <form onSubmit={formikFactura.handleSubmit}>
                     <FacturaContext.Provider
-                        value={{selectedFactura, setSelectedFactura, formikFactura}}
+                        value={{selectedFactura, setSelectedFactura, formikFactura, captureDialog}}
                     >
                         <FacturaDataForm/>
                     </FacturaContext.Provider>

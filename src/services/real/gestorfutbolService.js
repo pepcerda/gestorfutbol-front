@@ -48,8 +48,15 @@ export const gestorfutbolService = {
         return response;
     },
 
-    getAllMembers(idCampanya) {
-        var response = apiClient.get("/socis/" + idCampanya);
+    getAllMembers(filter) {
+        const axiosConfig = {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        }
+
+        var response = apiClient.post("/all-socis", JSON.stringify(filter), axiosConfig);
         return response;
     },
 
@@ -86,8 +93,15 @@ export const gestorfutbolService = {
         return response;
     },
 
-    getAllSponsors(idCampanya) {
-        var response = apiClient.get("/patrocinadors/" + idCampanya);
+    getAllSponsors(filter) {
+        const axiosConfig = {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        }
+        console.log(filter);
+        var response = apiClient.post("/all-patrocinadors", JSON.stringify(filter), axiosConfig);
         return response;
     },
 
@@ -104,7 +118,6 @@ export const gestorfutbolService = {
     },
 
     duplicaSponsor(sponsor, idCampanya) {
-        console.log(idCampanya);
         const axiosConfig = {
             headers: {
                 'Accept': 'application/json',

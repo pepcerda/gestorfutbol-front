@@ -109,6 +109,19 @@ const SponsorDataForm = ({props}) => {
         );
     };
 
+
+    const esBase64Embebida = (cadena) => {
+
+
+        if (typeof cadena !== 'string') return false;
+
+        // Expresión regular para detectar el esquema data:image/...;base64,...
+        const base64DataUrlRegex = /^data:([a-z]+\/[a-z0-9\-\+\.]+);base64,[A-Za-z0-9+/]+={0,2}$/i;
+
+        return base64DataUrlRegex.test(cadena.trim());
+    };
+
+
     const customBase64Uploader = async (event) => {
         // convert file to base64 encoded
         const file = event.files[0];
@@ -119,8 +132,9 @@ const SponsorDataForm = ({props}) => {
         reader.onloadend = function () {
             const base64data = reader.result;
             formikSponsor.setFieldValue("logo", base64data);
+            formikSponsor.setFieldValue("logoBlob", file.objectURL);
             setFileName(file.name);
-            event.options.clear();
+            event.options.clear();console.log(base64data);
         };
 
     };
@@ -225,7 +239,9 @@ const SponsorDataForm = ({props}) => {
         uploadHandler: customBase64Uploader,
         accept: "image/*",
         auto: true,
-        chooseLabel: `${t('t.afegeix')}`
+        chooseLabel: `${t('t.afegeix')}`,
+        disabled: captureDialog.visible
+
     }
 
 
@@ -260,21 +276,23 @@ const SponsorDataForm = ({props}) => {
                     <SelectOneMenu props={estatPagamentProps}></SelectOneMenu>
                     {getFormErrorMessage("estatPagament")}
                 </div>
-                <div className="row align-items-center align-content-center mt-3 mt-md-0">
+                <div className="row align-items-center align-content-center mt-3 mt-md-0 gap-3">
                     <div className="col-12 col-md-1 text-center text-md-start form-group">
                         <FileUploader props={logoUploader}/>
                     </div>
-                    <div className="col-12 col-md-1 text-center text-md-start form-group mt-3 mt-md-0 ms-3 my-auto">
-                        {formikSponsor.values.logo && <>
-                            <p>{t('t.logo.original')}</p>
-                            <p><a href={process.env.REACT_APP_URI_BACK + formikSponsor.values.logo}
-                                  target="_blank">{t('t.document')}</a></p>
-                        </>}
-                    </div>
-                    <div className="col-12 col-md-1 text-center text-md-start form-group mt-3 mt-md-0 ms-3">
-                        {fileName && <>
+                    {formikSponsor.values.logo && !esBase64Embebida(formikSponsor.values.logo) &&
+                        <div className="col-12 col-md-2 text-center text-md-start form-group mt-3 mt-md-0 ms-3 my-auto">
+                            <>
+                                <p>{t('t.logo.original')}</p>
+                                <p><a href={process.env.REACT_APP_URI_BACK + formikSponsor.values.logo}
+                                      target="_blank">{t('t.document')}</a></p>
+                            </>
+                        </div>}
+                    <div className="col-12 col-md-2 text-center text-md-start form-group mt-3 mt-md-0 ms-3">
+                        {formikSponsor.values.logoBlob && <>
                             <p>{t('t.logo.annexat')}</p>
-                            <p>{fileName}</p>
+                            <p><a href={formikSponsor.values.logoBlob}
+                                  target="_blank">{t('t.document')}</a></p>
                         </>}
                     </div>
                 </div>
@@ -348,7 +366,7 @@ const SponsorsPage = ({props}) => {
     const [campaigns, setCampaigns] = useState(null);
     const [activeCampaign, setActiveCampaign] = useState(null);
     let emptySponsor = {
-        id: 0,
+        id: null,
         cif: "",
         nom: "",
         donacio: 0,
@@ -510,7 +528,7 @@ const SponsorsPage = ({props}) => {
     const deleteButton = {
         icon: "pi pi-trash",
         className: "circular-btn",
-        disabled: selectedSponsor === null,
+        disabled: selectedSponsor.id === null,
         onClick: confirm,
         tooltip: `${t('t.elimina')}`,
         tooltipOptions: {
@@ -561,7 +579,8 @@ const SponsorsPage = ({props}) => {
         tooltip: `${t('t.edita')}`,
         tooltipOptions: {
             position: "bottom"
-        }
+        },
+        disabled: selectedSponsor.id === null
     };
 
     const consultaButton = {
@@ -576,7 +595,8 @@ const SponsorsPage = ({props}) => {
         tooltip: `${t('t.consulta')}`,
         tooltipOptions: {
             position: "bottom"
-        }
+        },
+        disabled: selectedSponsor.id === null
     };
 
     const filterButton = {
@@ -605,7 +625,16 @@ const SponsorsPage = ({props}) => {
 
     const exportExcel = () => {
 
-        gestorfutbolService.getAllSponsors(activeCampaign)
+        let apiFilter = {
+            pageNum: lazyState.page,
+            pageSize: lazyState.rows,
+            campanyaActiva: activeCampaign,
+            sortField: lazyState.sortField,
+            sortOrder: lazyState.sortOrder,
+            filters: lazyState.filters
+        };
+
+        gestorfutbolService.getAllSponsors(apiFilter)
             .then(data => {
                 const worksheet = xlsx.utils.json_to_sheet(data.data);
                 const workbook = {Sheets: {data: worksheet}, SheetNames: ['data']};
@@ -660,7 +689,7 @@ const SponsorsPage = ({props}) => {
     }, [campaigns])
 
     useEffect(() => {
-        if(location.state?.filtre) {
+        if (location.state?.filtre) {
             filterSponsor(location.state.filtre)
         }
     }, [])
@@ -742,7 +771,6 @@ const SponsorsPage = ({props}) => {
         breakpoint: "900px",
         lazy: true,
         onPage: (e) => {
-            console.log(lazyState);
             setlazyState(prevState => ({
                 ...prevState,
                 first: e.first,
@@ -804,6 +832,7 @@ const SponsorsPage = ({props}) => {
         }));
     }
 
+
     const duplicaSponsor = (data) => {
 
         gestorfutbolService.duplicaSponsor(selectedSponsor, data.campanya)
@@ -836,6 +865,7 @@ const SponsorsPage = ({props}) => {
             observacio: selectedSponsor.observacio,
             estatPagament: selectedSponsor.estatPagament,
             logo: selectedSponsor.logo,
+            logoBlob: null,
             campanya: activeCampaign
         },
         enableReinitialize: true,
@@ -1025,7 +1055,8 @@ const SponsorsPage = ({props}) => {
             <PageTitle props={{title: `${t("t.sponsors")}`}}></PageTitle>
             <TabMenuComponent props={tabMenu}></TabMenuComponent>
             <div className="row justify-content-between align-items-start flex-wrap">
-                <div className="col-12 col-xl-auto mb-3 mb-xl-0 d-flex flex-wrap gap-2 justify-content-center justify-content-xl-end">
+                <div
+                    className="col-12 col-xl-auto mb-3 mb-xl-0 d-flex flex-wrap gap-2 justify-content-center justify-content-xl-end">
                     <BasicButton props={filterButton}/>
                     <BasicButton props={exportButton}/>
                 </div>

@@ -88,5 +88,9 @@
   "t.total.recaptacio": "Total recaptació",
   "t.pendent.pagar": "Pendent pagament",
   "t.total.pagat": "Total pagat",
-  "t.num.soci": "Núm. soci"
+  "t.num.soci": "Núm. soci",
+  "t.logo.annexat": "Logo annexat",
+  "t.logo.original": "Logo original",
+  "t.factura.original": "Factura original",
+  "t.factura.annexat": "Factura annexada"
 }
