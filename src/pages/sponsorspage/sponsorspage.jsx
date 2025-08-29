@@ -240,7 +240,7 @@ const SponsorDataForm = ({props}) => {
         accept: "image/*",
         auto: true,
         chooseLabel: `${t('t.afegeix')}`,
-        disabled: captureDialog.visible
+        disabled: captureDialog.consulta
 
     }
 

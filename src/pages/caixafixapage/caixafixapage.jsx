@@ -81,7 +81,7 @@ const FacturaDataForm = ({props}) => {
         },
         classNameError: `${isFormFieldInvalid("nom") ? "invalid-inputtext" : ""}`,
         labelClassName: `${isFormFieldInvalid("nom") ? "form-text-invalid" : ""}`,
-        disabled: captureDialog.visible
+        disabled: captureDialog.consulta
     };
 
     const llinatge1Props = {
@@ -97,7 +97,7 @@ const FacturaDataForm = ({props}) => {
         labelClassName: `${
             isFormFieldInvalid("llinatge1") ? "form-text-invalid" : ""
         }`,
-        disabled: captureDialog.visible
+        disabled: captureDialog.consulta
     };
 
     const llinatge2Props = {
@@ -107,7 +107,7 @@ const FacturaDataForm = ({props}) => {
         onChange: (e) => {
             formikFactura.setFieldValue("llinatge2", e.target.value);
         },
-        disabled: captureDialog.visible
+        disabled: captureDialog.consulta
 
     };
 
@@ -122,7 +122,7 @@ const FacturaDataForm = ({props}) => {
         },
         classNameError: `${isFormFieldInvalid('despesa') ? 'invalid-inputnumber' : ''}`,
         labelClassName: `${isFormFieldInvalid('despesa') ? 'form-text-invalid' : ''}`,
-        disabled: captureDialog.visible
+        disabled: captureDialog.consulta
 
     };
 
@@ -142,7 +142,7 @@ const FacturaDataForm = ({props}) => {
         labelClassName: `${
             isFormFieldInvalid("estat") ? "form-text-invalid" : ""
         }`,
-        disabled: captureDialog.visible
+        disabled: captureDialog.consulta
 
     };
 
@@ -154,7 +154,7 @@ const FacturaDataForm = ({props}) => {
         onChange: (e) => {
             formikFactura.setFieldValue("observacio", e.target.value);
         },
-        disabled: captureDialog.visible
+        disabled: captureDialog.consulta
     };
 
     const facturaUploader = {
@@ -163,10 +163,10 @@ const FacturaDataForm = ({props}) => {
         label: `${t(`t.factura`)}`,
         customUpload: true,
         uploadHandler: customBase64Uploader,
-        accept: "image/*",
+        accept: "*",
         auto: true,
         chooseLabel: `${t('t.afegeix')}`,
-        disabled: captureDialog.visible
+        disabled: captureDialog.consulta
     }
 
 
