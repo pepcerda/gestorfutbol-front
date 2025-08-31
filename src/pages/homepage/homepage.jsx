@@ -63,12 +63,14 @@ const IngressosModul = ({props}) => {
 
     const emptyDadesPatrocinis = {
         previsioRecaptacio: 0,
-        totalRecaptat: 0
+        totalRecaptat: 0,
+        totalPatrocinadors: 0
     };
 
     const emptyDadesSocis = {
         previsioRecaptacio: 0,
-        totalRecaptat: 0
+        totalRecaptat: 0,
+        totalSocis: 0
     }
 
     const {t, i18n} = useTranslation("common");
@@ -96,10 +98,11 @@ const IngressosModul = ({props}) => {
             <>
                 <p>{t('t.previsio.recaptacio')}: {dadesPatrocinis.previsioRecaptacio} €</p>
                 <p>{t('t.total.recaptacio')}: {dadesPatrocinis.totalRecaptat} €</p>
+                <p>{t('t.total.patrocinadors')}: {dadesPatrocinis.totalPatrocinadors}</p>
                 <br/>
 
                 <NavLink to={"/patrocinadors"} state={{filtre: {estatPagament: "D"}}}
-                         className="basicbutton rounded-border-btn text-light">Consulta pendents</NavLink>
+                         className="basicbutton rounded-border-btn text-light">{t('t.consulta.pendents')}</NavLink>
             </>
         )
     }
@@ -116,10 +119,11 @@ const IngressosModul = ({props}) => {
                 <>
                     <p>{t('t.previsio.recaptacio')}: {dadesSocis.previsioRecaptacio} €</p>
                     <p>{t('t.total.recaptacio')}: {dadesSocis.totalRecaptat} €</p>
+                    <p>{t('t.total.socis')}: {dadesSocis.totalSocis}</p>
                     <br/>
 
-                    {/*<NavLink to={"/patrocinadors"} state={{filtre: {estatPagament: "D"}}}
-                             className="basicbutton rounded-border-btn text-light">Consulta pendents</NavLink>*/}
+                    <NavLink to={"/socis"} state={{filtre: {estatPagament: "D"}}}
+                             className="basicbutton rounded-border-btn text-light">{t('t.consulta.pendents')}</NavLink>
 
                 </>
             </>

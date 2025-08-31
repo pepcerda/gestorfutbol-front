@@ -47,6 +47,8 @@ const TableComponent = ({props}) => {
                 stripedRows={props.stripedRows}
                 onFilter={props.onFilter}
                 filterDisplay={props.filterDisplay}
+                footer={props.footer}
+                header={props.header}
             >
                 {props.columns
                     .map((c, idx) => (

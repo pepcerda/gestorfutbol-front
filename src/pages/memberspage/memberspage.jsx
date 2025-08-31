@@ -18,6 +18,8 @@ import * as module from 'file-saver';
 import moment from "moment";
 import {Card} from "primereact/card";
 import {Sidebar} from "primereact/sidebar";
+import { useLocation } from "react-router-dom";
+import { explotacioDadesService } from "../../services/real/explotacioDadesService";
 
 
 const MemberContext = createContext();
@@ -26,7 +28,7 @@ const FiltraContext = createContext();
 
 const FilterDataForm = ({props}) => {
     const {t, i18n} = useTranslation("common");
-    const {formikFilters} = useContext(FiltraContext);
+    const {formikFilters, tipoSocis} = useContext(FiltraContext);
     const opcionsPagament = gestorfutbolService.getOpcionsPagament();
 
     const dataDonacioCalc = (value) => {
@@ -56,6 +58,18 @@ const FilterDataForm = ({props}) => {
         optionValue: "valor"
     };
 
+    const tipoSocisProps = {
+        id: "tipo-soci",
+        label: `${t("t.tipo.soci")}`,
+        value: formikFilters.values.tipoSoci.id,
+        onChange: (e) => {
+            formikFilters.setFieldValue("tipoSoci", tipoSocis.find(c => c.id === e.value));
+        },
+        options: tipoSocis,
+        optionLabel: "nom",
+        optionValue: "id"
+    };
+
     return (
         <>
             <div className="row">
@@ -64,6 +78,9 @@ const FilterDataForm = ({props}) => {
                 </div>
                 <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
                     <SelectOneMenu props={estatPagamentProps}></SelectOneMenu>
+                </div>
+                <div className="col-12 col-md-6 form-group text-center text-md-start mt-3">
+                    <SelectOneMenu props={tipoSocisProps}></SelectOneMenu>
                 </div>
             </div>
         </>
@@ -197,6 +214,7 @@ const MemberDataForm = ({props}) => {
 
 const MembersPage = ({props}) => {
 
+    const location = useLocation();
     const {viewWidth, setViewWidth} = useContext(ConfigContext);
     const opcionsPagament = gestorfutbolService.getOpcionsPagament();
     const [tipoSocis, setTipoSocis] = useState(null);
@@ -223,6 +241,12 @@ const MembersPage = ({props}) => {
         },
         campanya: activeCampaign
     };
+
+    const emptyDadesSocis = {
+        previsioRecaptacio: 0,
+        totalRecaptat: 0,
+        totalSocis: 0
+    }
     const [selectedMember, setSelectedMember] = useState(emptyMember);
     const [lazyState, setlazyState] = useState({
         first: 0,
@@ -235,6 +259,7 @@ const MembersPage = ({props}) => {
     const [activeIndex, setActiveIndex] = useState(0)
     const [tabMenuItems, setTabMenuItems] = useState(null);
     const [filterVisible, setFilterVisible] = useState(false);
+    const [dadesSocis, setDadesSocis] = useState(emptyDadesSocis);
 
 
     const tabMenu = {
@@ -527,6 +552,22 @@ const MembersPage = ({props}) => {
     }, [activeCampaign]);
 
     useEffect(() => {
+        if (activeCampaign) {
+            explotacioDadesService.getDadesExplotacioSocis(activeCampaign)
+                .then((data) => {
+                    setDadesSocis(data.data);
+                })
+        }
+
+    }, [activeCampaign])
+
+    useEffect(() => {
+        if (location.state?.filtre) {
+            filterMember(location.state.filtre)
+        }
+    }, [])
+
+    useEffect(() => {
         loadLazyData();
         setDeleteFlag(false);
     }, [lazyState, deleteFlag, activeCampaign]);
@@ -553,6 +594,16 @@ const MembersPage = ({props}) => {
         gestorfutbolService.saveMember(newData)
             .then(() => loadLazyData())
     };
+
+    const tableHeader = () => {
+        return (
+            <div className="table-header-container d-flex flex-column flex-md-row gap-3">
+                <span>{t("t.total.socis")}: {dadesSocis.totalSocis}</span>
+                <span>{t("t.total.recaptacio")}: {dadesSocis.totalRecaptat} €</span>
+                <span>{t("t.previsio.recaptacio")}: {dadesSocis.previsioRecaptacio} €</span>
+            </div>
+        );
+    }
 
     const tableProps = {
         data: members,
@@ -589,7 +640,8 @@ const MembersPage = ({props}) => {
         editMode: 'row',
         onRowEditComplete: onRowEditComplete,
         rowEditor: true,
-        stripedRows: true
+        stripedRows: true,
+        header: tableHeader
     };
 
     const saveMember = (data) => {
@@ -614,6 +666,13 @@ const MembersPage = ({props}) => {
         if (data.estatPagament) {
             sponsorFilters.estatPagament = {
                 value: data.estatPagament,
+                matchMode: 'equals'
+            }
+        };
+
+        if (data.tipoSoci && data.tipoSoci.id !== 0) {
+            sponsorFilters.tipoSoci = {
+                value: data.tipoSoci.id,
                 matchMode: 'equals'
             }
         };
@@ -675,7 +734,8 @@ const MembersPage = ({props}) => {
     const formikFilters = useFormik({
         initialValues: {
             nom: emptyMember.nom,
-            estatPagament: emptyMember.estatPagament
+            estatPagament: emptyMember.estatPagament,
+            tipoSoci: emptyMember.tipoSoci
         },
         enableReinitialize: true,
         validate: (data) => {
@@ -710,7 +770,7 @@ const MembersPage = ({props}) => {
                 <Card className="mt-3">
                     <form onSubmit={formikFilters.handleSubmit}>
                         <FiltraContext.Provider
-                            value={{formikFilters}}
+                            value={{formikFilters, tipoSocis}}
                         >
                             <FilterDataForm/>
                         </FiltraContext.Provider>
@@ -723,7 +783,7 @@ const MembersPage = ({props}) => {
             ) : <Sidebar visible={filterVisible} onHide={() => setFilterVisible(false)}>
                 <form onSubmit={formikFilters.handleSubmit}>
                     <FiltraContext.Provider
-                        value={{formikFilters}}
+                        value={{formikFilters, tipoSocis}}
                     >
                         <FilterDataForm/>
                     </FiltraContext.Provider>

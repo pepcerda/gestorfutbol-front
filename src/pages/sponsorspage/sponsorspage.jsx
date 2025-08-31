@@ -25,6 +25,7 @@ import {Sidebar} from "primereact/sidebar";
 import * as xlsx from 'xlsx';
 import * as module from 'file-saver';
 import {useLocation} from "react-router-dom";
+import { explotacioDadesService } from '../../services/real/explotacioDadesService';
 
 const SponsorContext = createContext();
 const DuplicaContext = createContext();
@@ -376,6 +377,13 @@ const SponsorsPage = ({props}) => {
         logo: "",
         campanya: activeCampaign
     };
+
+    const emptyDadesPatrocinis = {
+        previsioRecaptacio: 0,
+        totalRecaptat: 0,
+        totalPatrocinadors: 0
+    };
+
     const [selectedSponsor, setSelectedSponsor] = useState(emptySponsor);
     const [lazyState, setlazyState] = useState({
         first: 0,
@@ -388,6 +396,7 @@ const SponsorsPage = ({props}) => {
     const [activeIndex, setActiveIndex] = useState(0)
     const [tabMenuItems, setTabMenuItems] = useState(null);
     const [filterVisible, setFilterVisible] = useState(false);
+    const [dadesPatrocinis, setDadesPatrocinis] = useState(emptyDadesPatrocinis);
 
     const tabMenu = {
         model: tabMenuItems,
@@ -636,6 +645,7 @@ const SponsorsPage = ({props}) => {
 
         gestorfutbolService.getAllSponsors(apiFilter)
             .then(data => {
+                console.log(data);
                 const worksheet = xlsx.utils.json_to_sheet(data.data);
                 const workbook = {Sheets: {data: worksheet}, SheetNames: ['data']};
                 const excelBuffer = xlsx.write(workbook, {
@@ -686,13 +696,23 @@ const SponsorsPage = ({props}) => {
             }
         }
 
-    }, [campaigns])
+    }, [campaigns]);
+
+    useEffect(() => {
+        if (activeCampaign) {
+            explotacioDadesService.getDadesExplotacioPatrocinis(activeCampaign)
+                .then((data) => {
+                    setDadesPatrocinis(data.data);
+                });
+        }
+
+    }, [activeCampaign])
 
     useEffect(() => {
         if (location.state?.filtre) {
             filterSponsor(location.state.filtre)
         }
-    }, [])
+    }, []);
 
     useEffect(() => {
         loadLazyData();
@@ -752,6 +772,16 @@ const SponsorsPage = ({props}) => {
         setlazyState(event);
     };
 
+    const tableHeader = () => {
+        return (
+            <div className="table-header-container d-flex flex-column flex-md-row gap-3">
+                <span>{t("t.total.patrocinadors")}: {dadesPatrocinis.totalPatrocinadors}</span>
+                <span>{t("t.total.recaptacio")}: {dadesPatrocinis.totalRecaptat} €</span>
+                <span>{t("t.previsio.recaptacio")}: {dadesPatrocinis.previsioRecaptacio} €</span>
+            </div>
+        );
+    }
+
     const tableProps = {
         data: sponsors,
         selectedData: selectedSponsor,
@@ -787,7 +817,8 @@ const SponsorsPage = ({props}) => {
         editMode: 'row',
         onRowEditComplete: onRowEditComplete,
         rowEditor: true,
-        stripedRows: true
+        stripedRows: true,
+        header: tableHeader
     };
 
     const saveSponsor = (data) => {

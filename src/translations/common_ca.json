@@ -92,5 +92,8 @@
   "t.logo.annexat": "Logo annexat",
   "t.logo.original": "Logo original",
   "t.factura.original": "Factura original",
-  "t.factura.annexat": "Factura annexada"
+  "t.factura.annexat": "Factura annexada",
+  "t.consulta.pendents": "Consulta pendents",
+  "t.total.socis": "Total socis",
+  "t.total.patrocinadors": "Total patrocinadors"
 }
