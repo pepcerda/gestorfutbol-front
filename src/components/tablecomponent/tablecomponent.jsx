@@ -30,6 +30,7 @@ const TableComponent = ({props}) => {
                 onSelectionChange={props.onChangeSelectedDataEvent}
                 metaKeySelection={false}
                 paginator={props.paginator}
+                paginatorPosition={props.paginatorPosition}
                 rows={props.rows}
                 rowsPerPageOptions={props.rowsPerPageOptions}
                 onRowUnselect={props.onRowUnselect}

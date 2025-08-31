@@ -13,6 +13,7 @@ import FormCalendar from "../../components/formcalendar/formcalendar";
 import FormInputText from "../../components/forminputtext/forminputtext";
 import {Dialog} from "primereact/dialog";
 import {confirmDialog, ConfirmDialog} from "primereact/confirmdialog";
+import { ConfigContext } from '../../App';
 
 const CampaignContext = createContext();
 
@@ -94,6 +95,7 @@ const CampaignDataForm = ({props}) => {
 const CampaignPage = ({props}) => {
 
     const {t, i18n} = useTranslation("common");
+    const {viewWidth, setViewWidth} = useContext(ConfigContext);
 
     let emptyCampaign = {
         titol: `${t('t.temporada.nova')} ${calculateCampaignYears()}`,
@@ -205,7 +207,8 @@ const CampaignPage = ({props}) => {
         sortOrder: lazyState.sortOrder,
         sortField: lazyState.sortField,
         stripedRows: true,
-        paginator: true
+        paginator: true,
+        paginatorPosition: `${viewWidth < process.env.REACT_APP_XL_VW ? "top" : "bottom"}`,
     };
 
 

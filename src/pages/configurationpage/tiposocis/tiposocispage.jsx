@@ -230,6 +230,7 @@ const TipoSocisPage = ({props}) => {
         selectedData: selectedTipoSoci,
         selectionMode: "single",
         paginator: true,
+        paginatorPosition: `${viewWidth < process.env.REACT_APP_XL_VW ? "top" : "bottom"}`,
         onChangeSelectedDataEvent: (e) => {
             if (e.value != null) {
                 setSelectedTipoSoci(e.value);

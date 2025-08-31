@@ -766,6 +766,7 @@ const SponsorsPage = ({props}) => {
         },
         columns: tableColumns,
         paginator: true,
+        paginatorPosition: `${viewWidth < process.env.REACT_APP_XL_VW ? "top" : "bottom"}`,
         rows: lazyState.rows,
         rowsPerPageOptions: [5, 10, 25, 50],
         breakpoint: "900px",

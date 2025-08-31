@@ -404,6 +404,10 @@ const CaixaFixaPage = ({props}) => {
         className: "circular-btn",
         disabled: selectedFactura.id === null,
         onClick: confirm,
+        tooltip: `${t('t.elimina')}`,
+        tooltipOptions: {
+            position: "bottom"
+        }
     };
 
     const newButton = {
@@ -417,6 +421,10 @@ const CaixaFixaPage = ({props}) => {
                 consulta: false
             });
         },
+        tooltip: `${t('t.nou')}`,
+        tooltipOptions: {
+            position: "bottom"
+        }
     };
 
     const editButton = {
@@ -511,6 +519,7 @@ const CaixaFixaPage = ({props}) => {
         selectedData: selectedFactura,
         selectionMode: "single",
         paginator: true,
+        paginatorPosition: `${viewWidth < process.env.REACT_APP_XL_VW ? "top" : "bottom"}`,
         onChangeSelectedDataEvent: (e) => {
             if (e.value != null) {
                 setSelectedFactura(e.value);

@@ -62,7 +62,7 @@ const FilterDataForm = ({props}) => {
                 <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
                     <FormInputText props={nomProps}></FormInputText>
                 </div>
-                <div className="col-12 col-md-6 form-group text-center text-md-start mt-3">
+                <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
                     <SelectOneMenu props={estatPagamentProps}></SelectOneMenu>
                 </div>
             </div>
@@ -315,9 +315,8 @@ const MembersPage = ({props}) => {
 
     const tipoSocisEditor = (options) => {
 
-
         const handleChange = (e) => {
-            options.rowData.tipoSoci = tipoSocis[e.value - 1];
+            options.rowData.tipoSoci = tipoSocis.find(c => c.id === e.value);
             forceUpdate();
         };
 
@@ -560,6 +559,7 @@ const MembersPage = ({props}) => {
         selectedData: selectedMember,
         selectionMode: "single",
         paginator: true,
+        paginatorPosition: `${viewWidth < process.env.REACT_APP_XL_VW ? "top" : "bottom"}`,
         onChangeSelectedDataEvent: (e) => {
             if (e.value != null) {
                 setSelectedMember(e.value);
@@ -573,7 +573,14 @@ const MembersPage = ({props}) => {
         rowsPerPageOptions: [5, 10, 25, 50],
         breakpoint: "900px",
         lazy: true,
-        onPage: (e) => setlazyState(e),
+        onPage: (e) => {
+            setlazyState(prevState => ({
+                ...prevState,
+                first: e.first,
+                page: e.page,
+                rows: e.rows
+            }));
+        },
         totalRecords: totalRecords,
         first: lazyState.first,
         onSort: (e) => setlazyState(e),

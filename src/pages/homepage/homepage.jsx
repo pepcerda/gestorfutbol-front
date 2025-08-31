@@ -197,7 +197,7 @@ const HomePage = ({props}) => {
     const [activeCampaign, setActiveCampaign] = useState(null);
 
     useEffect(() => {
-        let results;
+        let results;    
         gestorfutbolService.getAllCampaigns().then((data) => {
             results = data.data;
             setCampaigns(results);
@@ -225,7 +225,7 @@ const HomePage = ({props}) => {
             campanya: activeCampaign
         },
         onSubmit: (data) => {
-            console.log(data)
+            setActiveCampaign(data.campanya);
         }
     });
 
@@ -235,6 +235,7 @@ const HomePage = ({props}) => {
         value: activeCampaign,
         onChange: (e) => {
             formikMenu.setFieldValue("campanya", e.value);
+            formikMenu.handleSubmit();
         },
         options: campaigns,
         optionLabel: "titol",
