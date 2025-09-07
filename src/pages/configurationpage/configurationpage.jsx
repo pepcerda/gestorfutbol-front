@@ -1,22 +1,15 @@
 import './configurationpage.css';
-import BasicButton from "../../components/basicbutton/basicbutton";
-import {useFormik} from "formik";
-import {gestorfutbolService} from "../../services/real/gestorfutbolService";
-import React, {useContext, useEffect, useRef, useState} from "react";
+import React, {useState} from "react";
 import {useTranslation} from "react-i18next";
-import FormInputText from "../../components/forminputtext/forminputtext";
 import PageTitle from "../../components/pagetitle/pagetitle";
-import {Toast} from "primereact/toast";
-import {ConfigContext} from "../../App";
-import ColorPickerInput from "../../components/colorpickerinput/colorpickerinput";
-import FileUploader from "../../components/fileuploader/fileuploader";
-import {setFavicon} from "../../hooks/faviconHook";
 import TabMenuComponent from "../../components/tabmenucomponent/tabmenucomponent";
 import ConfigGeneral from "./general/configgeneral";
 import TipoSocisPage from "./tiposocis/tiposocispage";
 
 const ConfigurationPage = ({props}) => {
-    const {t, i18n} = useTranslation("common"), [activeIndex, setActiveIndex] = useState(0), tabMenuItems = [
+        const {t, i18n} = useTranslation("common");
+        const [activeIndex, setActiveIndex] = useState(0);
+        const tabMenuItems = [
             {label: `${t('t.general')}`},
             {label: `${t('t.tipo.socis')}`},
         ],

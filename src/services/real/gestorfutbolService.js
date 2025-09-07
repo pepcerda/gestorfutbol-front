@@ -292,8 +292,95 @@ export const gestorfutbolService = {
     deleteTipoSoci(id) {
         var response = apiClient.delete("/tipo-soci/" + id);
         return response;
-    }
+    },
 
+    getJugadors(filter) {
+        const axiosConfig = {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        }
 
+        var response = apiClient.post("/jugadors", JSON.stringify(filter), axiosConfig);
+        return response;
+    },
 
+    saveJugador(jugador) {
+        const axiosConfig = {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        }
+        console.log(jugador);
+        var response = apiClient.post("/jugador", JSON.stringify(jugador), axiosConfig);
+        return response;
+    },
+
+    deleteJugador(id) {
+        var response = apiClient.delete("/jugador/" + id);
+        return response;
+    },
+
+    getEntrenadors(filter) {
+        const axiosConfig = {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        }
+
+        var response = apiClient.post("/entrenadors", JSON.stringify(filter), axiosConfig);
+        return response;
+    },
+
+    saveEntrenador(entrenador) {
+        const axiosConfig = {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        }
+        var response = apiClient.post("/entrenador", JSON.stringify(entrenador), axiosConfig);
+        return response;
+    },
+
+    deleteEntrenador(id) {
+        var response = apiClient.delete("/entrenador/" + id);
+        return response;
+    },
+
+    getDelegats(filter) {
+        const axiosConfig = {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        }
+
+        var response = apiClient.post("/delegats", JSON.stringify(filter), axiosConfig);
+        return response;
+    },
+
+    saveDelegat(delegat) {
+        const axiosConfig = {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        }
+        var response = apiClient.post("/delegat", JSON.stringify(delegat), axiosConfig);
+        return response;
+    },
+
+    deleteDelegat(id) {
+        var response = apiClient.delete("/delegat/" + id);
+        return response;
+    },
+
+    getPosicions() {
+        var response = apiClient.get("/posicions")
+        return response;
+    },
 }

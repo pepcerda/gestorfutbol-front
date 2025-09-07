@@ -525,8 +525,8 @@ const DirectivaPage = ({props}) => {
             icon: "pi pi-info-circle",
             acceptClassName: "rounded-border-btn basicbutton",
             rejectClassName: "confirm-popup-reject",
-            acceptLabel: "Sí",
-            rejectLabel: "No",
+            acceptLabel: t("t.yes"),
+            rejectLabel: t("t.no"),
             accept,
             reject,
         });

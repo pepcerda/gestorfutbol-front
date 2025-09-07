@@ -95,5 +95,22 @@
   "t.factura.annexat": "Factura annexada",
   "t.consulta.pendents": "Consulta pendents",
   "t.total.socis": "Total socis",
-  "t.total.patrocinadors": "Total patrocinadors"
+  "t.total.patrocinadors": "Total patrocinadors",
+  "t.pos.PORTER": "Porter",
+  "t.pos.DEFENSA": "Defensa",
+  "t.pos.MIGCAMPISTA": "Migcampista",
+  "t.pos.DAVANTER": "Davanter",
+  "t.data.naixement": "Data de naixement",
+  "t.posicio": "Posició",
+  "t.jugadors": "Jugadors",
+  "t.jugador": "Jugador",
+  "t.plantilla": "Plantilla",
+  "t.entrenadors": "Entrenadors",
+  "t.delegats": "Delegats",
+  "t.carrec": "Càrrec",
+  "t.yes": "Sí",
+  "t.no": "No",
+  "t.nou.jugador": "Nou jugador",
+  "t.nou.entrenador": "Nou entrenador",
+  "t.nou.delegat": "Nou delegat"
 }

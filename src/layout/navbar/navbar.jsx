@@ -108,6 +108,17 @@ const Navbar = () => {
             className: "sidenav-item ",
             template: () => {
                 return (
+                    <NavLink to={"/plantilla"} className="p-menuitem-link">
+                        <span className="p-menuitem-icon pi pi-fw pi-sitemap fs-2"></span>
+                        <span className="p-menuitem-text">{t("t.plantilla")}</span>
+                    </NavLink>
+                );
+            },
+        },
+        {
+            className: "sidenav-item ",
+            template: () => {
+                return (
                     <NavLink to={"/factures"} className="p-menuitem-link">
                         <span className="p-menuitem-icon pi pi-fw pi-money-bill fs-2"></span>
                         <span className="p-menuitem-text">{t("t.caixa.fixa")}</span>
@@ -183,7 +194,17 @@ const Navbar = () => {
                     </NavLink>
                 );
             },
-        }
+        },
+        {
+            className: "sidenav-item ",
+            template: () => {
+                return (
+                    <NavLink to={"/plantilla"} className="p-menuitem-link">
+                        <i className="pi pi-sitemap"></i>
+                    </NavLink>
+                );
+            },
+        },
     ];
 
     /*    {

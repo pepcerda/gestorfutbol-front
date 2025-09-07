@@ -41,6 +41,7 @@ const TableComponent = ({props}) => {
                 onSort={props.onSort}
                 sortOrder={props.sortOrder}
                 sortField={props.sortField}
+                sortMode={props.sortMode}
                 editMode={props.editMode}
                 onRowEditComplete={props.onRowEditComplete}
                 showGridlines={props.showGridlines}
@@ -49,6 +50,13 @@ const TableComponent = ({props}) => {
                 filterDisplay={props.filterDisplay}
                 footer={props.footer}
                 header={props.header}
+                rowGroupMode={props.rowGroupMode} 
+                groupRowsBy={props.groupRowsBy}
+                rowGroupHeaderTemplate={props.rowGroupHeaderTemplate}
+                rowGroupFooterTemplate={props.rowGroupFooterTemplate}
+                expandableRowGroups={props.expandableRowGroups}
+                onRowToggle={props.onRowToggle}
+                expandedRows={props.expandedRows}
             >
                 {props.columns
                     .map((c, idx) => (
