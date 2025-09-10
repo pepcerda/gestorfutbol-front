@@ -75,7 +75,7 @@ const FacturaDataForm = ({ props }) => {
     }
 
     // Guardamos directamente el File en formik
-    formikFactura.setFieldValue("facturaFile", file);
+    formikFactura.setFieldValue("facturaFile", processedFile);
 
     // Opcional: guardar el nombre para mostrarlo en UI
     setFileName(file.name);
