@@ -52,6 +52,15 @@ const FacturaDataForm = ({ props }) => {
     return base64DataUrlRegex.test(cadena.trim());
   };
 
+  const isImageFile = (file) => {
+    if (!file || !file.type) return false;
+    return (
+      file.type.startsWith("image/") ||
+      file.type === "image/heic" ||
+      file.type === "image/heif"
+    );
+  };
+
   const customUploader = async (event) => {
     const file = event.files[0];
     if (!file) return;
@@ -59,7 +68,7 @@ const FacturaDataForm = ({ props }) => {
     let processedFile = file;
 
     // Detectar si es imagen
-    if (file.type.startsWith("image/")) {
+    if (isImageFile(file)) {
       try {
         const options = {
           maxSizeMB: 1, // reducir a ~1MB
