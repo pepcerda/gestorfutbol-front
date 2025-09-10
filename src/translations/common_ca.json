@@ -116,5 +116,7 @@
   "t.pos.1": "Porter",
   "t.pos.2": "Defensa",
   "t.pos.3": "Migcampista",
-  "t.pos.4": "Davanter"
+  "t.pos.4": "Davanter",
+  "t.entrenador": "Entrenador",
+  "t.delegat": "Delegat"
 }

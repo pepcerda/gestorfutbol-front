@@ -17,6 +17,7 @@ import FormInputNumber from "../../components/forminputnumber/forminputnumber";
 import FormCalendar from "../../components/formcalendar/formcalendar";
 import FormTextArea from "../../components/formtextarea/formtextarea";
 import FileUploader from "../../components/fileuploader/fileuploader";
+import imageCompression from "browser-image-compression";
 
 const FacturaContext = createContext();
 
@@ -54,6 +55,24 @@ const FacturaDataForm = ({ props }) => {
   const customUploader = async (event) => {
     const file = event.files[0];
     if (!file) return;
+
+    let processedFile = file;
+
+    // Detectar si es imagen
+    if (file.type.startsWith("image/")) {
+      try {
+        const options = {
+          maxSizeMB: 1, // reducir a ~1MB
+          maxWidthOrHeight: 1920, // ajustar dimensiones si es muy grande
+          useWebWorker: true,
+        };
+        processedFile = await imageCompression(file, options);
+      } catch (err) {
+        console.error("Error al comprimir imagen:", err);
+      }
+    } else {
+      console.log("Archivo no es imagen, se sube sin cambios:", file.type);
+    }
 
     // Guardamos directamente el File en formik
     formikFactura.setFieldValue("facturaFile", file);
