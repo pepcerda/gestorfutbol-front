@@ -301,7 +301,7 @@ const JugadorsPage = ({ props }) => {
     return (
       <React.Fragment>
         <span className="vertical-align-middle ml-2 font-bold line-height-3">
-          {data.posicio.descripcion}
+          {t(`t.pos.${data.posicio.valor}`)}
         </span>
       </React.Fragment>
     );

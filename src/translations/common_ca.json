@@ -112,5 +112,9 @@
   "t.no": "No",
   "t.nou.jugador": "Nou jugador",
   "t.nou.entrenador": "Nou entrenador",
-  "t.nou.delegat": "Nou delegat"
+  "t.nou.delegat": "Nou delegat",
+  "t.pos.1": "Porter",
+  "t.pos.2": "Defensa",
+  "t.pos.3": "Migcampista",
+  "t.pos.4": "Davanter"
 }
