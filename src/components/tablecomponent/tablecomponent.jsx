@@ -57,6 +57,9 @@ const TableComponent = ({props}) => {
                 expandableRowGroups={props.expandableRowGroups}
                 onRowToggle={props.onRowToggle}
                 expandedRows={props.expandedRows}
+                onContextMenuSelectionChange={props.onContextMenuSelectionChange}
+                contextMenuSelection={props.contextMenuSelection}
+                onContextMenu={props.onContextMenu}
             >
                 {props.columns
                     .map((c, idx) => (

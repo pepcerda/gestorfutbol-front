@@ -5,6 +5,7 @@ import React, {
   useContext,
   useEffect,
   useReducer,
+  useRef,
   useState,
 } from "react";
 import FormCheckbox from "../../components/formcheckbox/formcheckbox";
@@ -26,6 +27,7 @@ import { Card } from "primereact/card";
 import { Sidebar } from "primereact/sidebar";
 import { useLocation } from "react-router-dom";
 import { explotacioDadesService } from "../../services/real/explotacioDadesService";
+import { ContextMenu } from "primereact/contextmenu";
 
 const MemberContext = createContext();
 const FiltraContext = createContext();
@@ -266,6 +268,35 @@ const MembersPage = ({ props }) => {
   const [tabMenuItems, setTabMenuItems] = useState(null);
   const [filterVisible, setFilterVisible] = useState(false);
   const [dadesSocis, setDadesSocis] = useState(emptyDadesSocis);
+
+  const cm = useRef(null);
+  const menuModel = [
+    {
+      label: `${t("t.edita")}`,
+      icon: "pi pi-fw pi-pencil",
+      command: () => {
+        setCaptureDialog({
+          visible: true,
+          consulta: false,
+        });
+      },
+    },
+    {
+      label: `${t("t.elimina")}`,
+      icon: "pi pi-fw pi-trash",
+      command: () => accept(),
+    },
+    {
+      label: `${t("t.consulta")}`,
+      icon: "pi pi-fw pi-eye",
+      command: () => {
+        setCaptureDialog({
+          visible: true,
+          consulta: true,
+        });
+      },
+    }
+  ];
 
   const tabMenu = {
     model: tabMenuItems,
@@ -658,6 +689,9 @@ const MembersPage = ({ props }) => {
     rowEditor: true,
     stripedRows: true,
     header: tableHeader,
+    onContextMenu: (e) => cm.current.show(e.originalEvent),
+    contextMenuSelection: selectedMember,
+    onContextMenuSelectionChange: (e) => setSelectedMember(e.value),
   };
 
   const saveMember = (data) => {
@@ -803,6 +837,11 @@ const MembersPage = ({ props }) => {
         </Sidebar>
       )}
       <div className="row mt-3">
+        <ContextMenu
+          model={menuModel}
+          ref={cm}
+          
+        />
         <TableComponent props={tableProps}></TableComponent>
       </div>
       <Dialog

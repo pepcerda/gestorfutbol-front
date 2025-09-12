@@ -1,6 +1,12 @@
 import "./caixafixapage.css";
 import { ConfigContext } from "../../App";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { gestorfutbolService } from "../../services/real/gestorfutbolService";
 import { useTranslation } from "react-i18next";
 import FormCheckbox from "../../components/formcheckbox/formcheckbox";
@@ -18,6 +24,7 @@ import FormCalendar from "../../components/formcalendar/formcalendar";
 import FormTextArea from "../../components/formtextarea/formtextarea";
 import FileUploader from "../../components/fileuploader/fileuploader";
 import imageCompression from "browser-image-compression";
+import { ContextMenu } from "primereact/contextmenu";
 
 const FacturaContext = createContext();
 
@@ -290,6 +297,36 @@ const CaixaFixaPage = ({ props }) => {
   });
 
   const [activeIndex, setActiveIndex] = useState(0);
+  const cm = useRef(null);
+
+  const menuModel = [
+    {
+      label: `${t("t.edita")}`,
+      icon: "pi pi-fw pi-pencil",
+      command: () => {
+        setCaptureDialog({
+          visible: true,
+          consulta: false,
+        });
+      },
+    },
+    {
+      label: `${t("t.elimina")}`,
+      icon: "pi pi-fw pi-trash",
+      command: () => accept(),
+    },
+    {
+      label: `${t("t.consulta")}`,
+      icon: "pi pi-fw pi-eye",
+      command: () => {
+        setCaptureDialog({
+          visible: true,
+          consulta: true,
+        });
+      },
+    },
+  ];
+
   const [tabMenuItems, setTabMenuItems] = useState(null);
 
   const tabMenu = {
@@ -601,6 +638,9 @@ const CaixaFixaPage = ({ props }) => {
     onRowEditComplete: onRowEditComplete,
     rowEditor: true,
     stripedRows: true,
+    onContextMenu: (e) => cm.current.show(e.originalEvent),
+    contextMenuSelection: selectedFactura,
+    onContextMenuSelectionChange: (e) => selectedFactura(e.value),
   };
 
   const saveFactura = (data) => {
@@ -707,6 +747,7 @@ const CaixaFixaPage = ({ props }) => {
         <BasicButton props={deleteButton}></BasicButton>
       </div>
       <div className="row mt-3">
+        <ContextMenu model={menuModel} ref={cm} />
         <TableComponent props={tableProps}></TableComponent>
       </div>
       <Dialog

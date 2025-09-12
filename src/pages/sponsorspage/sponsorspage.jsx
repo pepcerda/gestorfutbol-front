@@ -1,6 +1,12 @@
 import "./sponsorspage.css";
 import { gestorfutbolService } from "../../services/real/gestorfutbolService";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { useFormik } from "formik";
@@ -26,6 +32,8 @@ import * as xlsx from "xlsx";
 import * as module from "file-saver";
 import { useLocation } from "react-router-dom";
 import { explotacioDadesService } from "../../services/real/explotacioDadesService";
+import context from "react-bootstrap/esm/AccordionContext";
+import { ContextMenu } from "primereact/contextmenu";
 
 const SponsorContext = createContext();
 const DuplicaContext = createContext();
@@ -411,6 +419,35 @@ const SponsorsPage = ({ props }) => {
   const [tabMenuItems, setTabMenuItems] = useState(null);
   const [filterVisible, setFilterVisible] = useState(false);
   const [dadesPatrocinis, setDadesPatrocinis] = useState(emptyDadesPatrocinis);
+  const cm = useRef(null);
+
+  const menuModel = [
+    {
+      label: `${t("t.edita")}`,
+      icon: "pi pi-fw pi-pencil",
+      command: () => {
+        setCaptureDialog({
+          visible: true,
+          consulta: false,
+        });
+      },
+    },
+    {
+      label: `${t("t.elimina")}`,
+      icon: "pi pi-fw pi-trash",
+      command: () => accept(),
+    },
+    {
+      label: `${t("t.consulta")}`,
+      icon: "pi pi-fw pi-eye",
+      command: () => {
+        setCaptureDialog({
+          visible: true,
+          consulta: true,
+        });
+      },
+    }
+  ];
 
   const tabMenu = {
     model: tabMenuItems,
@@ -850,6 +887,9 @@ const SponsorsPage = ({ props }) => {
     rowEditor: true,
     stripedRows: true,
     header: tableHeader,
+    onContextMenu: (e) => cm.current.show(e.originalEvent),
+    contextMenuSelection: selectedSponsor,
+    onContextMenuSelectionChange: (e) => setSelectedSponsor(e.value),
   };
 
   const saveSponsor = (data) => {
@@ -1144,6 +1184,11 @@ const SponsorsPage = ({ props }) => {
       )}
 
       <div className="row mt-3">
+        <ContextMenu
+          model={menuModel}
+          ref={cm}
+          
+        />
         <TableComponent props={tableProps}></TableComponent>
       </div>
       <Dialog
