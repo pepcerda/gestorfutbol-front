@@ -285,16 +285,6 @@ const MembersPage = ({ props }) => {
       label: `${t("t.elimina")}`,
       icon: "pi pi-fw pi-trash",
       command: () => accept(),
-    },
-    {
-      label: `${t("t.consulta")}`,
-      icon: "pi pi-fw pi-eye",
-      command: () => {
-        setCaptureDialog({
-          visible: true,
-          consulta: true,
-        });
-      },
     }
   ];
 

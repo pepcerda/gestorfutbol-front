@@ -13,6 +13,7 @@ import FormCalendar from "../../../components/formcalendar/formcalendar";
 import SelectOneMenu from "../../../components/selectonemenu/selectonemenu";
 import { CampanyaContext } from "../plantillapage";
 import React from "react";
+import moment from "moment";
 
 const JugadorContext = createContext();
 
@@ -169,6 +170,25 @@ const JugadorsPage = ({ props }) => {
     return <FormInputText props={textProps} />;
   };
 
+  const calendarEditor = (options) => {
+    let dateString = options.value;
+    console.log(dateString);
+    let dateMomentObject = moment(dateString, "YYYY-MM-DD");
+    let dateObject = dateMomentObject.toDate();
+
+    const calendarProps = {
+      value: dateObject,
+      dateFormat: "dd/mm/yy",
+      view: "date",
+      onChange: (e) => {
+        options.editorCallback(
+          moment(e.target.value).format("YYYY-MM-DD").toString()
+        );
+      },
+    };
+    return <FormCalendar props={calendarProps} />;
+  };
+
   const dataNaixementBody = (rowData) => {
     // Crear objeto Date
     const fecha = new Date(rowData.dataNaixement);
@@ -214,7 +234,7 @@ const JugadorsPage = ({ props }) => {
       field: "dataNaixement",
       header: `${t("t.data.naixement")}`,
       body: dataNaixementBody,
-      editor: (options) => textEditor(options),
+      editor: (options) => calendarEditor(options),
     },
   ];
 
@@ -294,13 +314,14 @@ const JugadorsPage = ({ props }) => {
 
   const onRowEditComplete = (e) => {
     let { newData, index } = e;
+    console.log(newData);
     gestorfutbolService.saveJugador(newData).then(() => loadLazyData());
   };
 
   const headerTemplate = (data) => {
     return (
       <React.Fragment>
-        <span className="vertical-align-middle ml-2 font-bold line-height-3">
+        <span className="vertical-align-middle ml-2 line-height-3 fw-bold">
           {t(`t.pos.${data.posicio.valor}`)}
         </span>
       </React.Fragment>

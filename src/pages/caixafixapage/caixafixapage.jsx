@@ -640,7 +640,7 @@ const CaixaFixaPage = ({ props }) => {
     stripedRows: true,
     onContextMenu: (e) => cm.current.show(e.originalEvent),
     contextMenuSelection: selectedFactura,
-    onContextMenuSelectionChange: (e) => selectedFactura(e.value),
+    onContextMenuSelectionChange: (e) => setSelectedFactura(e.value),
   };
 
   const saveFactura = (data) => {

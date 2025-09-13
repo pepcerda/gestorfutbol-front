@@ -1109,7 +1109,7 @@ const SponsorsPage = ({ props }) => {
 
     const calendarProps = {
       value: dateObject,
-      dateFormat: "yy-mm-dd",
+      dateFormat: "dd/mm/yy",
       view: "date",
       onChange: (e) => {
         options.editorCallback(
