@@ -130,6 +130,17 @@ const Navbar = () => {
             className: "sidenav-item ",
             template: () => {
                 return (
+                    <NavLink to={"/mensualitats"} className="p-menuitem-link">
+                        <span className="p-menuitem-icon pi pi-fw pi-money-bill fs-2"></span>
+                        <span className="p-menuitem-text">{t("t.mensualitats")}</span>
+                    </NavLink>
+                );
+            },
+        },
+        {
+            className: "sidenav-item ",
+            template: () => {
+                return (
                     <NavLink to={"/configuracio"} className="p-menuitem-link">
                         <span className="p-menuitem-icon pi pi-fw pi-cog fs-2"></span>
                         <span className="p-menuitem-text">{t("t.settings")}</span>
@@ -190,6 +201,16 @@ const Navbar = () => {
             template: () => {
                 return (
                     <NavLink to={"/factures"} className="p-menuitem-link">
+                        <i className="pi pi-money-bill"></i>
+                    </NavLink>
+                );
+            },
+        },
+        {
+            className: "sidenav-item ",
+            template: () => {
+                return (
+                    <NavLink to={"/mensualitats"} className="p-menuitem-link">
                         <i className="pi pi-money-bill"></i>
                     </NavLink>
                 );

@@ -51,6 +51,14 @@ a{
 
 }
 
+.main-color {
+    color: var(--main-color) !important;
+}
+
+.main-color > a {
+    color: var(--main-color) !important;
+}
+
 /* Anchos de filas */
 .w-10 {
     width: 10% !important;

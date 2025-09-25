@@ -300,7 +300,6 @@ export const gestorfutbolService = {
   },
 
   saveFactura(factura, file) {
-    
     const formData = new FormData();
     formData.append("file", file);
     formData.append(
@@ -357,6 +356,24 @@ export const gestorfutbolService = {
   deleteTipoSoci(id) {
     var response = apiClient.delete("/tipo-soci/" + id);
     return response;
+  },
+
+  getMembresPlantilla(filter) {
+    const axiosConfig = {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    };
+
+    var response = apiClient.post(
+      "/membres-plantilla",
+      JSON.stringify(filter),
+      axiosConfig
+    );
+    return response;
+
+
   },
 
   getJugadors(filter) {
@@ -472,4 +489,59 @@ export const gestorfutbolService = {
     var response = apiClient.get("/posicions");
     return response;
   },
+
+  getMensualitats(filter) {
+    const axiosConfig = {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    };
+    var response = apiClient.post(
+      "/mensualitats",
+      JSON.stringify(filter),
+      axiosConfig
+    );
+    return response;
+  },
+
+  saveMensualitat(mensualitat) {
+    const axiosConfig = {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    };
+    var response = apiClient.post(
+      "/mensualitat",
+      JSON.stringify(mensualitat),
+      axiosConfig
+    );
+    return response;
+  },
+
+  deleteMensualitat(id) {
+    var response = apiClient.delete("/mensualitat/" + id);
+    return response;
+  },
+
+  saveNomina(nomina) {
+    const axiosConfig = {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    };  
+    var response = apiClient.post(
+      "/nomina",
+      JSON.stringify(nomina),
+      axiosConfig
+    );
+    return response;
+  },
+
+  deleteNomina(id) {
+    var response = apiClient.delete("/nomina/" + id);
+    return response;
+  }
 };
