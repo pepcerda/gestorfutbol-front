@@ -490,6 +490,11 @@ export const gestorfutbolService = {
     return response;
   },
 
+  getEstatsPagament() {
+    var response = apiClient.get("/estats-pagament");
+    return response;
+  },
+
   getMensualitats(filter) {
     const axiosConfig = {
       headers: {

@@ -2,32 +2,269 @@ import { useTranslation } from "react-i18next";
 import PageTitle from "../../components/pagetitle/pagetitle";
 import TabMenuComponent from "../../components/tabmenucomponent/tabmenucomponent";
 import "./mensualitatspage.css";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { gestorfutbolService } from "../../services/real/gestorfutbolService";
 import { Accordion, AccordionTab } from "primereact/accordion";
+import { Stepper } from "primereact/stepper";
 import BasicButton from "../../components/basicbutton/basicbutton";
 import { Dialog } from "primereact/dialog";
 import { useFormik } from "formik";
+import { ConfigContext } from "../../App";
+import TableComponent from "../../components/tablecomponent/tablecomponent";
+import { StepperPanel } from "primereact/stepperpanel";
+import FormInputText from "../../components/forminputtext/forminputtext";
 
 const NominaContext = createContext();
 
 const NominaDataForm = ({ props }) => {
+  const { viewWidth, setViewWidth } = useContext(ConfigContext);
+  const { t, i18n } = useTranslation("common");
+  const { activeCampaign, formikMensualitat } = useContext(NominaContext);
+  const [plantilla, setPlantilla] = useState(null);
+  const [selectedPlantilla, setSelectedPlantilla] = useState(null);
+  const [activeStep, setActiveStep] = useState(0);
+  const stepperRef = useRef(null);
+  const [lazyState, setlazyState] = useState({
+    first: 0,
+    rows: 10,
+    page: 0,
+    sortOrder: null,
+    sortField: null,
+  });
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [nomines, setNomines] = useState(null);
+  const [estatsPagament, setEstatsPagament] = useState(null);
 
-  const {activeCampaign} = useContext(NominaContext); 
-  const [plantilla, setPlantilla] = useState(null); 
+  const emptyNomina = {
+    id: null,
+    jugador: null,
+    mensualitat: null,
+    estatPagament: null,
+    dataPagament: null,
+    quantitat: 0,
+  };
 
-   useEffect(() => {
+  useEffect(() => {
     let results;
     const filter = {
-      campanyaActiva: activeCampaign
-    }
+      campanyaActiva: activeCampaign,
+    };
     gestorfutbolService.getMembresPlantilla(filter).then((data) => {
       results = data.data;
       setPlantilla(results);
     });
   }, []);
 
+  useEffect(() => {
+    gestorfutbolService.getEstatsPagament().then((data) => {
+      let results = data.data;
+      setEstatsPagament(results);
+    });
+  }, []);
 
+  const dataNaixementBody = (rowData) => {
+    // Crear objeto Date
+    const fecha = new Date(rowData.dataNaixement);
+
+    // Obtener día, mes y año
+    const dia = String(fecha.getDate()).padStart(2, "0");
+    const mes = String(fecha.getMonth() + 1).padStart(2, "0"); // Los meses van de 0 a 11
+    const anio = fecha.getFullYear();
+
+    // Formatear como dd/mm/yyyy
+    const fechaFormateada = `${dia}/${mes}/${anio}`;
+
+    return (
+      <>
+        {viewWidth <= 900 ? (
+          <span className="fw-bold">{t("t.data.naixement")}</span>
+        ) : (
+          <></>
+        )}
+        <span>{fechaFormateada}</span>
+      </>
+    );
+  };
+
+  const tableColumns = [
+    { field: "id", header: `${t("t.jugador")}` },
+    {
+      field: "nom",
+      header: `${t("t.name")}`,
+    },
+    {
+      field: "llinatge1",
+      header: `${t("t.surname1")}`,
+    },
+    {
+      field: "llinatge2",
+      header: `${t("t.surname2")}`,
+    },
+    {
+      field: "dataNaixement",
+      header: `${t("t.data.naixement")}`,
+      body: dataNaixementBody,
+    },
+  ];
+
+  const tableProps = {
+    dataKey: "id",
+    data: plantilla,
+    selectedData: selectedPlantilla,
+    selectionMode: "checkbox",
+    rowSelectionMode: "multiple",
+    onChangeSelectedDataEvent: (e) => {
+      if (e.value != null) {
+        setSelectedPlantilla(e.value);
+      }
+    },
+    columns: tableColumns,
+    rowsPerPageOptions: [5, 10, 25, 50],
+    breakpoint: "900px",
+    onPage: (e) => setlazyState(e),
+    totalRecords: totalRecords,
+    first: lazyState.first,
+    stripedRows: true,
+  };
+
+  const handleSelectedNomines = (e) => {
+    selectedPlantilla.forEach((p) => {
+      let nomina = {
+        ...emptyNomina,
+        mensualitat: formikMensualitat.values.mensualitat.id,
+        membre: p.id,
+      };
+      setNomines((prevNomines) => [...(prevNomines || []), nomina]);
+    });
+  };
+
+  const nextButtonI = {
+    label: `${t("t.next")}`,
+    icon: "pi pi-arrow-right",
+    iconPos: "right",
+    className: "rounded-border-btn",
+    onClick: () => {
+      handleSelectedNomines();
+      setActiveStep((prev) => prev + 1);
+      stepperRef.current.nextCallback();
+    },
+  };
+
+  /********   Propietats formulari nòmines  ***********************/
+
+  return (
+    <div className="row mt-3">
+      <Stepper activeStep={activeStep} className="w-100" ref={stepperRef}>
+        <StepperPanel header={t("t.seleccio.jugadors")}>
+          <div className="row mt-3">
+            <TableComponent props={tableProps}></TableComponent>
+          </div>
+          <div className="mt-3 d-flex justify-content-end">
+            <BasicButton props={nextButtonI}></BasicButton>
+          </div>
+        </StepperPanel>
+        <StepperPanel header={t("t.dades.nomina")}>
+          {activeStep === 1 && selectedPlantilla !== null && selectedPlantilla.map((d, idx) => {
+            const nomProps = {
+              id: `nom-${idx}`,
+              value: d.nom,
+              className: "directiva-form-inputs",
+              disabled: true,
+            };
+
+            const llinatge1Props = {
+              id: `llinatge1-${idx}`,
+              value: d.llinatge1,
+              className: "directiva-form-inputs",
+              disabled: true,
+            };
+
+            const llinatge2Props = {
+              id: `llinatge2-${idx}`,
+              value: d.llinatge2,
+              className: "directiva-form-inputs",
+              disabled: true,
+            };
+
+            const quantitatProps = {
+              id: `quantitat-${idx}`,
+              value: nomines[idx].quantitat,
+              className: "directiva-form-inputs",
+              onChange: (e) => {
+                setNomines((prevNomines) => {
+                  const updatedNomines = [...(prevNomines || [])];
+                  updatedNomines[idx] = {
+                    ...updatedNomines[idx],
+                    quantitat: e.target.value,
+                  };
+                  return updatedNomines;
+                });
+              },
+            };
+
+            const dataPagamentProps = {
+              id: `dataNaixement-${idx}`,
+              value: nomines[idx].dataPagament,
+              view: "date",
+              dateFormat: "dd/mm/yy",
+              onChange: (e) => {
+                setNomines((prevNomines) => {
+                  const updatedNomines = [...(prevNomines || [])];
+                  updatedNomines[idx] = {
+                    ...updatedNomines[idx],
+                    dataPagament: e.target.value,
+                  };
+                  return updatedNomines;
+                });
+              },
+            };
+
+            return (
+              <>
+                {idx === 0 && (
+                  <div className="row">
+                    <div className="col-2">
+                      <span className="fw-bold">{t("t.role")}</span>
+                    </div>
+                    <div className="col-2">
+                      <span className="fw-bold">{t("t.name")}</span>
+                    </div>
+                    <div className="col-2">
+                      <span className="fw-bold">{t("t.surname1")}</span>
+                    </div>
+                    <div className="col-2">
+                      <span className="fw-bold">{t("t.surname2")}</span>
+                    </div>
+                    <div className="col-2">
+                      <span className="fw-bold">{t("t.nif")}</span>
+                    </div>
+                  </div>
+                )}
+                <div className="row ">
+                  <div className="col-2">
+                    <FormInputText props={nomProps}></FormInputText>
+                  </div>
+                  <div className="col-2">
+                    <FormInputText props={llinatge1Props}></FormInputText>
+                  </div>
+                  <div className="col-2">
+                    <FormInputText props={llinatge2Props}></FormInputText>
+                  </div>
+                  <div className="col-2">
+                    <FormInputText props={quantitatProps}></FormInputText>
+                  </div>
+                  <div className="col-2">
+                    <FormInputText props={dataPagamentProps}></FormInputText>
+                  </div>
+                </div>
+              </>
+            );
+          })}
+        </StepperPanel>
+        <StepperPanel header={t("t.revisio.confirmacio")}></StepperPanel>
+      </Stepper>
+    </div>
+  );
 };
 
 const MensualitatsPage = ({ props }) => {
@@ -38,6 +275,7 @@ const MensualitatsPage = ({ props }) => {
   const [tabMenuItems, setTabMenuItems] = useState([]);
   const [captureDialog, setCaptureDialog] = useState(false);
   const [mensualitats, setMensualitats] = useState(null);
+  const [mensualitat, setMensualitat] = useState(null);
 
   useEffect(() => {
     let results;
@@ -97,14 +335,6 @@ const MensualitatsPage = ({ props }) => {
     },
   };
 
-  const newButton = {
-    label: `${t("t.alta.nomines")}`,
-    className: "rounded-border-btn",
-    onClick: () => {
-      setCaptureDialog(true);
-    },
-  };
-
   const cancelFormButton = {
     icon: "pi pi-times",
     className: "basicbutton-outlined me-2",
@@ -122,8 +352,9 @@ const MensualitatsPage = ({ props }) => {
 
   const saveNomines = (data) => {};
 
-  const formikNomina = useFormik({
+  const formikMensualitat = useFormik({
     initialValues: {
+      mensualitat: mensualitat,
       campanya: activeCampaign,
     },
     enableReinitialize: true,
@@ -161,6 +392,15 @@ const MensualitatsPage = ({ props }) => {
                 const mesFormateado = String(m.mes).padStart(2, "0"); // Asegura formato 01, 02, ..., 12
                 const header = `Mensualitat ${mesFormateado}-${m.any}`;
 
+                const newButton = {
+                  label: `${t("t.alta.nomines")}`,
+                  className: "rounded-border-btn",
+                  onClick: () => {
+                    setMensualitat(m);
+                    setCaptureDialog(true);
+                  },
+                };
+
                 return (
                   <AccordionTab
                     key={m.id}
@@ -183,8 +423,10 @@ const MensualitatsPage = ({ props }) => {
             header={t("t.alta.nomina").toUpperCase()}
             onHide={hideDialog}
           >
-            <form onSubmit={formikNomina.handleSubmit}>
-              <NominaContext.Provider value={{activeCampaign}}>
+            <form onSubmit={formikMensualitat.handleSubmit}>
+              <NominaContext.Provider
+                value={{ activeCampaign, formikMensualitat }}
+              >
                 <NominaDataForm />
               </NominaContext.Provider>
               <div className="p-dialog-footer pb-0 mt-5">

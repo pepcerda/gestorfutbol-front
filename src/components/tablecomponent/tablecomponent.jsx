@@ -21,6 +21,7 @@ const TableComponent = ({props}) => {
     return (
         <div className="table-component-wrapper p-fluid">
             <DataTable
+                dataKey={props.dataKey}
                 value={props.data}
                 className={`table-component ${props.className}`}
                 selectionMode={props.selectionMode}
@@ -61,6 +62,9 @@ const TableComponent = ({props}) => {
                 contextMenuSelection={props.contextMenuSelection}
                 onContextMenu={props.onContextMenu}
             >
+                {(props.selectionMode === "checkbox" || props.selectionMode === "multiple") && (
+                    <Column selectionMode={props.rowSelectionMode}></Column>
+                )}
                 {props.columns
                     .map((c, idx) => (
                     <Column
