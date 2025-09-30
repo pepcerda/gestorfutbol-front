@@ -120,5 +120,11 @@
   "t.entrenador": "Entrenador",
   "t.delegat": "Delegat",
   "t.mensualitats": "Mensualitats",
-  "t.alta.nomines": "Alta nòmines"
+  "t.alta.nomines": "Alta nòmines",
+  "t.estat.PAGADA": "Pagat",
+  "t.estat.PENDENT": "Pendent",
+  "t.endavant": "Endavant",
+  "t.endarrere": "Endarrere",
+  "t.quantitat": "Quantitat",
+  "t.data.pagament": "Data pagament"
 }

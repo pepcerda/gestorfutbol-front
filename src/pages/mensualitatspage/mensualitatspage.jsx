@@ -13,13 +13,15 @@ import { ConfigContext } from "../../App";
 import TableComponent from "../../components/tablecomponent/tablecomponent";
 import { StepperPanel } from "primereact/stepperpanel";
 import FormInputText from "../../components/forminputtext/forminputtext";
+import FormCalendar from "../../components/formcalendar/formcalendar";
+import SelectOneMenu from "../../components/selectonemenu/selectonemenu";
 
 const NominaContext = createContext();
 
 const NominaDataForm = ({ props }) => {
   const { viewWidth, setViewWidth } = useContext(ConfigContext);
   const { t, i18n } = useTranslation("common");
-  const { activeCampaign, formikMensualitat } = useContext(NominaContext);
+  const { formikMensualitat } = useContext(NominaContext);
   const [plantilla, setPlantilla] = useState(null);
   const [selectedPlantilla, setSelectedPlantilla] = useState(null);
   const [activeStep, setActiveStep] = useState(0);
@@ -37,7 +39,7 @@ const NominaDataForm = ({ props }) => {
 
   const emptyNomina = {
     id: null,
-    jugador: null,
+    membre: null,
     mensualitat: null,
     estatPagament: null,
     dataPagament: null,
@@ -47,7 +49,7 @@ const NominaDataForm = ({ props }) => {
   useEffect(() => {
     let results;
     const filter = {
-      campanyaActiva: activeCampaign,
+      campanyaActiva: formikMensualitat.values.mensualitat.campanya,
     };
     gestorfutbolService.getMembresPlantilla(filter).then((data) => {
       results = data.data;
@@ -58,9 +60,18 @@ const NominaDataForm = ({ props }) => {
   useEffect(() => {
     gestorfutbolService.getEstatsPagament().then((data) => {
       let results = data.data;
-      setEstatsPagament(results);
+
+      const estatsFormatejats = results.map((item) => ({
+        valor: item.valor,
+        nom: t(`t.estat.${item.valor}`),
+      }));
+      setEstatsPagament(estatsFormatejats);
     });
   }, []);
+
+  useEffect(() => {
+    formikMensualitat.setFieldValue("mensualitat.nomines", nomines);
+  }, [nomines]);
 
   const dataNaixementBody = (rowData) => {
     // Crear objeto Date
@@ -139,13 +150,24 @@ const NominaDataForm = ({ props }) => {
   };
 
   const nextButtonI = {
-    label: `${t("t.next")}`,
+    label: `${t("t.endavant")}`,
     icon: "pi pi-arrow-right",
     iconPos: "right",
     className: "rounded-border-btn",
     onClick: () => {
       handleSelectedNomines();
       setActiveStep((prev) => prev + 1);
+      stepperRef.current.nextCallback();
+    },
+  };
+
+  const backButtonI = {
+    label: `${t("t.enrrere")}`,
+    icon: "pi pi-arrow-left",
+    iconPos: "right",
+    className: "rounded-border-btn",
+    onClick: () => {
+      setActiveStep((prev) => prev - 1);
       stepperRef.current.nextCallback();
     },
   };
@@ -164,104 +186,133 @@ const NominaDataForm = ({ props }) => {
           </div>
         </StepperPanel>
         <StepperPanel header={t("t.dades.nomina")}>
-          {activeStep === 1 && selectedPlantilla !== null && selectedPlantilla.map((d, idx) => {
-            const nomProps = {
-              id: `nom-${idx}`,
-              value: d.nom,
-              className: "directiva-form-inputs",
-              disabled: true,
-            };
+          {activeStep === 1 &&
+            selectedPlantilla !== null &&
+            selectedPlantilla.map((d, idx) => {
+              const nomProps = {
+                id: `nom-${idx}`,
+                value: d.nom,
+                className: "directiva-form-inputs",
+                disabled: true,
+              };
 
-            const llinatge1Props = {
-              id: `llinatge1-${idx}`,
-              value: d.llinatge1,
-              className: "directiva-form-inputs",
-              disabled: true,
-            };
+              const llinatge1Props = {
+                id: `llinatge1-${idx}`,
+                value: d.llinatge1,
+                className: "directiva-form-inputs",
+                disabled: true,
+              };
 
-            const llinatge2Props = {
-              id: `llinatge2-${idx}`,
-              value: d.llinatge2,
-              className: "directiva-form-inputs",
-              disabled: true,
-            };
+              const llinatge2Props = {
+                id: `llinatge2-${idx}`,
+                value: d.llinatge2,
+                className: "directiva-form-inputs",
+                disabled: true,
+              };
 
-            const quantitatProps = {
-              id: `quantitat-${idx}`,
-              value: nomines[idx].quantitat,
-              className: "directiva-form-inputs",
-              onChange: (e) => {
-                setNomines((prevNomines) => {
-                  const updatedNomines = [...(prevNomines || [])];
-                  updatedNomines[idx] = {
-                    ...updatedNomines[idx],
-                    quantitat: e.target.value,
-                  };
-                  return updatedNomines;
-                });
-              },
-            };
+              const quantitatProps = {
+                id: `quantitat-${idx}`,
+                value: nomines[idx].quantitat,
+                className: "directiva-form-inputs",
+                onChange: (e) => {
+                  setNomines((prevNomines) => {
+                    const updatedNomines = [...(prevNomines || [])];
+                    updatedNomines[idx] = {
+                      ...updatedNomines[idx],
+                      quantitat: e.target.value,
+                    };
+                    return updatedNomines;
+                  });
+                },
+              };
 
-            const dataPagamentProps = {
-              id: `dataNaixement-${idx}`,
-              value: nomines[idx].dataPagament,
-              view: "date",
-              dateFormat: "dd/mm/yy",
-              onChange: (e) => {
-                setNomines((prevNomines) => {
-                  const updatedNomines = [...(prevNomines || [])];
-                  updatedNomines[idx] = {
-                    ...updatedNomines[idx],
-                    dataPagament: e.target.value,
-                  };
-                  return updatedNomines;
-                });
-              },
-            };
+              const estatPagamentProps = {
+                id: `estat-pagament-${idx}`,
+                value: nomines[idx].estatPagament,
+                onChange: (e) => {
+                  setNomines((prevNomines) => {
+                    const updatedNomines = [...(prevNomines || [])];
+                    updatedNomines[idx] = {
+                      ...updatedNomines[idx],
+                      estatPagament: e.value,
+                    };
+                    return updatedNomines;
+                  });
+                },
+                options: estatsPagament,
+                optionLabel: "nom",
+                optionValue: "valor",
+                className: "w-100",
+              };
 
-            return (
-              <>
-                {idx === 0 && (
-                  <div className="row">
+              const dataPagamentProps = {
+                id: `dataNaixement-${idx}`,
+                value: nomines[idx].dataPagament,
+                view: "date",
+                dateFormat: "dd/mm/yy",
+                onChange: (e) => {
+                  setNomines((prevNomines) => {
+                    const updatedNomines = [...(prevNomines || [])];
+                    updatedNomines[idx] = {
+                      ...updatedNomines[idx],
+                      dataPagament: e.target.value,
+                    };
+                    return updatedNomines;
+                  });
+                },
+              };
+
+              return (
+                <>
+                  {idx === 0 && (
+                    <div className="row">
+                      <div className="col-2">
+                        <span className="fw-bold">{t("t.name")}</span>
+                      </div>
+                      <div className="col-2">
+                        <span className="fw-bold">{t("t.surname1")}</span>
+                      </div>
+                      <div className="col-2">
+                        <span className="fw-bold">{t("t.surname2")}</span>
+                      </div>
+                      <div className="col-2">
+                        <span className="fw-bold">{t("t.quantitat")}</span>
+                      </div>
+                      <div className="col-2">
+                        <span className="fw-bold">{t("t.estat.pagament")}</span>
+                      </div>
+                      <div className="col-2">
+                        <span className="fw-bold">{t("t.data.pagament")}</span>
+                      </div>
+                    </div>
+                  )}
+                  <div className="row mt-2">
                     <div className="col-2">
-                      <span className="fw-bold">{t("t.role")}</span>
+                      <FormInputText props={nomProps}></FormInputText>
                     </div>
                     <div className="col-2">
-                      <span className="fw-bold">{t("t.name")}</span>
+                      <FormInputText props={llinatge1Props}></FormInputText>
                     </div>
                     <div className="col-2">
-                      <span className="fw-bold">{t("t.surname1")}</span>
+                      <FormInputText props={llinatge2Props}></FormInputText>
                     </div>
                     <div className="col-2">
-                      <span className="fw-bold">{t("t.surname2")}</span>
+                      <FormInputText props={quantitatProps}></FormInputText>
                     </div>
                     <div className="col-2">
-                      <span className="fw-bold">{t("t.nif")}</span>
+                      <SelectOneMenu props={estatPagamentProps}></SelectOneMenu>
+                    </div>
+                    <div className="col-2">
+                      <FormCalendar props={dataPagamentProps}></FormCalendar>
                     </div>
                   </div>
-                )}
-                <div className="row ">
-                  <div className="col-2">
-                    <FormInputText props={nomProps}></FormInputText>
-                  </div>
-                  <div className="col-2">
-                    <FormInputText props={llinatge1Props}></FormInputText>
-                  </div>
-                  <div className="col-2">
-                    <FormInputText props={llinatge2Props}></FormInputText>
-                  </div>
-                  <div className="col-2">
-                    <FormInputText props={quantitatProps}></FormInputText>
-                  </div>
-                  <div className="col-2">
-                    <FormInputText props={dataPagamentProps}></FormInputText>
-                  </div>
-                </div>
-              </>
-            );
-          })}
+                </>
+              );
+            })}
+          <div className="mt-3 d-flex justify-content-between">
+            <BasicButton props={backButtonI}></BasicButton>
+          </div>
         </StepperPanel>
-        <StepperPanel header={t("t.revisio.confirmacio")}></StepperPanel>
       </Stepper>
     </div>
   );
@@ -276,6 +327,10 @@ const MensualitatsPage = ({ props }) => {
   const [captureDialog, setCaptureDialog] = useState(false);
   const [mensualitats, setMensualitats] = useState(null);
   const [mensualitat, setMensualitat] = useState(null);
+
+  const handleMensualitats = () => {
+    
+  }
 
   useEffect(() => {
     let results;
@@ -314,6 +369,7 @@ const MensualitatsPage = ({ props }) => {
 
       gestorfutbolService.getMensualitats(apiFilter).then((data) => {
         let results = data.data;
+        console.log(results);
         setMensualitats(results);
       });
     }
@@ -350,22 +406,27 @@ const MensualitatsPage = ({ props }) => {
     className: "p-2 rounded-2",
   };
 
-  const saveNomines = (data) => {};
+  const saveNomines = (data) => {
+    console.log(data);
+    gestorfutbolService.saveMensualitat(data.mensualitat).then(() => {
+      let apiFilter = {
+        campanyaActiva: activeCampaign,
+      };
+      gestorfutbolService.getMensualitats(apiFilter).then((data) => {
+        let results = data.data;
+        setMensualitats(results);
+      });
+    });
+    setCaptureDialog(false);
+  };
 
   const formikMensualitat = useFormik({
     initialValues: {
       mensualitat: mensualitat,
-      campanya: activeCampaign,
     },
     enableReinitialize: true,
     validate: (data) => {
       let errors = {};
-      if (!data.nom) {
-        errors.nom = t("t.empty.field");
-      }
-      if (!data.llinatge1) {
-        errors.llinatge1 = t("t.empty.field");
-      }
       return errors;
     },
     onSubmit: (data) => {
