@@ -328,9 +328,7 @@ const MensualitatsPage = ({ props }) => {
   const [mensualitats, setMensualitats] = useState(null);
   const [mensualitat, setMensualitat] = useState(null);
 
-  const handleMensualitats = () => {
-    
-  }
+  const handleMensualitats = () => {};
 
   useEffect(() => {
     let results;
@@ -361,19 +359,45 @@ const MensualitatsPage = ({ props }) => {
     }
   }, [campaigns]);
 
-  useEffect(() => {
-    if (activeCampaign !== null) {
-      let apiFilter = {
-        campanyaActiva: activeCampaign,
-      };
+useEffect(() => {
+  if (activeCampaign !== null) {
+    const apiFilter = { campanyaActiva: activeCampaign };
 
-      gestorfutbolService.getMensualitats(apiFilter).then((data) => {
-        let results = data.data;
-        console.log(results);
-        setMensualitats(results);
-      });
-    }
-  }, [activeCampaign]);
+    gestorfutbolService.getMensualitats(apiFilter).then(async (data) => {
+      const mensualitatsOriginals = data.data;
+
+      const mensualitatsEnriquides = await Promise.all(
+        mensualitatsOriginals.map(async (m) => {
+          if (m.nomines && m.nomines.length > 0) {
+            const apiFilterMembres = {
+              campanyaActiva: activeCampaign,
+              ids: m.nomines.map((n) => n.membre),
+            };
+
+            try {
+              const membresData = await gestorfutbolService.getMembresPlantilla(apiFilterMembres);
+              const membres = membresData.data;
+
+              const nominesCompletes = m.nomines.map((n) => {
+                const membre = membres.find((r) => r.id === n.membre);
+                return { ...n, membre };
+              });
+
+              return { ...m, nomines: nominesCompletes };
+            } catch (error) {
+              console.error("Error al cargar membres:", error);
+              return m;
+            }
+          } else {
+            return m;
+          }
+        })
+      );
+
+      setMensualitats(mensualitatsEnriquides);
+    });
+  }
+}, [activeCampaign]);
 
   /********   PROPIETATS D'ELEMENTS DEL FRONTAL  ***********************/
 
@@ -462,6 +486,65 @@ const MensualitatsPage = ({ props }) => {
                   },
                 };
 
+                let tableProps = null;
+
+                if (m.nomines && m.nomines.length > 0) {
+                  console.log(m);
+                  const tableColumns = [
+                    { field: "membre.id", header: `${t("t.jugador")}` },
+                    {
+                      field: "membre.nom",
+                      header: `${t("t.name")}`,
+                    },
+                    {
+                      field: "membre.llinatge1",
+                      header: `${t("t.surname1")}`,
+                    },
+                    {
+                      field: "membre.llinatge2",
+                      header: `${t("t.surname2")}`,
+                    },
+                    {
+                      field: "quantitat",
+                      header: `${t("t.quantitat")}`,
+                    },
+                    {
+                      field: "estatPagament",
+                      header: `${t("t.estat.pagament")}`,
+                    },
+                    {
+                      field: "dataPagament",
+                      header: `${t("t.data.pagament")}`,
+                      body: (rowData) => {
+                        if (rowData.dataPagament) {
+                          // Crear objeto Date
+                          const fecha = new Date(rowData.dataPagament);
+                          // Obtener día, mes y año
+                          const dia = String(fecha.getDate()).padStart(2, "0");
+                          const mes = String(fecha.getMonth() + 1).padStart(
+                            2,
+                            "0"
+                          ); // Los meses van de 0 a 11
+                          const anio = fecha.getFullYear();
+                          // Formatear como dd/mm/yyyy
+                          const fechaFormateada = `${dia}/${mes}/${anio}`;
+                          return <span>{fechaFormateada}</span>;
+                        } else {
+                          return <span></span>;
+                        }
+                      },
+                    },
+                  ];
+                  tableProps = {
+                    dataKey: "id",
+                    data: m.nomines,
+                    columns: tableColumns,
+                    rowsPerPageOptions: [5, 10, 25, 50],
+                    breakpoint: "900px",
+                    stripedRows: true,
+                  };
+                }
+
                 return (
                   <AccordionTab
                     key={m.id}
@@ -471,7 +554,7 @@ const MensualitatsPage = ({ props }) => {
                     headerClassName="main-color"
                   >
                     {m.nomines && m.nomines.length > 0 ? (
-                      <></>
+                      <TableComponent props={tableProps}></TableComponent>
                     ) : (
                       <BasicButton props={newButton}></BasicButton>
                     )}
