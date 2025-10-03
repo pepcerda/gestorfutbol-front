@@ -15,6 +15,8 @@ import { StepperPanel } from "primereact/stepperpanel";
 import FormInputText from "../../components/forminputtext/forminputtext";
 import FormCalendar from "../../components/formcalendar/formcalendar";
 import SelectOneMenu from "../../components/selectonemenu/selectonemenu";
+import FormInputNumber from "../../components/forminputnumber/forminputnumber";
+import { use } from "react";
 
 const NominaContext = createContext();
 
@@ -55,6 +57,18 @@ const NominaDataForm = ({ props }) => {
       results = data.data;
       setPlantilla(results);
     });
+  }, []);
+
+  useEffect(() => {
+    if (
+      formikMensualitat.values.mensualitat &&
+      formikMensualitat.values.mensualitat.nomines
+    ) {
+      setNomines(formikMensualitat.values.mensualitat.nomines);
+      setSelectedPlantilla(
+        formikMensualitat.values.mensualitat.nomines.map((n) => n.membre)
+      );
+    }
   }, []);
 
   useEffect(() => {
@@ -162,10 +176,11 @@ const NominaDataForm = ({ props }) => {
   };
 
   const backButtonI = {
-    label: `${t("t.enrrere")}`,
+    label: `${t("t.endarrere")}`,
     icon: "pi pi-arrow-left",
     iconPos: "right",
     className: "rounded-border-btn",
+    type: "button",
     onClick: () => {
       setActiveStep((prev) => prev - 1);
       stepperRef.current.nextCallback();
@@ -214,7 +229,9 @@ const NominaDataForm = ({ props }) => {
                 id: `quantitat-${idx}`,
                 value: nomines[idx].quantitat,
                 className: "directiva-form-inputs",
-                onChange: (e) => {
+                mode: "currency",
+                currency: "EUR",
+                onValueChange: (e) => {
                   setNomines((prevNomines) => {
                     const updatedNomines = [...(prevNomines || [])];
                     updatedNomines[idx] = {
@@ -297,7 +314,7 @@ const NominaDataForm = ({ props }) => {
                       <FormInputText props={llinatge2Props}></FormInputText>
                     </div>
                     <div className="col-2">
-                      <FormInputText props={quantitatProps}></FormInputText>
+                      <FormInputNumber props={quantitatProps}></FormInputNumber>
                     </div>
                     <div className="col-2">
                       <SelectOneMenu props={estatPagamentProps}></SelectOneMenu>
@@ -320,6 +337,7 @@ const NominaDataForm = ({ props }) => {
 
 const MensualitatsPage = ({ props }) => {
   const { t, i18n } = useTranslation("common");
+  const { viewWidth, setViewWidth } = useContext(ConfigContext);
   const [activeIndex, setActiveIndex] = useState(0);
   const [activeCampaign, setActiveCampaign] = useState(null);
   const [campaigns, setCampaigns] = useState(null);
@@ -327,6 +345,7 @@ const MensualitatsPage = ({ props }) => {
   const [captureDialog, setCaptureDialog] = useState(false);
   const [mensualitats, setMensualitats] = useState(null);
   const [mensualitat, setMensualitat] = useState(null);
+  const [estatsPagament, setEstatsPagament] = useState(null);
 
   const handleMensualitats = () => {};
 
@@ -335,6 +354,15 @@ const MensualitatsPage = ({ props }) => {
     gestorfutbolService.getAllCampaigns().then((data) => {
       results = data.data;
       setCampaigns(results);
+    });
+
+    gestorfutbolService.getEstatsPagament().then((data) => {
+      let results = data.data;
+      const estatsFormatejats = results.map((item) => ({
+        valor: item.valor,
+        nom: t(`t.estat.${item.valor}`),
+      }));
+      setEstatsPagament(estatsFormatejats);
     });
   }, []);
 
@@ -359,45 +387,48 @@ const MensualitatsPage = ({ props }) => {
     }
   }, [campaigns]);
 
-useEffect(() => {
-  if (activeCampaign !== null) {
-    const apiFilter = { campanyaActiva: activeCampaign };
+  useEffect(() => {
+    if (activeCampaign !== null) {
+      const apiFilter = { campanyaActiva: activeCampaign };
 
-    gestorfutbolService.getMensualitats(apiFilter).then(async (data) => {
-      const mensualitatsOriginals = data.data;
+      gestorfutbolService.getMensualitats(apiFilter).then(async (data) => {
+        const mensualitatsOriginals = data.data;
 
-      const mensualitatsEnriquides = await Promise.all(
-        mensualitatsOriginals.map(async (m) => {
-          if (m.nomines && m.nomines.length > 0) {
-            const apiFilterMembres = {
-              campanyaActiva: activeCampaign,
-              ids: m.nomines.map((n) => n.membre),
-            };
+        const mensualitatsEnriquides = await Promise.all(
+          mensualitatsOriginals.map(async (m) => {
+            if (m.nomines && m.nomines.length > 0) {
+              const apiFilterMembres = {
+                campanyaActiva: activeCampaign,
+                ids: m.nomines.map((n) => n.membre),
+              };
 
-            try {
-              const membresData = await gestorfutbolService.getMembresPlantilla(apiFilterMembres);
-              const membres = membresData.data;
+              try {
+                const membresData =
+                  await gestorfutbolService.getMembresPlantilla(
+                    apiFilterMembres
+                  );
+                const membres = membresData.data;
 
-              const nominesCompletes = m.nomines.map((n) => {
-                const membre = membres.find((r) => r.id === n.membre);
-                return { ...n, membre };
-              });
+                const nominesCompletes = m.nomines.map((n) => {
+                  const membre = membres.find((r) => r.id === n.membre);
+                  return { ...n, membre };
+                });
 
-              return { ...m, nomines: nominesCompletes };
-            } catch (error) {
-              console.error("Error al cargar membres:", error);
+                return { ...m, nomines: nominesCompletes };
+              } catch (error) {
+                console.error("Error al cargar membres:", error);
+                return m;
+              }
+            } else {
               return m;
             }
-          } else {
-            return m;
-          }
-        })
-      );
+          })
+        );
 
-      setMensualitats(mensualitatsEnriquides);
-    });
-  }
-}, [activeCampaign]);
+        setMensualitats(mensualitatsEnriquides);
+      });
+    }
+  }, [activeCampaign]);
 
   /********   PROPIETATS D'ELEMENTS DEL FRONTAL  ***********************/
 
@@ -431,14 +462,45 @@ useEffect(() => {
   };
 
   const saveNomines = (data) => {
-    console.log(data);
     gestorfutbolService.saveMensualitat(data.mensualitat).then(() => {
       let apiFilter = {
         campanyaActiva: activeCampaign,
       };
-      gestorfutbolService.getMensualitats(apiFilter).then((data) => {
-        let results = data.data;
-        setMensualitats(results);
+      gestorfutbolService.getMensualitats(apiFilter).then(async (data) => {
+        const mensualitatsOriginals = data.data;
+
+        const mensualitatsEnriquides = await Promise.all(
+          mensualitatsOriginals.map(async (m) => {
+            if (m.nomines && m.nomines.length > 0) {
+              const apiFilterMembres = {
+                campanyaActiva: activeCampaign,
+                ids: m.nomines.map((n) => n.membre),
+              };
+
+              try {
+                const membresData =
+                  await gestorfutbolService.getMembresPlantilla(
+                    apiFilterMembres
+                  );
+                const membres = membresData.data;
+
+                const nominesCompletes = m.nomines.map((n) => {
+                  const membre = membres.find((r) => r.id === n.membre);
+                  return { ...n, membre };
+                });
+
+                return { ...m, nomines: nominesCompletes };
+              } catch (error) {
+                console.error("Error al cargar membres:", error);
+                return m;
+              }
+            } else {
+              return m;
+            }
+          })
+        );
+
+        setMensualitats(mensualitatsEnriquides);
       });
     });
     setCaptureDialog(false);
@@ -475,7 +537,16 @@ useEffect(() => {
 
               .map((m, index) => {
                 const mesFormateado = String(m.mes).padStart(2, "0"); // Asegura formato 01, 02, ..., 12
-                const header = `Mensualitat ${mesFormateado}-${m.any}`;
+
+                const editButton = {
+                  icon: "pi pi-pencil",
+                  label: `${t("t.edita")}`,
+                  className: "rounded-border-btn",
+                  onClick: () => {
+                    setMensualitat(m);
+                    setCaptureDialog(true);
+                  },
+                };
 
                 const newButton = {
                   label: `${t("t.alta.nomines")}`,
@@ -486,10 +557,56 @@ useEffect(() => {
                   },
                 };
 
+                const headerTemplate = () => {
+                  return (
+                    <div className="d-flex justify-content-between align-items-center w-100">
+                      <span className="accordion-header-text">{`Mensualitat ${mesFormateado}-${m.any}`}</span>
+                       {m.nomines && m.nomines.length > 0 ? (
+                        <>
+                        <span className="accordion-header-text">
+                          {m.nomines.length} {t("t.nomines")}
+                        </span>
+                        <BasicButton props={editButton}></BasicButton></>
+                      ) : (
+                        <>{t('t.no.mensualitat')}</>
+                      )}
+                      
+                    </div>
+                  );
+                };
+
                 let tableProps = null;
 
+                const estatPagamentBodyTemplate = (nomina) => {
+                  let estat = estatsPagament.find((o) => {
+                    return o.valor === nomina.estatPagament;
+                  });
+
+                  if (estat != null) {
+                    return (
+                      <>
+                        {viewWidth <= 900 ? (
+                          <span className="fw-bold">
+                            {t("t.payment.state")}
+                          </span>
+                        ) : (
+                          <></>
+                        )}
+                        <span
+                          className={`${
+                            estat.valor === "PAGADA"
+                              ? "text-bg-success"
+                              : "text-bg-danger"
+                          } px-3 py-2 rounded-pill`}
+                        >
+                          {estat.nom}
+                        </span>
+                      </>
+                    );
+                  }
+                };
+
                 if (m.nomines && m.nomines.length > 0) {
-                  console.log(m);
                   const tableColumns = [
                     { field: "membre.id", header: `${t("t.jugador")}` },
                     {
@@ -511,6 +628,7 @@ useEffect(() => {
                     {
                       field: "estatPagament",
                       header: `${t("t.estat.pagament")}`,
+                      body: estatPagamentBodyTemplate,
                     },
                     {
                       field: "dataPagament",
@@ -528,7 +646,18 @@ useEffect(() => {
                           const anio = fecha.getFullYear();
                           // Formatear como dd/mm/yyyy
                           const fechaFormateada = `${dia}/${mes}/${anio}`;
-                          return <span>{fechaFormateada}</span>;
+                          return (
+                            <>
+                              {viewWidth <= 900 ? (
+                                <span className="fw-bold">
+                                  {t("t.data.pagament")}
+                                </span>
+                              ) : (
+                                <></>
+                              )}
+                              <span>{fechaFormateada}</span>
+                            </>
+                          );
                         } else {
                           return <span></span>;
                         }
@@ -548,7 +677,7 @@ useEffect(() => {
                 return (
                   <AccordionTab
                     key={m.id}
-                    header={header}
+                    headerTemplate={headerTemplate}
                     className="main-color"
                     contentClassName="main-color"
                     headerClassName="main-color"

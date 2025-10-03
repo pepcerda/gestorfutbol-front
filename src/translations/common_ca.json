@@ -126,5 +126,9 @@
   "t.endavant": "Endavant",
   "t.endarrere": "Endarrere",
   "t.quantitat": "Quantitat",
-  "t.data.pagament": "Data pagament"
+  "t.data.pagament": "Data pagament",
+  "t.seleccio.jugadors": "Selecció de jugadors",
+  "t.dades.nomina": "Dades nòmina",
+  "t.nomines": "Nòmines",
+  "t.no.mensualitat": "No hi ha mensualitat"
 }

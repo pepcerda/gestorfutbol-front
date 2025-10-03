@@ -1,6 +1,10 @@
 .form-inputnumber {
-    max-width: 75% !important;
+    max-width: 100% !important;
     display: block;
+}
+
+.form-inputnumber input {
+    width: 100% !important;
 }
 
 .inputnumber-label {
