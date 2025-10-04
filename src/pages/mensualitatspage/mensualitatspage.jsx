@@ -17,6 +17,9 @@ import FormCalendar from "../../components/formcalendar/formcalendar";
 import SelectOneMenu from "../../components/selectonemenu/selectonemenu";
 import FormInputNumber from "../../components/forminputnumber/forminputnumber";
 import { use } from "react";
+import moment from "moment";
+import TableNoRespComponent from "../../components/tablenorespcomponent/tablenorespcomponent";
+import { FilterMatchMode } from "primereact/api";
 
 const NominaContext = createContext();
 
@@ -38,6 +41,10 @@ const NominaDataForm = ({ props }) => {
   const [totalRecords, setTotalRecords] = useState(0);
   const [nomines, setNomines] = useState(null);
   const [estatsPagament, setEstatsPagament] = useState(null);
+  const [filters, setFilters] = useState({
+    nomComplet: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  });
+
 
   const emptyNomina = {
     id: null,
@@ -54,7 +61,10 @@ const NominaDataForm = ({ props }) => {
       campanyaActiva: formikMensualitat.values.mensualitat.campanya,
     };
     gestorfutbolService.getMembresPlantilla(filter).then((data) => {
-      results = data.data;
+      results = data.data.map((m) => ({
+        ...m,
+        nomComplet: `${m.nom} ${m.llinatge1 ?? ""} ${m.llinatge2 ?? ""}`.trim(),
+      }));
       setPlantilla(results);
     });
   }, []);
@@ -62,12 +72,42 @@ const NominaDataForm = ({ props }) => {
   useEffect(() => {
     if (
       formikMensualitat.values.mensualitat &&
-      formikMensualitat.values.mensualitat.nomines
+      Array.isArray(formikMensualitat.values.mensualitat.nomines)
     ) {
-      setNomines(formikMensualitat.values.mensualitat.nomines);
-      setSelectedPlantilla(
-        formikMensualitat.values.mensualitat.nomines.map((n) => n.membre)
-      );
+      if (
+        formikMensualitat.values.mensualitat.nomines.every(
+          (n) => typeof n.membre === "object" && n !== null
+        )
+      ) {
+        const nominesCorregides =
+          formikMensualitat.values.mensualitat.nomines.map((n) => {
+            let nomina = {
+              ...n,
+              membre: n.membre.id,
+            };
+            return nomina;
+          });
+
+        setNomines(nominesCorregides);
+        setSelectedPlantilla(
+          formikMensualitat.values.mensualitat.nomines.map((n) => n.membre)
+        );
+      } else {
+        setNomines(formikMensualitat.values.mensualitat.nomines);
+
+        let ident = formikMensualitat.values.mensualitat.nomines.map((n) => {
+          return n.membre;
+        });
+        const apiFilterMembres = {
+          campanyaActiva: formikMensualitat.values.mensualitat.campanya,
+          ids: ident,
+        };
+        gestorfutbolService
+          .getMembresPlantilla(apiFilterMembres)
+          .then((data) => {
+            setSelectedPlantilla(data.data);
+          });
+      }
     }
   }, []);
 
@@ -101,29 +141,17 @@ const NominaDataForm = ({ props }) => {
 
     return (
       <>
-        {viewWidth <= 900 ? (
-          <span className="fw-bold">{t("t.data.naixement")}</span>
-        ) : (
-          <></>
-        )}
         <span>{fechaFormateada}</span>
       </>
     );
   };
 
   const tableColumns = [
-    { field: "id", header: `${t("t.jugador")}` },
     {
-      field: "nom",
+      field: "nomComplet",
       header: `${t("t.name")}`,
-    },
-    {
-      field: "llinatge1",
-      header: `${t("t.surname1")}`,
-    },
-    {
-      field: "llinatge2",
-      header: `${t("t.surname2")}`,
+      filter: true,
+      filterField: "nomComplet",
     },
     {
       field: "dataNaixement",
@@ -150,16 +178,22 @@ const NominaDataForm = ({ props }) => {
     totalRecords: totalRecords,
     first: lazyState.first,
     stripedRows: true,
+    filterDisplay: "row",
+    filters: filters,
+    showFilterMatchModes: false,
+    globalFilterFields: ['nomComplet'],
   };
 
   const handleSelectedNomines = (e) => {
     selectedPlantilla.forEach((p) => {
-      let nomina = {
-        ...emptyNomina,
-        mensualitat: formikMensualitat.values.mensualitat.id,
-        membre: p.id,
-      };
-      setNomines((prevNomines) => [...(prevNomines || []), nomina]);
+      if (nomines && !nomines.find((n) => n.membre === p.id)) {
+        let nomina = {
+          ...emptyNomina,
+          mensualitat: formikMensualitat.values.mensualitat.id,
+          membre: p.id,
+        };
+        setNomines((prevNomines) => [...(prevNomines || []), nomina]);
+      }
     });
   };
 
@@ -194,7 +228,7 @@ const NominaDataForm = ({ props }) => {
       <Stepper activeStep={activeStep} className="w-100" ref={stepperRef}>
         <StepperPanel header={t("t.seleccio.jugadors")}>
           <div className="row mt-3">
-            <TableComponent props={tableProps}></TableComponent>
+            <TableNoRespComponent props={tableProps}></TableNoRespComponent>
           </div>
           <div className="mt-3 d-flex justify-content-end">
             <BasicButton props={nextButtonI}></BasicButton>
@@ -204,6 +238,12 @@ const NominaDataForm = ({ props }) => {
           {activeStep === 1 &&
             selectedPlantilla !== null &&
             selectedPlantilla.map((d, idx) => {
+              const dataPagamentCalc = (value) => {
+                let dateString = value;
+                let dateMomentObject = moment(dateString);
+                return dateMomentObject.toDate();
+              };
+
               const nomProps = {
                 id: `nom-${idx}`,
                 value: d.nom,
@@ -264,7 +304,7 @@ const NominaDataForm = ({ props }) => {
 
               const dataPagamentProps = {
                 id: `dataNaixement-${idx}`,
-                value: nomines[idx].dataPagament,
+                value: dataPagamentCalc(nomines[idx].dataPagament),
                 view: "date",
                 dateFormat: "dd/mm/yy",
                 onChange: (e) => {
@@ -434,6 +474,7 @@ const MensualitatsPage = ({ props }) => {
 
   const hideDialog = () => {
     setCaptureDialog(false);
+    formikMensualitat.resetForm();
   };
 
   const tabMenu = {
@@ -561,16 +602,16 @@ const MensualitatsPage = ({ props }) => {
                   return (
                     <div className="d-flex justify-content-between align-items-center w-100">
                       <span className="accordion-header-text">{`Mensualitat ${mesFormateado}-${m.any}`}</span>
-                       {m.nomines && m.nomines.length > 0 ? (
+                      {m.nomines && m.nomines.length > 0 ? (
                         <>
-                        <span className="accordion-header-text">
-                          {m.nomines.length} {t("t.nomines")}
-                        </span>
-                        <BasicButton props={editButton}></BasicButton></>
+                          <span className="accordion-header-text">
+                            {m.nomines.length} {t("t.nomines")}
+                          </span>
+                          <BasicButton props={editButton}></BasicButton>
+                        </>
                       ) : (
-                        <>{t('t.no.mensualitat')}</>
+                        <>{t("t.no.mensualitat")}</>
                       )}
-                      
                     </div>
                   );
                 };
@@ -695,6 +736,9 @@ const MensualitatsPage = ({ props }) => {
             visible={captureDialog}
             header={t("t.alta.nomina").toUpperCase()}
             onHide={hideDialog}
+            maximizable={true}
+            resizable={true}
+            className="w-100"
           >
             <form onSubmit={formikMensualitat.handleSubmit}>
               <NominaContext.Provider

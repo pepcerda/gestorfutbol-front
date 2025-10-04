@@ -1,29 +1,14 @@
-import "./tablecomponent.css";
-import React, {useState, useEffect} from "react";
-import {DataTable} from "primereact/datatable";
-import {Column} from "primereact/column";
-import {useTranslation} from "react-i18next";
+import { Column } from 'primereact/column';
+import './tablenorespcomponent.css';
+import { DataTable } from 'primereact/datatable';
 
-const getValue = (row, field) =>
-    field.split(/\./u).reduce((acc, curr) => {
-        if (acc?.[curr]) {
-            return acc[curr];
-        }
-
-        return undefined;
-    }, row);
-
-const TableComponent = ({props}) => {
-    const [products, setProducts] = useState([]);
-    const [selectedProduct, setSelectedProduct] = useState(null);
-    const {t, i18n} = useTranslation("common");
-
-    return (
-        <div className="table-component-wrapper p-fluid">
+const TableNoRespComponent = ({props})=> {
+   return (
+      <div>
             <DataTable
                 dataKey={props.dataKey}
                 value={props.data}
-                className={`table-component ${props.className}`}
+                className={`${props.className}`}
                 selectionMode={props.selectionMode}
                 paginatorClassName="table-paginator"
                 paginatorDropdownAppendTo="self"
@@ -51,6 +36,7 @@ const TableComponent = ({props}) => {
                 onFilter={props.onFilter}
                 filterDisplay={props.filterDisplay}
                 showFilterMatchModes={props.showFilterMatchModes}
+                globalFilterFields={props.globalFilterFields}
                 footer={props.footer}
                 header={props.header}
                 rowGroupMode={props.rowGroupMode} 
@@ -72,12 +58,10 @@ const TableComponent = ({props}) => {
                     <Column
                         key={c.field}
                         field={c.field}
-                        body={(row, {field}) => (
-                            <>
-                                <span className="p-column-title">{c.header}</span>
-                                {getValue(row, field)}
-                            </>
-                        )}
+                        body={c.body}
+                        filter={c.filter} // Asegúrate de que esta propiedad esté habilitada
+                        filterField={c.filterField}
+                        filterFunction={c.filterFunction}
                         {...c}
                     />
                 ))}
@@ -91,8 +75,8 @@ const TableComponent = ({props}) => {
                 )}
 
             </DataTable>
-        </div>
-    );
-};
+        </div>);
+}
 
-export default TableComponent;
+
+export default TableNoRespComponent;
