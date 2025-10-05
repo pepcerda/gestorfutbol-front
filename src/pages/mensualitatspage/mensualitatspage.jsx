@@ -20,6 +20,7 @@ import { use } from "react";
 import moment from "moment";
 import TableNoRespComponent from "../../components/tablenorespcomponent/tablenorespcomponent";
 import { FilterMatchMode } from "primereact/api";
+import { Divider } from "primereact/divider";
 
 const NominaContext = createContext();
 
@@ -44,7 +45,6 @@ const NominaDataForm = ({ props }) => {
   const [filters, setFilters] = useState({
     nomComplet: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
-
 
   const emptyNomina = {
     id: null,
@@ -152,6 +152,7 @@ const NominaDataForm = ({ props }) => {
       header: `${t("t.name")}`,
       filter: true,
       filterField: "nomComplet",
+      className: "mw-60vw",
     },
     {
       field: "dataNaixement",
@@ -181,7 +182,7 @@ const NominaDataForm = ({ props }) => {
     filterDisplay: "row",
     filters: filters,
     showFilterMatchModes: false,
-    globalFilterFields: ['nomComplet'],
+    globalFilterFields: ["nomComplet"],
   };
 
   const handleSelectedNomines = (e) => {
@@ -321,48 +322,107 @@ const NominaDataForm = ({ props }) => {
 
               return (
                 <>
-                  {idx === 0 && (
-                    <div className="row">
-                      <div className="col-2">
-                        <span className="fw-bold">{t("t.name")}</span>
+                  {viewWidth <= process.env.REACT_APP_XL_VW ? (
+                    <>
+                      <Divider className="mt-2 mb-2"/>
+                      <div className="row">
+                        <div className="col-12">
+                          <span className="fw-bold">{idx + 1}</span>
+                        </div>
                       </div>
-                      <div className="col-2">
-                        <span className="fw-bold">{t("t.surname1")}</span>
+                      <div className="row">
+                        <div className="col-12 col-lg-2">
+                          <span className="fw-bold">{t("t.name")}</span>
+                          <FormInputText props={nomProps}></FormInputText>
+                        </div>
+                        <div className="col-12 col-lg-2">
+                          <span className="fw-bold">{t("t.surname1")}</span>
+                          <FormInputText props={llinatge1Props}></FormInputText>
+                        </div>
+                        <div className="col-12 col-lg-2">
+                          <span className="fw-bold">{t("t.surname2")}</span>
+                          <FormInputText props={llinatge2Props}></FormInputText>
+                        </div>
+                        <div className="col-12 col-lg-2">
+                          <span className="fw-bold">{t("t.quantitat")}</span>
+                          <FormInputNumber
+                            props={quantitatProps}
+                          ></FormInputNumber>
+                        </div>
+                        <div className="col-12 col-lg-2">
+                          <span className="fw-bold">
+                            {t("t.estat.pagament")}
+                          </span>
+                          <SelectOneMenu
+                            props={estatPagamentProps}
+                          ></SelectOneMenu>
+                        </div>
+                        <div className="col-12 col-lg-2">
+                          <span className="fw-bold">
+                            {t("t.data.pagament")}
+                          </span>
+                          <FormCalendar
+                            props={dataPagamentProps}
+                          ></FormCalendar>
+                        </div>
                       </div>
-                      <div className="col-2">
-                        <span className="fw-bold">{t("t.surname2")}</span>
+                    </>
+                  ) : (
+                    <>
+                      {idx === 0 && (
+                        <div className="row">
+                          <div className="col-12 col-lg-2">
+                            <span className="fw-bold">{t("t.name")}</span>
+                          </div>
+                          <div className="col-12 col-lg-2">
+                            <span className="fw-bold">{t("t.surname1")}</span>
+                          </div>
+                          <div className="col-12 col-lg-2">
+                            <span className="fw-bold">{t("t.surname2")}</span>
+                          </div>
+                          <div className="col-12 col-lg-2">
+                            <span className="fw-bold">{t("t.quantitat")}</span>
+                          </div>
+                          <div className="col-12 col-lg-2">
+                            <span className="fw-bold">
+                              {t("t.estat.pagament")}
+                            </span>
+                          </div>
+                          <div className="col-12 col-lg-2">
+                            <span className="fw-bold">
+                              {t("t.data.pagament")}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                      <div className="row mt-2">
+                        <div className="col-12 col-lg-2">
+                          <FormInputText props={nomProps}></FormInputText>
+                        </div>
+                        <div className="col-12 col-lg-2">
+                          <FormInputText props={llinatge1Props}></FormInputText>
+                        </div>
+                        <div className="col-12 col-lg-2">
+                          <FormInputText props={llinatge2Props}></FormInputText>
+                        </div>
+                        <div className="col-12 col-lg-2">
+                          <FormInputNumber
+                            props={quantitatProps}
+                          ></FormInputNumber>
+                        </div>
+                        <div className="col-12 col-lg-2">
+                          <SelectOneMenu
+                            props={estatPagamentProps}
+                          ></SelectOneMenu>
+                        </div>
+                        <div className="col-12 col-lg-2">
+                          <FormCalendar
+                            props={dataPagamentProps}
+                          ></FormCalendar>
+                        </div>
                       </div>
-                      <div className="col-2">
-                        <span className="fw-bold">{t("t.quantitat")}</span>
-                      </div>
-                      <div className="col-2">
-                        <span className="fw-bold">{t("t.estat.pagament")}</span>
-                      </div>
-                      <div className="col-2">
-                        <span className="fw-bold">{t("t.data.pagament")}</span>
-                      </div>
-                    </div>
+                    </>
                   )}
-                  <div className="row mt-2">
-                    <div className="col-2">
-                      <FormInputText props={nomProps}></FormInputText>
-                    </div>
-                    <div className="col-2">
-                      <FormInputText props={llinatge1Props}></FormInputText>
-                    </div>
-                    <div className="col-2">
-                      <FormInputText props={llinatge2Props}></FormInputText>
-                    </div>
-                    <div className="col-2">
-                      <FormInputNumber props={quantitatProps}></FormInputNumber>
-                    </div>
-                    <div className="col-2">
-                      <SelectOneMenu props={estatPagamentProps}></SelectOneMenu>
-                    </div>
-                    <div className="col-2">
-                      <FormCalendar props={dataPagamentProps}></FormCalendar>
-                    </div>
-                  </div>
                 </>
               );
             })}
@@ -600,7 +660,7 @@ const MensualitatsPage = ({ props }) => {
 
                 const headerTemplate = () => {
                   return (
-                    <div className="d-flex justify-content-between align-items-center w-100">
+                    <div className="d-flex flex-column flex-md-row justify-content-between align-items-center w-100">
                       <span className="accordion-header-text">{`Mensualitat ${mesFormateado}-${m.any}`}</span>
                       {m.nomines && m.nomines.length > 0 ? (
                         <>

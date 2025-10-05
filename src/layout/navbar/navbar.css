@@ -61,6 +61,20 @@
     border-color: var(--main-color)  !important;
 }
 
+.burger-menu-card {
+    background: transparent !important;
+    border: none !important;
+}
+
+.burger-menu {
+    background: transparent !important;
+    border: none !important;
+}
+
+.burger-menu .p-menubar-button {
+    color: var(--main-color);
+}
+
 
 @media (min-width: 576px) {
 

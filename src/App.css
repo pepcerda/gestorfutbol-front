@@ -96,6 +96,42 @@ a{
     width: 90% !important;
 }
 
+.mw-10vw {
+    min-width: 10vw;
+}
+
+.mw-20vw {
+    min-width: 20vw;
+}
+
+.mw-30vw {
+    min-width: 30vw;
+}
+
+.mw-40vw {
+    min-width: 40vw;
+}
+
+.mw-50vw {
+    min-width: 50vw;
+}
+
+.mw-60vw {
+    min-width: 60vw;
+}
+
+.mw-70vw {
+    min-width: 70vw;
+}
+
+.mw-80vw {
+    min-width: 80vw;
+}
+
+.mw-90vw {
+    min-width: 90vw;
+}
+
 .campaign-dialog {
     width: 30rem;
 }
