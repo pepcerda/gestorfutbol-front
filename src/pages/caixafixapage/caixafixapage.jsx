@@ -25,8 +25,71 @@ import FormTextArea from "../../components/formtextarea/formtextarea";
 import FileUploader from "../../components/fileuploader/fileuploader";
 import imageCompression from "browser-image-compression";
 import { ContextMenu } from "primereact/contextmenu";
+import { Card } from "primereact/card";
+import { Sidebar } from "primereact/sidebar";
+import moment from "moment";
+import { explotacioDadesService } from "../../services/real/explotacioDadesService";
 
 const FacturaContext = createContext();
+const FiltraContext = createContext();
+
+const FilterDataForm = ({ props }) => {
+  const { t, i18n } = useTranslation("common");
+  const { formikFilters } = useContext(FiltraContext);
+  const opcionsPagament = gestorfutbolService.getOpcionsPagament();
+
+  const dataDonacioCalc = (value) => {
+    let dateString = value;
+    let dateMomentObject = moment(dateString, "YYYY-MM-DD");
+    return dateMomentObject.toDate();
+  };
+
+  const nomProps = {
+    id: "nom",
+    label: `${t("t.name")}`,
+    value: formikFilters.values.nom,
+    onChange: (e) => {
+      formikFilters.setFieldValue("nom", e.target.value);
+    },
+  };
+
+  const observacioProps = {
+    id: "observacio",
+    label: `${t("t.observacio")}`,
+    value: formikFilters.values.observacio,
+    onChange: (e) => {
+      formikFilters.setFieldValue("observacio", e.target.value);
+    },
+  };
+
+  const estatProps = {
+    id: "estat",
+    label: `${t("t.payment.state")}`,
+    value: formikFilters.values.estat,
+    onChange: (e) => {
+      formikFilters.setFieldValue("estat", e.value);
+    },
+    options: opcionsPagament,
+    optionLabel: "nom",
+    optionValue: "valor",
+  };
+
+  return (
+    <>
+      <div className="row">
+        <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
+          <FormInputText props={nomProps}></FormInputText>
+        </div>
+        <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
+          <FormInputText props={observacioProps}></FormInputText>
+        </div>
+        <div className="col-12 col-md-6 form-group text-center text-md-start mt-3">
+          <SelectOneMenu props={estatProps}></SelectOneMenu>
+        </div>
+      </div>
+    </>
+  );
+};
 
 const FacturaDataForm = ({ props }) => {
   const { t, i18n } = useTranslation("common");
@@ -295,9 +358,18 @@ const CaixaFixaPage = ({ props }) => {
     sortOrder: null,
     sortField: null,
   });
+  const [filterVisible, setFilterVisible] = useState(false);
 
   const [activeIndex, setActiveIndex] = useState(0);
   const cm = useRef(null);
+
+  const emptyDadesFactures = {
+    totalFactures: 0,
+    totalPagat: 0,
+    pendentPagar: 0
+  };
+
+  const [dadesFactures, setDadesFactures] = useState(emptyDadesFactures);
 
   const menuModel = [
     {
@@ -554,6 +626,18 @@ const CaixaFixaPage = ({ props }) => {
     disabled: selectedFactura.id === null,
   };
 
+  const filterButton = {
+    icon: "pi pi-filter",
+    className: "circular-btn",
+    onClick: () => {
+      setFilterVisible(!filterVisible);
+    },
+    tooltip: `${t("t.filtra")}`,
+    tooltipOptions: {
+      position: "bottom",
+    },
+  };
+
   useEffect(() => {
     let results;
     gestorfutbolService.getAllCampaigns().then((data) => {
@@ -584,6 +668,16 @@ const CaixaFixaPage = ({ props }) => {
   }, [campaigns]);
 
   useEffect(() => {
+    if (activeCampaign) {
+      explotacioDadesService
+        .getDadesExplotacioFactures(activeCampaign)
+        .then((data) => {
+          setDadesFactures(data.data);
+        });
+    }
+  }, [activeCampaign]);
+
+  useEffect(() => {
     loadLazyData();
     setDeleteFlag(false);
   }, [lazyState, deleteFlag, activeCampaign]);
@@ -593,6 +687,7 @@ const CaixaFixaPage = ({ props }) => {
       pageNum: lazyState.page,
       pageSize: lazyState.rows,
       campanyaActiva: activeCampaign,
+      filters: lazyState.filters,
     };
 
     gestorfutbolService.getFacturas(apiFilter).then((data) => {
@@ -605,6 +700,22 @@ const CaixaFixaPage = ({ props }) => {
   const onRowEditComplete = (e) => {
     let { newData, index } = e;
     gestorfutbolService.saveFactura(newData).then(() => loadLazyData());
+  };
+
+  const tableHeader = () => {
+    return (
+      <div className="table-header-container d-flex flex-column flex-md-row gap-3">
+        <span>
+          {t("t.total.factures")}: {dadesFactures.totalFactures}
+        </span>
+        <span>
+          {t("t.total.pagat")}: {dadesFactures.totalPagat} €
+        </span>
+        <span>
+          {t("t.pendent.pagar")}: {dadesFactures.pendentPagar} €
+        </span>
+      </div>
+    );
   };
 
   const tableProps = {
@@ -634,13 +745,14 @@ const CaixaFixaPage = ({ props }) => {
     onSort: (e) => setlazyState(e),
     sortOrder: lazyState.sortOrder,
     sortField: lazyState.sortField,
-    editMode: "row",
+    editMode: "row",  
     onRowEditComplete: onRowEditComplete,
     rowEditor: true,
     stripedRows: true,
     onContextMenu: (e) => cm.current.show(e.originalEvent),
     contextMenuSelection: selectedFactura,
     onContextMenuSelectionChange: (e) => setSelectedFactura(e.value),
+    header: tableHeader,
   };
 
   const saveFactura = (data) => {
@@ -677,6 +789,33 @@ const CaixaFixaPage = ({ props }) => {
     });
   };
 
+  const filterFactura = (data) => {
+    let facturaFilters = {};
+    if (data.observacio) {
+      facturaFilters.observacio = {
+        value: data.observacio,
+        matchMode: "contains",
+      };
+    }
+    if (data.nom) {
+      facturaFilters.nom = {
+        value: data.nom,
+        matchMode: "contains",
+      };
+    }
+    if (data.estat) {
+      facturaFilters.estat = {
+        value: data.estat,
+        matchMode: "equals",
+      };
+    }
+
+    setlazyState((prevState) => ({
+      ...prevState,
+      filters: facturaFilters,
+    }));
+  };
+
   const hideDialog = () => {
     setCaptureDialog({
       visible: false,
@@ -697,6 +836,30 @@ const CaixaFixaPage = ({ props }) => {
     label: `${t("t.save")}`,
     type: "submit",
     className: "p-2 rounded-2",
+  };
+
+  const cercaFormButton = {
+    icon: "pi pi-search",
+    label: `${t("t.search")}`,
+    type: "submit",
+    className: "p-2 rounded-2 mx-2",
+    onClick: () => {
+      if (viewWidth < process.env.REACT_APP_XL_VW) setFilterVisible(false);
+    },
+  };
+
+  const netejaFormButton = {
+    className: "p-2 rounded-2 mx-2",
+    label: `${t("t.neteja")}`,
+    type: "button",
+    onClick: () => {
+      formikFilters.resetForm();
+      setlazyState((prevState) => ({
+        ...prevState,
+        filters: null,
+      }));
+      setFilterVisible(false);
+    },
   };
 
   const formikFactura = useFormik({
@@ -735,17 +898,65 @@ const CaixaFixaPage = ({ props }) => {
     },
   });
 
+  const formikFilters = useFormik({
+    initialValues: {
+      observacio: emptyFactura.observacio,
+      nom: emptyFactura.nom,
+      despesa: emptyFactura.donacio,
+      estatPagament: emptyFactura.estatPagament,
+    },
+    enableReinitialize: true,
+    validate: (data) => {
+      let errors = {};
+      return errors;
+    },
+    onSubmit: (data) => {
+      filterFactura(data);
+    },
+  });
+
   return (
     <div className="container p-2 p-xl-4">
       <ConfirmPopup />
       <PageTitle props={{ title: `${t("t.factures")}` }}></PageTitle>
       <TabMenuComponent props={tabMenu}></TabMenuComponent>
-      <div className="row gap-3 justify-content-center justify-content-xl-end">
-        <BasicButton props={newButton}></BasicButton>
-        <BasicButton props={editButton}></BasicButton>
-        <BasicButton props={consultaButton}></BasicButton>
-        <BasicButton props={deleteButton}></BasicButton>
+      <div className="row justify-content-between align-items-start flex-wrap">
+        <div className="col-12 col-xl-auto mb-3 mb-xl-0 d-flex flex-wrap gap-2 justify-content-center justify-content-xl-end">
+          <BasicButton props={filterButton} />
+        </div>
+        <div className="col-12 col-xl-auto d-flex flex-wrap gap-2 justify-content-center justify-content-xl-end">
+          <BasicButton props={newButton}></BasicButton>
+          <BasicButton props={editButton}></BasicButton>
+          <BasicButton props={consultaButton}></BasicButton>
+          <BasicButton props={deleteButton}></BasicButton>
+        </div>
       </div>
+
+      {filterVisible && viewWidth > process.env.REACT_APP_XL_VW ? (
+        <Card className="mt-3">
+          <form onSubmit={formikFilters.handleSubmit}>
+            <FiltraContext.Provider value={{ formikFilters }}>
+              <FilterDataForm />
+            </FiltraContext.Provider>
+            <div className="p-dialog-footer pb-0 mt-5">
+              <BasicButton props={cercaFormButton} />
+              <BasicButton props={netejaFormButton} />
+            </div>
+          </form>
+        </Card>
+      ) : (
+        <Sidebar visible={filterVisible} onHide={() => setFilterVisible(false)}>
+          <form onSubmit={formikFilters.handleSubmit}>
+            <FiltraContext.Provider value={{ formikFilters }}>
+              <FilterDataForm />
+            </FiltraContext.Provider>
+            <div className="p-dialog-footer pb-0 mt-5 text-center">
+              <BasicButton props={cercaFormButton} />
+              <BasicButton props={netejaFormButton} />
+            </div>
+          </form>
+        </Sidebar>
+      )}
       <div className="row mt-3">
         <ContextMenu model={menuModel} ref={cm} />
         <TableComponent props={tableProps}></TableComponent>

@@ -130,5 +130,6 @@
   "t.seleccio.jugadors": "Selecció de jugadors",
   "t.dades.nomina": "Dades nòmina",
   "t.nomines": "Nòmines",
-  "t.no.mensualitat": "No hi ha mensualitat"
+  "t.no.mensualitat": "No hi ha mensualitat",
+  "t.total.factures": "Total factures"
 }
