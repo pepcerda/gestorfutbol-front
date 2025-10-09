@@ -43,7 +43,7 @@ jobs:
         run: |
           echo "${{ secrets.EC2_SSH_KEY }}" > key.pem
           chmod 600 key.pem
-          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@${{ secrets.EC2_INSTANCE_IP }} << EOF
+          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@${{ secrets.EC2_INSTANCE_DNS }} << EOF
             aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
             cd /opt/docker
             docker pull $IMAGE
