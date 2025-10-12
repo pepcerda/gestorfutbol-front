@@ -29,6 +29,7 @@ import { Card } from "primereact/card";
 import { Sidebar } from "primereact/sidebar";
 import moment from "moment";
 import { explotacioDadesService } from "../../services/real/explotacioDadesService";
+import { useLocation } from "react-router-dom";
 
 const FacturaContext = createContext();
 const FiltraContext = createContext();
@@ -327,6 +328,7 @@ const FacturaDataForm = ({ props }) => {
 };
 
 const CaixaFixaPage = ({ props }) => {
+  const location = useLocation();
   const { viewWidth, setViewWidth } = useContext(ConfigContext);
   const opcionsPagament = gestorfutbolService.getOpcionsPagament();
   const [factures, setFactures] = useState([]);
@@ -676,6 +678,12 @@ const CaixaFixaPage = ({ props }) => {
         });
     }
   }, [activeCampaign]);
+
+  useEffect(() => {
+    if (location.state?.filtre) {
+      filterFactura(location.state.filtre);
+    }
+  }, []);
 
   useEffect(() => {
     loadLazyData();

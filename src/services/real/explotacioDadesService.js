@@ -47,4 +47,9 @@ export const explotacioDadesService = {
         return response;
     },
 
+    getDadesExplotacioNomines(idCampanya) {
+        var response = apiClient.get("/explotacio-nomines/" + idCampanya);
+        return response;
+    }
+
 }
