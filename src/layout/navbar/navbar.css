@@ -56,6 +56,14 @@
     font-size: .8rem;
 }
 
+.sidenav-menu.p-megamenu .p-submenu-header {
+    padding: 0!important;
+}
+
+.sidenav-item .p-megamenu-panel {
+    width: 15rem;
+}
+
 .active {
     color: var(--main-color)  !important;
     border-color: var(--main-color)  !important;

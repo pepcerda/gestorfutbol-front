@@ -1,5 +1,5 @@
 import "./navbar.css";
-import { NavLink, redirect } from "react-router-dom";
+import { NavLink, redirect, useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { TabMenu } from "primereact/tabmenu";
 import { ConfigContext } from "../../App";
@@ -39,7 +39,12 @@ const Sidebar = ({ props }) => {
 
   return (
     <div className="sidenav">
-      <Menu model={props} className="sidenav-menu"></Menu>
+      <MegaMenu
+        model={props}
+        className="sidenav-menu"
+        orientation="vertical"
+        breakpoint={process.env.REACT_APP_L_VW}
+      ></MegaMenu>
     </div>
   );
 };
@@ -47,6 +52,7 @@ const Sidebar = ({ props }) => {
 const Navbar = () => {
   const { viewWidth, setViewWidth } = useContext(ConfigContext);
   const { t, i18n } = useTranslation("common");
+  const navigate = useNavigate();
 
   const items = [
     {
@@ -151,16 +157,15 @@ const Navbar = () => {
     },
   ];
 
-  const visibleItems = [
+  const itemsPrueba = [
     {
       className: "sidenav-item",
 
       template: () => {
         return (
           <NavLink to={"/home"} className="p-menuitem-link">
-            <>
-              <i className="pi pi-home"></i>
-            </>
+            <span className="p-menuitem-icon pi pi-fw pi-home fs-2"></span>
+            <span className="p-menuitem-text">{t("t.home")}</span>
           </NavLink>
         );
       },
@@ -170,151 +175,165 @@ const Navbar = () => {
       template: () => {
         return (
           <NavLink to={"/campanya"} className="p-menuitem-link">
-            <i className="pi pi-book"></i>
+            <span className="p-menuitem-icon pi pi-fw pi-book fs-2"></span>
+            <span className="p-menuitem-text">{t("t.campaigns")}</span>
           </NavLink>
         );
       },
+    },
+
+    {
+      className: "sidenav-item",
+      template: () => {
+        return (
+          <a href="" className="p-menuitem-link">
+            <span className="p-menuitem-icon pi pi-fw pi-money-bill fs-2"></span>
+            <span className="p-menuitem-text">{t("t.ingressos")}</span>
+          </a>
+        );
+      },
+      items: [
+        [
+          {
+            // No label aquí, así no se reserva espacio para el header
+            items: [
+              {
+                className: "sidenav-item",
+                icon: "pi pi-fw pi-users",
+                label: `${t("t.members")}`,
+                command: () => {
+                  navigate("/socis");
+                },
+              },
+            ],
+          },
+        ],
+        [
+          {
+            items: [
+              {
+                className: "sidenav-item",
+                icon: "pi pi-fw pi-wallet",
+                label: `${t("t.sponsors")}`,
+                command: () => {
+                  navigate("/patrocinadors");
+                },
+              },
+            ],
+          },
+        ],
+      ],
+    },
+
+    {
+      className: "sidenav-item ",
+      label: `${t("t.despeses")}`,
+      icon: "pi pi-fw pi-credit-card",
+      template: () => {
+        return (
+          <a href="" className="p-menuitem-link">
+            <span className="p-menuitem-icon pi pi-fw pi-credit-card fs-2"></span>
+            <span className="p-menuitem-text">{t("t.despeses")}</span>
+          </a>
+        );
+      },
+      items: [
+        [
+          {
+            items: [
+              {
+                className: "sidenav-item",
+                icon: "pi pi-fw pi-file",
+                label: `${t("t.factures")}`,
+                command: () => {
+                  navigate("/factures");
+                },
+              },
+            ],
+          },
+        ],
+        [
+          {
+            items: [
+              {
+                className: "sidenav-item",
+                icon: "pi pi-fw pi-money-bill",
+                label: `${t("t.mensualitats")}`,
+                command: () => {
+                  navigate("/mensualitats");
+                },
+              },
+            ],
+          },
+        ],
+      ],
+    },
+    {
+      className: "sidenav-item ",
+      label: `${t("t.administracio")}`,
+      icon: "pi pi-fw pi-cog",
+      template: () => {
+        return (
+          <a href="" className="p-menuitem-link">
+            <span className="p-menuitem-icon pi pi-fw pi-sitemap fs-2"></span>
+            <span className="p-menuitem-text">{t("t.administracio")}</span>
+          </a>
+        );
+      },
+      items: [
+        [
+          {
+            items: [
+              {
+                className: "sidenav-item",
+                icon: "pi pi-fw pi-users",
+                label: `${t("t.plantilla")}`,
+                command: () => {
+                  navigate("/plantilla");
+                },
+              },
+            ],
+          },
+        ],
+        [
+          {
+            items: [
+              {
+                className: "sidenav-item",
+                icon: "pi pi-fw pi-users",
+                label: `${t("t.directive")}`,
+                command: () => {
+                  navigate("/directiva");
+                },
+              },
+            ],
+          },
+        ]
+      ],
     },
     {
       className: "sidenav-item ",
       template: () => {
         return (
-          <NavLink to={"/socis"} className="p-menuitem-link">
-            <>
-              <i className="pi pi-users"></i>
-            </>
-          </NavLink>
-        );
-      },
-    },
-    {
-      className: "sidenav-item ",
-      template: () => {
-        return (
-          <NavLink to={"/patrocinadors"} className="p-menuitem-link">
-            <i className="pi pi-calendar"></i>
-          </NavLink>
-        );
-      },
-    },
-    {
-      className: "sidenav-item ",
-      template: () => {
-        return (
-          <NavLink to={"/factures"} className="p-menuitem-link">
-            <i className="pi pi-money-bill"></i>
-          </NavLink>
-        );
-      },
-    },
-    {
-      className: "sidenav-item ",
-      template: () => {
-        return (
-          <NavLink to={"/mensualitats"} className="p-menuitem-link">
-            <i className="pi pi-money-bill"></i>
-          </NavLink>
-        );
-      },
-    },
-    {
-      className: "sidenav-item ",
-      template: () => {
-        return (
-          <NavLink to={"/plantilla"} className="p-menuitem-link">
-            <i className="pi pi-sitemap"></i>
+          <NavLink to={"/configuracio"} className="p-menuitem-link">
+            <span className="p-menuitem-icon pi pi-fw pi-cog fs-2"></span>
+            <span className="p-menuitem-text">{t("t.settings")}</span>
           </NavLink>
         );
       },
     },
   ];
 
-  const items1 = [
-    {
-        label: 'Home',
-        icon: 'pi pi-home'
-    },
-    {
-        label: 'Features',
-        icon: 'pi pi-star'
-    },
-    {
-        label: 'Projects',
-        icon: 'pi pi-search',
-        items: [
-            {
-                label: 'Components',
-                icon: 'pi pi-bolt'
-            },
-            {
-                label: 'Blocks',
-                icon: 'pi pi-server'
-            },
-            {
-                label: 'UI Kit',
-                icon: 'pi pi-pencil'
-            },
-            {
-                label: 'Templates',
-                icon: 'pi pi-palette',
-                items: [
-                    {
-                        label: 'Apollo',
-                        icon: 'pi pi-palette'
-                    },
-                    {
-                        label: 'Ultima',
-                        icon: 'pi pi-palette'
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        label: 'Contact',
-        icon: 'pi pi-envelope'
-    }
-];
 
-  /*    {
-            className: "sidenav-item ",
-                template: () => {
-            return (
-                <NavLink to={"/directiva"} className="p-menuitem-link">
-                    <i className="pi pi-users"></i>
-                </NavLink>
-            );
-        },
-        },
-        {
-            className: "sidenav-item ",
-                template: () => {
-            return (
-                <NavLink
-                    to={"/configuracio"}
-                    className="p-menuitem-link">
-                    {viewWidth <= process.env.REACT_APP_XL_VW ? (
-                        <>
-                            <i className="pi pi-cog"></i>
-                        </>
-                    ) : (
-                        <>
-                            <span className="p-menuitem-icon pi pi-fw pi-cog fs-2"></span>
-                            <span className="p-menuitem-text">{t("t.settings")}</span>
-                        </>)}
-                </NavLink>
-            );
-        },
-        }*/
 
   return (
     <>
       {viewWidth <= process.env.REACT_APP_XL_VW ? (
         <div className="card burger-menu-card">
-        <Menubar model={items} className="burger-menu ml-5"/>
-    </div>
+          <Menubar model={items} className="burger-menu ml-5" />
+        </div>
       ) : (
-        <Sidebar props={items}></Sidebar>
+        <Sidebar props={itemsPrueba}></Sidebar>
       )}
     </>
   );
