@@ -14,6 +14,7 @@ import common_en from './translations/common_en.json';
 import {I18nextProvider} from "react-i18next";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'primeicons/primeicons.css';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 i18next
     .use(LanguageDetector)
@@ -27,12 +28,24 @@ i18next
         }
     });
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 60 * 24, // 24h
+      cacheTime: 1000 * 60 * 60 * 24, // mantener cache 24h
+      refetchOnWindowFocus: false, // no recargar al volver al tab
+    },
+  },
+});
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <Router>
+        <QueryClientProvider client={queryClient}>
         <I18nextProvider i18n={i18next}>
             <App/>
         </I18nextProvider>
+        </QueryClientProvider>
     </Router>
 );
 
