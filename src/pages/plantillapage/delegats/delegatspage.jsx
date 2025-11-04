@@ -116,7 +116,7 @@ const DelegatsPage = () => {
   const [totalRecords, setTotalRecords] = useState(0);
   const [captureDialog, setCaptureDialog] = useState(false);
   const [deleteFlag, setDeleteFlag] = useState(false);
-  const { activeCampaign } = useContext(CampanyaContext);
+  const { activeCampaign, setActiveCampaign, selectedCategoria } = useContext(CampanyaContext);
   const [posicions, setPosicions] = useState([]);
 
   let emptyDelegat = {
@@ -245,13 +245,14 @@ const DelegatsPage = () => {
   useEffect(() => {
     loadLazyData();
     setDeleteFlag(false);
-  }, [lazyState, deleteFlag, activeCampaign]);
+  }, [lazyState, deleteFlag, activeCampaign, selectedCategoria]);
 
   const loadLazyData = () => {
     let apiFilter = {
       pageNum: lazyState.page,
       pageSize: lazyState.rows,
       campanyaActiva: activeCampaign,
+      categoriaActiva: selectedCategoria ? selectedCategoria.id : null,
     };
 
     gestorfutbolService.getDelegats(apiFilter).then((data) => {

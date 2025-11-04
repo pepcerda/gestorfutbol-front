@@ -27,7 +27,7 @@ const NominaContext = createContext();
 const NominaDataForm = ({ props }) => {
   const { viewWidth, setViewWidth } = useContext(ConfigContext);
   const { t, i18n } = useTranslation("common");
-  const { formikMensualitat } = useContext(NominaContext);
+  const { formikMensualitat, selectedCategoria } = useContext(NominaContext);
   const [plantilla, setPlantilla] = useState(null);
   const [selectedPlantilla, setSelectedPlantilla] = useState(null);
   const [activeStep, setActiveStep] = useState(0);
@@ -59,6 +59,7 @@ const NominaDataForm = ({ props }) => {
     let results;
     const filter = {
       campanyaActiva: formikMensualitat.values.mensualitat.campanya,
+      categoriaActiva: selectedCategoria ? selectedCategoria.id : null,
     };
     gestorfutbolService.getMembresPlantilla(filter).then((data) => {
       results = data.data.map((m) => ({
@@ -100,6 +101,7 @@ const NominaDataForm = ({ props }) => {
         });
         const apiFilterMembres = {
           campanyaActiva: formikMensualitat.values.mensualitat.campanya,
+          categoriaActiva: selectedCategoria ? selectedCategoria.id : null,
           ids: ident,
         };
         gestorfutbolService
@@ -324,7 +326,7 @@ const NominaDataForm = ({ props }) => {
                 <>
                   {viewWidth <= process.env.REACT_APP_XL_VW ? (
                     <>
-                      <Divider className="mt-2 mb-2"/>
+                      <Divider className="mt-2 mb-2" />
                       <div className="row">
                         <div className="col-12">
                           <span className="fw-bold">{idx + 1}</span>
@@ -446,6 +448,8 @@ const MensualitatsPage = ({ props }) => {
   const [mensualitats, setMensualitats] = useState(null);
   const [mensualitat, setMensualitat] = useState(null);
   const [estatsPagament, setEstatsPagament] = useState(null);
+  const [categories, setCategories] = useState(null);
+  const [selectedCategoria, setSelectedCategoria] = useState(null);
 
   const handleMensualitats = () => {};
 
@@ -487,9 +491,22 @@ const MensualitatsPage = ({ props }) => {
     }
   }, [campaigns]);
 
+  
+    useEffect(() => {
+      if (activeCampaign !== null) {
+        gestorfutbolService.getCategories(activeCampaign).then((data) => {
+          let results = data.data;
+          setCategories(results);
+          setSelectedCategoria(results[0]);
+        });
+      }
+    }, [activeCampaign]);
+
   useEffect(() => {
     if (activeCampaign !== null) {
-      const apiFilter = { campanyaActiva: activeCampaign };
+      const apiFilter = { 
+        campanyaActiva: activeCampaign
+       };
 
       gestorfutbolService.getMensualitats(apiFilter).then(async (data) => {
         const mensualitatsOriginals = data.data;
@@ -499,6 +516,7 @@ const MensualitatsPage = ({ props }) => {
             if (m.nomines && m.nomines.length > 0) {
               const apiFilterMembres = {
                 campanyaActiva: activeCampaign,
+                categoriaActiva: selectedCategoria ? selectedCategoria.id : null,
                 ids: m.nomines.map((n) => n.membre),
               };
 
@@ -528,7 +546,7 @@ const MensualitatsPage = ({ props }) => {
         setMensualitats(mensualitatsEnriquides);
       });
     }
-  }, [activeCampaign]);
+  }, [activeCampaign, selectedCategoria]);
 
   /********   PROPIETATS D'ELEMENTS DEL FRONTAL  ***********************/
 
@@ -562,6 +580,20 @@ const MensualitatsPage = ({ props }) => {
     className: "p-2 rounded-2",
   };
 
+    const categoriaProps = {
+    id: "categoria",
+    label: t("t.selecciona.categoria"),
+    value: selectedCategoria ? selectedCategoria.id : null,
+    onChange: (e) => {
+      let category = categories.find((c) => c.id === e.value);
+      setSelectedCategoria(category);
+    },
+    options: categories,
+    optionLabel: "nom",
+    optionValue: "id",
+    className: "w-auto",
+  };
+
   const saveNomines = (data) => {
     gestorfutbolService.saveMensualitat(data.mensualitat).then(() => {
       let apiFilter = {
@@ -575,6 +607,7 @@ const MensualitatsPage = ({ props }) => {
             if (m.nomines && m.nomines.length > 0) {
               const apiFilterMembres = {
                 campanyaActiva: activeCampaign,
+                categoriaActiva: selectedCategoria ? selectedCategoria.id : null,
                 ids: m.nomines.map((n) => n.membre),
               };
 
@@ -625,6 +658,9 @@ const MensualitatsPage = ({ props }) => {
     <div className="container p-2 p-xl-4">
       <PageTitle props={{ title: `${t("t.mensualitats")}` }}></PageTitle>
       <TabMenuComponent props={tabMenu}></TabMenuComponent>
+      <div className="d-flex gap-4 align-items-center mb-3 mt-3">
+        <SelectOneMenu props={categoriaProps}></SelectOneMenu>
+      </div>
       {mensualitats && mensualitats.length > 0 ? (
         <>
           <Accordion activeIndex={0} className="mt-4 d-flex flex-column gap-3">
@@ -802,7 +838,7 @@ const MensualitatsPage = ({ props }) => {
           >
             <form onSubmit={formikMensualitat.handleSubmit}>
               <NominaContext.Provider
-                value={{ activeCampaign, formikMensualitat }}
+                value={{ activeCampaign, formikMensualitat, selectedCategoria}}
               >
                 <NominaDataForm />
               </NominaContext.Provider>

@@ -1,101 +1,130 @@
-import './plantillapage.css';
-import {useTranslation} from "react-i18next";
-import React, {useEffect, useState} from "react";
+import "./plantillapage.css";
+import { useTranslation } from "react-i18next";
+import React, { useEffect, useState } from "react";
 import ConfigGeneral from "../configurationpage/general/configgeneral";
 import PageTitle from "../../components/pagetitle/pagetitle";
 import TabMenuComponent from "../../components/tabmenucomponent/tabmenucomponent";
-import {gestorfutbolService} from "../../services/real/gestorfutbolService";
-import JugadorsPage from './jugadors/jugadorspage';
-import EntrenadorsPage from './entrenadors/entrenadorspage';
-import DelegatsPage from './delegats/delegatspage';
+import { gestorfutbolService } from "../../services/real/gestorfutbolService";
+import JugadorsPage from "./jugadors/jugadorspage";
+import EntrenadorsPage from "./entrenadors/entrenadorspage";
+import DelegatsPage from "./delegats/delegatspage";
+import SelectOneMenu from "../../components/selectonemenu/selectonemenu";
 
 export const CampanyaContext = React.createContext();
 
-const PlantillaPage = ({props}) => {
-    const {t, i18n} = useTranslation("common")
-    const [activeIndex, setActiveIndex] = useState(0);
-    const [activeCampaign, setActiveCampaign] = useState(null);
-    const [campaigns, setCampaigns] = useState(null);
-    const [tabMenuItems, setTabMenuItems] = useState([]);
-    const [subActiveIndex, setSubActiveIndex] = useState(0);
+const PlantillaPage = ({ props }) => {
+  const { t, i18n } = useTranslation("common");
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeCampaign, setActiveCampaign] = useState(null);
+  const [campaigns, setCampaigns] = useState(null);
+  const [categories, setCategories] = useState(null);
+  const [selectedCategoria, setSelectedCategoria] = useState(null);
+  const [tabMenuItems, setTabMenuItems] = useState([]);
+  const [subActiveIndex, setSubActiveIndex] = useState(0);
 
-    useEffect(() => {
-        let results;
-        gestorfutbolService.getAllCampaigns().then((data) => {
-            results = data.data;
-            setCampaigns(results);
+  useEffect(() => {
+    let results;
+    gestorfutbolService.getAllCampaigns().then((data) => {
+      results = data.data;
+      setCampaigns(results);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (campaigns !== null) {
+      setTabMenuItems(
+        campaigns.map((r) => {
+          return { label: r.titol };
         })
-    }, [])
-
-    useEffect(() => {
-        if (campaigns !== null) {
-            setTabMenuItems(campaigns.map(r => {
-                    return {label: r.titol}
-                }
-            ))
-            let year = new Date().getFullYear();
-            let campaign = campaigns.find(c =>
-                new Date(c.any).getFullYear() === year
-            )
-            if(campaign) {
-                let index = campaigns.findIndex(c => c.id === campaign.id);
-                setActiveCampaign(campaign.id);
-                setActiveIndex(index);
-            } else {
-                setActiveCampaign(campaigns[0].id);
-            }
-        }
-
-    }, [campaigns])
-
-
-
-    /********   HOOKS  ***********************/
-    const renderContenido = () => {
-        // eslint-disable-next-line default-case
-        switch (subActiveIndex) {
-            case 0:
-                return <JugadorsPage></JugadorsPage>
-            case 1:
-                return <EntrenadorsPage></EntrenadorsPage>
-            case 2:
-                return <DelegatsPage></DelegatsPage>
-        }
+      );
+      let year = new Date().getFullYear();
+      let campaign = campaigns.find(
+        (c) => new Date(c.any).getFullYear() === year
+      );
+      if (campaign) {
+        let index = campaigns.findIndex((c) => c.id === campaign.id);
+        setActiveCampaign(campaign.id);
+        setActiveIndex(index);
+      } else {
+        setActiveCampaign(campaigns[0].id);
+      }
     }
-    /********   PROPIETATS D'ELEMENTS DEL FRONTAL  ***********************/
-    const tabMenu = {
-        model: tabMenuItems,
-        activeIndex: activeIndex,
-        onTabChange: (e) => {
-            setActiveIndex(e.index);
-            let result = campaigns[e.index];
-            setActiveCampaign(result.id);
-        }
+  }, [campaigns]);
+
+  useEffect(() => {
+    if (activeCampaign !== null) {
+      gestorfutbolService.getCategories(activeCampaign).then((data) => {
+        let results = data.data;
+        setCategories(results);
+        setSelectedCategoria(results[0]);
+      });
     }
+  }, [activeCampaign]);
 
-    const subTabMenu = {
-        model: [
-            {label: `${t("t.jugadors")}`},
-            {label: `${t("t.entrenadors")}`},
-            {label: `${t("t.delegats")}`},
-        ],
-        activeIndex: subActiveIndex,
-        onTabChange: (e) => {
-            setSubActiveIndex(e.index);
-        }
+  /********   HOOKS  ***********************/
+  const renderContenido = () => {
+    // eslint-disable-next-line default-case
+    switch (subActiveIndex) {
+      case 0:
+        return <JugadorsPage></JugadorsPage>;
+      case 1:
+        return <EntrenadorsPage></EntrenadorsPage>;
+      case 2:
+        return <DelegatsPage></DelegatsPage>;
     }
+  };
+  /********   PROPIETATS D'ELEMENTS DEL FRONTAL  ***********************/
+  const tabMenu = {
+    model: tabMenuItems,
+    activeIndex: activeIndex,
+    onTabChange: (e) => {
+      setActiveIndex(e.index);
+      let result = campaigns[e.index];
+      setActiveCampaign(result.id);
+    },
+  };
 
-    return (
-        <div className="container p-2 p-xl-4">
-            <PageTitle props={{title: `${t("t.plantilla")}`}}></PageTitle>
-            <TabMenuComponent props={tabMenu}></TabMenuComponent>
-            <TabMenuComponent props={subTabMenu}></TabMenuComponent>
-            <CampanyaContext.Provider value={{activeCampaign, setActiveCampaign}}>
-                {renderContenido()}
-            </CampanyaContext.Provider>
-        </div>
-    );
-}
+  const subTabMenu = {
+    model: [
+      { label: `${t("t.jugadors")}` },
+      { label: `${t("t.entrenadors")}` },
+      { label: `${t("t.delegats")}` },
+    ],
+    activeIndex: subActiveIndex,
+    onTabChange: (e) => {
+      setSubActiveIndex(e.index);
+    },
+  };
 
+  const categoriaProps = {
+    id: "categoria",
+    label: t("t.selecciona.categoria"),
+    value: selectedCategoria ? selectedCategoria.id : null,
+    onChange: (e) => {
+      let category = categories.find((c) => c.id === e.value);
+      setSelectedCategoria(category);
+    },
+    options: categories,
+    optionLabel: "nom",
+    optionValue: "id",
+    className: "w-auto",
+  };
+
+  return (
+    <div className="container p-2 p-xl-4">
+      <PageTitle props={{ title: `${t("t.plantilla")}` }}></PageTitle>
+      <TabMenuComponent props={tabMenu}></TabMenuComponent>
+      <div className="d-flex gap-4 align-items-center mb-3 mt-3">
+        <SelectOneMenu props={categoriaProps}></SelectOneMenu>
+      </div>
+      <TabMenuComponent props={subTabMenu}></TabMenuComponent>
+      <CampanyaContext.Provider
+        value={{ activeCampaign, setActiveCampaign, selectedCategoria }}
+      >
+        {renderContenido()}
+      </CampanyaContext.Provider>
+    </div>
+  );
+};
 
 export default PlantillaPage;

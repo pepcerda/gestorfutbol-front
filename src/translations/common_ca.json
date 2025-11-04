@@ -132,5 +132,9 @@
   "t.nomines": "Nòmines",
   "t.no.mensualitat": "No hi ha mensualitat",
   "t.total.factures": "Total factures",
-  "t.administracio": "Admin"
+  "t.administracio": "Admin",
+  "t.categories": "Categories",
+  "t.categoria": "Categoria",
+  "t.selecciona.categoria": "Seleccioni la categoria",
+  "t.alta.nomina":" Alta nòmina"
 }

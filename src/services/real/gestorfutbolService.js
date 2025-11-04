@@ -548,5 +548,46 @@ export const gestorfutbolService = {
   deleteNomina(id) {
     var response = apiClient.delete("/nomina/" + id);
     return response;
+  },
+
+  getCategoria(filter) {
+    const axiosConfig = {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    };
+
+    var response = apiClient.post(
+      "/categories",
+      JSON.stringify(filter),
+      axiosConfig
+    );
+    return response;
+  },
+
+  getCategories(idCampanya) {
+    var response = apiClient.get("/categories/" + idCampanya);
+    return response;
+  },
+
+  saveCategoria(categoria) {
+    const axiosConfig = {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    };
+    var response = apiClient.post(
+      "/categoria",
+      JSON.stringify(categoria),
+      axiosConfig
+    );
+    return response;
+  },
+
+  deleteCategoria(id) {
+    var response = apiClient.delete("/categoria/" + id);
+    return response;
   }
 };

@@ -139,7 +139,7 @@ const JugadorsPage = ({ props }) => {
   const [captureDialog, setCaptureDialog] = useState(false);
   const [deleteFlag, setDeleteFlag] = useState(false);
   const [campaigns, setCampaigns] = useState(null);
-  const { activeCampaign, setActiveCampaign } = useContext(CampanyaContext);
+  const { activeCampaign, setActiveCampaign, selectedCategoria } = useContext(CampanyaContext);
   const [posicions, setPosicions] = useState([]);
   const [expandedRows, setExpandedRows] = useState([]);
 
@@ -297,13 +297,14 @@ const JugadorsPage = ({ props }) => {
   useEffect(() => {
     loadLazyData();
     setDeleteFlag(false);
-  }, [lazyState, deleteFlag, activeCampaign]);
+  }, [lazyState, deleteFlag, activeCampaign, selectedCategoria]);
 
   const loadLazyData = () => {
     let apiFilter = {
       pageNum: lazyState.page,
       pageSize: lazyState.rows,
       campanyaActiva: activeCampaign,
+      categoriaActiva: selectedCategoria ? selectedCategoria.id : null,
     };
 
     gestorfutbolService.getJugadors(apiFilter).then((data) => {
