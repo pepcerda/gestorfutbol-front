@@ -83,6 +83,17 @@
     color: var(--main-color);
 }
 
+.burger-menu.p-menubar .p-menubar-button {
+    width: 3rem;
+    height: 3rem;
+}
+
+.burger-menu.p-menubar .p-menubar-button .p-icon,
+.burger-menu.p-menubar .p-menubar-button svg {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
 
 @media (min-width: 576px) {
 

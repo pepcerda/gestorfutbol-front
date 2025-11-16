@@ -357,7 +357,7 @@ const DirectiuDataForm = ({ props }) => {
     },
   ];
 
-  const tableProps = {
+   const tableProps = {
     data: formikDirectiva.values.directiva.directius,
     columns: tableColumns,
     breakpoint: "900px",
@@ -365,7 +365,7 @@ const DirectiuDataForm = ({ props }) => {
     className: "directiva-form-table",
   };
 
-  const addRow = () => {
+  const addRow =() => {
     const newRow = {
       id: null,
       nom: "",

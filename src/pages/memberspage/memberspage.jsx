@@ -285,7 +285,7 @@ const MembersPage = ({ props }) => {
       label: `${t("t.elimina")}`,
       icon: "pi pi-fw pi-trash",
       command: () => accept(),
-    }
+    },
   ];
 
   const tabMenu = {
@@ -574,15 +574,6 @@ const MembersPage = ({ props }) => {
 
   useEffect(() => {
     if (activeCampaign) {
-      gestorfutbolService.getAllTipoSocis(activeCampaign).then((data) => {
-        let results = data.data;
-        setTipoSocis(results);
-      });
-    }
-  }, [activeCampaign]);
-
-  useEffect(() => {
-    if (activeCampaign) {
       explotacioDadesService
         .getDadesExplotacioSocis(activeCampaign)
         .then((data) => {
@@ -612,11 +603,21 @@ const MembersPage = ({ props }) => {
       filters: lazyState.filters,
     };
 
-    gestorfutbolService.getMembers(apiFilter).then((data) => {
-      setTotalRecords(data.data.total);
-      let results = data.data.result;
-      setMembers(results);
-    });
+    gestorfutbolService
+      .getMembers(apiFilter)
+      .then((data) => {
+        setTotalRecords(data.data.total);
+        let results = data.data.result;
+        setMembers(results);
+      })
+      .then(() => {
+        if (activeCampaign) {
+          gestorfutbolService.getAllTipoSocis(activeCampaign).then((data) => {
+            let results = data.data;
+            setTipoSocis(results);
+          });
+        }
+      });
   };
 
   const onRowEditComplete = (e) => {
@@ -827,11 +828,7 @@ const MembersPage = ({ props }) => {
         </Sidebar>
       )}
       <div className="row mt-3">
-        <ContextMenu
-          model={menuModel}
-          ref={cm}
-          
-        />
+        <ContextMenu model={menuModel} ref={cm} />
         <TableComponent props={tableProps}></TableComponent>
       </div>
       <Dialog

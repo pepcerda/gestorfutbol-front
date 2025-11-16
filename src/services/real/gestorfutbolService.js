@@ -283,6 +283,39 @@ export const gestorfutbolService = {
     return response;
   },
 
+  getCaixesFixes(filter) {
+    const axiosConfig = {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    };
+    var response = apiClient.post(
+      "/caixes-fixes",
+      JSON.stringify(filter),
+      axiosConfig
+    );
+    return response;
+  },
+
+  saveCaixaFixa(caixaFixa, file) {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append(
+      "caixaFixa",
+      new Blob([JSON.stringify(caixaFixa)], { type: "application/json" })
+    );
+
+    return apiClient.post("/caixa-fixa", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
+
+  deleteCaixaFixa(id) {
+    var response = apiClient.delete("/caixa-fixa/" + id);
+    return response;
+  },
+
   getFacturas(filter) {
     const axiosConfig = {
       headers: {
@@ -303,7 +336,7 @@ export const gestorfutbolService = {
     const formData = new FormData();
     formData.append("file", file);
     formData.append(
-      "caixaFixa",
+      "facturaDTO",
       new Blob([JSON.stringify(factura)], { type: "application/json" })
     );
 
@@ -550,6 +583,47 @@ export const gestorfutbolService = {
     return response;
   },
 
+  getAllCategoriaDespesa() {
+    var response = apiClient.get("/categories-despesa");
+    return response;
+  },
+
+  getCategoriaDespesa(filter) {
+    const axiosConfig = {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    };
+
+    var response = apiClient.post(
+      "/categories-despesa",
+      JSON.stringify(filter),
+      axiosConfig
+    );
+    return response;
+  },
+
+  saveCategoriaDespesa(categoriaDespesa) {
+    const axiosConfig = {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      }, 
+    };
+    var response = apiClient.post(
+      "/categoria-despesa",
+      JSON.stringify(categoriaDespesa),
+      axiosConfig
+    );
+    return response;
+  },
+
+  deleteCategoriaDespesa(id) {
+    var response = apiClient.delete("/categoria-despesa/" + id);
+    return response;
+  },
+
   getCategoria(filter) {
     const axiosConfig = {
       headers: {
@@ -588,6 +662,45 @@ export const gestorfutbolService = {
 
   deleteCategoria(id) {
     var response = apiClient.delete("/categoria/" + id);
+    return response;
+  },
+
+  getProveidors(filter) {
+    const axiosConfig = {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    };
+    var response = apiClient.post(
+      "/proveidors",
+      JSON.stringify(filter),
+      axiosConfig
+    );
+    return response;
+  },
+
+  getAllProveidors() {
+    var response = apiClient.get("/proveidors");
+    return response;
+  },
+
+  saveProveidor(proveidor) {
+    const axiosConfig = {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    };
+    var response = apiClient.post(
+      "/proveidor",
+      JSON.stringify(proveidor),
+      axiosConfig
+    );
+    return response;
+  },  
+  deleteProveidor(id) {
+    var response = apiClient.delete("/proveidor/" + id);
     return response;
   }
 };

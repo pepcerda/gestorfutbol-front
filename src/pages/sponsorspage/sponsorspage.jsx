@@ -446,7 +446,7 @@ const SponsorsPage = ({ props }) => {
           consulta: true,
         });
       },
-    }
+    },
   ];
 
   const tabMenu = {
@@ -761,16 +761,6 @@ const SponsorsPage = ({ props }) => {
   }, [campaigns]);
 
   useEffect(() => {
-    if (activeCampaign) {
-      explotacioDadesService
-        .getDadesExplotacioPatrocinis(activeCampaign)
-        .then((data) => {
-          setDadesPatrocinis(data.data);
-        });
-    }
-  }, [activeCampaign]);
-
-  useEffect(() => {
     if (location.state?.filtre) {
       filterSponsor(location.state.filtre);
     }
@@ -811,14 +801,25 @@ const SponsorsPage = ({ props }) => {
       sortOrder: lazyState.sortOrder,
       filters: lazyState.filters,
     };
-    gestorfutbolService.getSponsors(apiFilter).then((data) => {
-      setTotalRecords(data.data.total);
-      /*data.data.result.forEach(r => {
+    gestorfutbolService
+      .getSponsors(apiFilter)
+      .then((data) => {
+        setTotalRecords(data.data.total);
+        /*data.data.result.forEach(r => {
                 r.dataDonacio = new Date(r.dataDonacio).toLocaleDateString('es-ES')
             })*/
-      let results = data.data.result;
-      setSponsors(results);
-    });
+        let results = data.data.result;
+        setSponsors(results);
+      })
+      .then(() => {
+        if (activeCampaign) {
+          explotacioDadesService
+            .getDadesExplotacioPatrocinis(activeCampaign)
+            .then((data) => {
+              setDadesPatrocinis(data.data);
+            });
+        }
+      });
   };
 
   const onRowEditComplete = (e) => {
@@ -1184,11 +1185,7 @@ const SponsorsPage = ({ props }) => {
       )}
 
       <div className="row mt-3">
-        <ContextMenu
-          model={menuModel}
-          ref={cm}
-          
-        />
+        <ContextMenu model={menuModel} ref={cm} />
         <TableComponent props={tableProps}></TableComponent>
       </div>
       <Dialog

@@ -18,6 +18,7 @@ import CaixaFixaPage from "./pages/caixafixapage/caixafixapage";
 import PlantillaPage from "./pages/plantillapage/plantillapage";
 import MensualitatsPage from "./pages/mensualitatspage/mensualitatspage";
 import { QueryClient, useQuery } from "@tanstack/react-query";
+import FacturaPage from "./pages/facturespage/facturespage";
 
 export const ConfigContext = createContext();
 
@@ -114,7 +115,8 @@ function App() {
                 path={"/configuracio"}
                 element={<ConfigurationPage />}
               ></Route>
-              <Route path={"/factures"} element={<CaixaFixaPage />}></Route>
+              <Route path={"/tiquets"} element={<CaixaFixaPage />}></Route>
+              <Route path={"/factures"} element={<FacturaPage />}></Route>
               <Route path={"/plantilla"} element={<PlantillaPage />}></Route>
               <Route
                 path={"/mensualitats"}

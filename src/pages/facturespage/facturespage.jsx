@@ -1,4 +1,4 @@
-import "./caixafixapage.css";
+import "./facturespage.css";
 import { ConfigContext } from "../../App";
 import React, {
   createContext,
@@ -37,7 +37,31 @@ const FiltraContext = createContext();
 const FilterDataForm = ({ props }) => {
   const { t, i18n } = useTranslation("common");
   const { formikFilters } = useContext(FiltraContext);
-  const opcionsPagament = gestorfutbolService.getOpcionsPagament();
+  const [estatsPagament, setEstatsPagament] = useState([]);
+  const [categoriesDespesa, setCategoriesDespesa] = useState([]);
+  const [proveidors, setProveidors] = useState([]);
+
+  useEffect(() => {
+    gestorfutbolService.getEstatsPagament().then((data) => {
+      let results = data.data;
+
+      const estatsFormatejats = results.map((item) => ({
+        valor: item.valor,
+        nom: t(`t.estat.${item.valor}`),
+      }));
+      setEstatsPagament(estatsFormatejats);
+    });
+
+    gestorfutbolService.getAllCategoriaDespesa().then((data) => {
+      let results = data.data;
+      setCategoriesDespesa(results);
+    });
+
+    gestorfutbolService.getAllProveidors().then((data) => {
+      let results = data.data;
+      setProveidors(results);
+    });
+  }, []);
 
   const dataDonacioCalc = (value) => {
     let dateString = value;
@@ -45,47 +69,71 @@ const FilterDataForm = ({ props }) => {
     return dateMomentObject.toDate();
   };
 
-  const nomProps = {
-    id: "nom",
-    label: `${t("t.name")}`,
-    value: formikFilters.values.nom,
+  const proveidorProps = {
+    id: "proveidor",
+    label: `${t("t.proveidor")}`,
+    value: formikFilters.values.proveidor.id,
     onChange: (e) => {
-      formikFilters.setFieldValue("nom", e.target.value);
+      formikFilters.setFieldValue(
+        "proveidor",
+        proveidors.find((prov) => prov.id === e.value)
+      );
     },
+    options: proveidors,
+    optionLabel: "nom",
+    optionValue: "id",
   };
 
-  const observacioProps = {
-    id: "observacio",
-    label: `${t("t.observacio")}`,
-    value: formikFilters.values.observacio,
+  const categoriaDespesaProps = {
+    id: "categoriaDespesa",
+    label: `${t("t.categoria.despesa")}`,
+    value: formikFilters.values.categoriaDespesa.id,
     onChange: (e) => {
-      formikFilters.setFieldValue("observacio", e.target.value);
+      formikFilters.setFieldValue(
+        "categoriaDespesa",
+        categoriesDespesa.find((cat) => cat.id === e.value)
+      );
     },
+    options: categoriesDespesa,
+    optionLabel: "nom",
+    optionValue: "id",
   };
 
-  const estatProps = {
-    id: "estat",
+  const estatPagamentProps = {
+    id: "estatPagament",
     label: `${t("t.payment.state")}`,
-    value: formikFilters.values.estat,
+    value: formikFilters.values.estatPagament,
     onChange: (e) => {
-      formikFilters.setFieldValue("estat", e.value);
+      formikFilters.setFieldValue("estatPagament", e.value);
     },
-    options: opcionsPagament,
+    options: estatsPagament,
     optionLabel: "nom",
     optionValue: "valor",
+  };
+
+  const concepteProps = {
+    id: "concepte",
+    label: `${t("t.concepte")}`,
+    value: formikFilters.values.concepte,
+    onChange: (e) => {
+      formikFilters.setFieldValue("concepte", e.value);
+    },
   };
 
   return (
     <>
       <div className="row">
         <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
-          <FormInputText props={nomProps}></FormInputText>
+          <SelectOneMenu props={proveidorProps}></SelectOneMenu>
         </div>
         <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
-          <FormInputText props={observacioProps}></FormInputText>
+          <SelectOneMenu props={categoriaDespesaProps}></SelectOneMenu>
         </div>
         <div className="col-12 col-md-6 form-group text-center text-md-start mt-3">
-          <SelectOneMenu props={estatProps}></SelectOneMenu>
+          <SelectOneMenu props={estatPagamentProps}></SelectOneMenu>
+        </div>
+        <div className="col-12 col-md-6 form-group text-center text-md-start mt-3">
+          <FormInputText props={concepteProps}></FormInputText>
         </div>
       </div>
     </>
@@ -96,11 +144,35 @@ const FacturaDataForm = ({ props }) => {
   const { t, i18n } = useTranslation("common");
   const { selectedFactura, setSelectedFactura, formikFactura, captureDialog } =
     useContext(FacturaContext);
-
   const [selectCheck, setSelectedCheck] = useState(null);
   const [fecha, setFecha] = useState(null);
   const opcionsPagament = gestorfutbolService.getOpcionsPagament();
   const [fileName, setFileName] = useState(null);
+  const [estatsPagament, setEstatsPagament] = useState([]);
+  const [categoriasDespesa, setCategoriesDespesa] = useState([]);
+  const [proveidors, setProveidors] = useState([]);
+
+  useEffect(() => {
+    gestorfutbolService.getEstatsPagament().then((data) => {
+      let results = data.data;
+
+      const estatsFormatejats = results.map((item) => ({
+        valor: item.valor,
+        nom: t(`t.estat.${item.valor}`),
+      }));
+      setEstatsPagament(estatsFormatejats);
+    });
+
+    gestorfutbolService.getAllCategoriaDespesa().then((data) => {
+      let results = data.data;
+      setCategoriesDespesa(results);
+    });
+
+    gestorfutbolService.getAllProveidors().then((data) => {
+      let results = data.data;
+      setProveidors(results);
+    });
+  }, []);
 
   const isFormFieldInvalid = (name) =>
     !!(formikFactura.touched[name] && formikFactura.errors[name]);
@@ -168,51 +240,73 @@ const FacturaDataForm = ({ props }) => {
     event.options.clear();
   };
 
-    const dataDespesaCalc = (value) => {
-      let dateString = value;
-      let dateMomentObject = moment(dateString);
-      if (captureDialog.consulta) {
-        return dateMomentObject.format("DD-MM-YYYY");
-      } else {
-        return dateMomentObject.toDate();
-      }
-    };
-
-  const nomProps = {
-    id: "nom",
-    label: `${t("t.name")}`,
-    value: formikFactura.values.nom,
-    onChange: (e) => {
-      formikFactura.setFieldValue("nom", e.target.value);
-    },
-    classNameError: `${isFormFieldInvalid("nom") ? "invalid-inputtext" : ""}`,
-    labelClassName: `${isFormFieldInvalid("nom") ? "form-text-invalid" : ""}`,
-    disabled: captureDialog.consulta,
+  const dataDespesaCalc = (value) => {
+    let dateString = value;
+    let dateMomentObject = moment(dateString);
+    if (captureDialog.consulta) {
+      return dateMomentObject.format("DD-MM-YYYY");
+    } else {
+      return dateMomentObject.toDate();
+    }
   };
 
-  const llinatge1Props = {
-    id: "llinatge1",
-    label: `${t("t.surname1")}`,
-    value: formikFactura.values.llinatge1,
+  const proveidorProps = {
+    id: "proveidor",
+    label: `${t("t.proveidor")}`,
+    value: formikFactura.values.proveidor.id,
     onChange: (e) => {
-      formikFactura.setFieldValue("llinatge1", e.target.value);
+      formikFactura.setFieldValue(
+        "proveidor",
+        proveidors.find((prov) => prov.id === e.value)
+      );
     },
+    options: proveidors,
+    optionLabel: "nom",
+    optionValue: "id",
     classNameError: `${
-      isFormFieldInvalid("llinatge1") ? "invalid-inputtext" : ""
+      isFormFieldInvalid("proveidor") ? "invalid-inputtext" : ""
     }`,
     labelClassName: `${
-      isFormFieldInvalid("llinatge1") ? "form-text-invalid" : ""
+      isFormFieldInvalid("proveidor") ? "form-text-invalid" : ""
     }`,
     disabled: captureDialog.consulta,
   };
 
-  const llinatge2Props = {
-    id: "llinatge2",
-    label: `${t("t.surname2")}`,
-    value: formikFactura.values.llinatge2,
+  const categoriaProps = {
+    id: "categoriaDespesa",
+    label: `${t("t.categoria.despesa")}`,
+    value: formikFactura.values.categoriaDespesa.id,
     onChange: (e) => {
-      formikFactura.setFieldValue("llinatge2", e.target.value);
+      formikFactura.setFieldValue(
+        "categoriaDespesa",
+        categoriasDespesa.find((cat) => cat.id === e.value)
+      );
     },
+    options: categoriasDespesa,
+    optionLabel: "nom",
+    optionValue: "id",
+    classNameError: `${
+      isFormFieldInvalid("categoriaDespesa") ? "invalid-inputtext" : ""
+    }`,
+    labelClassName: `${
+      isFormFieldInvalid("categoriaDespesa") ? "form-text-invalid" : ""
+    }`,
+    disabled: captureDialog.consulta,
+  };
+
+  const concepteProps = {
+    id: "concepte",
+    label: `${t("t.concepte")}`,
+    value: formikFactura.values.concepte,
+    onChange: (e) => {
+      formikFactura.setFieldValue("concepte", e.target.value);
+    },
+    classNameError: `${
+      isFormFieldInvalid("concepte") ? "invalid-inputtext" : ""
+    }`,
+    labelClassName: `${
+      isFormFieldInvalid("concepte") ? "form-text-invalid" : ""
+    }`,
     disabled: captureDialog.consulta,
   };
 
@@ -234,51 +328,45 @@ const FacturaDataForm = ({ props }) => {
     disabled: captureDialog.consulta,
   };
 
-  const dataDespesaProps = {
-    id: "dataDonacio",
+  const dataFacturaProps = {
+    id: "dataFactura",
     label: `${t("t.data.despesa")}`,
-    value: dataDespesaCalc(formikFactura.values.dataDonacio),
+    value: dataDespesaCalc(formikFactura.values.dataFactura),
     view: "date",
     dateFormat: "dd/mm/yy",
     onChange: (e) => {
-      formikFactura.setFieldValue("dataDespesa", e.target.value);
+      formikFactura.setFieldValue("dataFactura", e.target.value);
     },
     classNameError: `${
-      isFormFieldInvalid("dataDespesa") ? "formcalendar-invalid" : ""
+      isFormFieldInvalid("dataFactura") ? "formcalendar-invalid" : ""
     }`,
     labelClassName: `${
-      isFormFieldInvalid("dataDespesa") ? "form-text-invalid" : ""
+      isFormFieldInvalid("dataFactura") ? "form-text-invalid" : ""
     }`,
     disabled: captureDialog.consulta,
   };
 
-  const estatProps = {
-    id: "estat",
+  const estatPagamentProps = {
+    id: "estatPagament",
     label: `${t("t.payment.state")}`,
-    value: formikFactura.values.estat,
+    value: formikFactura.values.estatPagament,
     onChange: (e) => {
-      formikFactura.setFieldValue("estat", e.value);
+      formikFactura.setFieldValue("estatPagament", e.value);
     },
-    options: opcionsPagament,
+    options: estatsPagament,
     optionLabel: "nom",
     optionValue: "valor",
-    classNameError: `${isFormFieldInvalid("estat") ? "invalid-select" : ""}`,
-    labelClassName: `${isFormFieldInvalid("estat") ? "form-text-invalid" : ""}`,
-    disabled: captureDialog.consulta,
-  };
-
-  const observacioProps = {
-    id: "observacions",
-    label: `${t("t.observacions")}`,
-    value: formikFactura.values.observacio,
-    onChange: (e) => {
-      formikFactura.setFieldValue("observacio", e.target.value);
-    },
+    classNameError: `${
+      isFormFieldInvalid("estatPagament") ? "invalid-select" : ""
+    }`,
+    labelClassName: `${
+      isFormFieldInvalid("estatPagament") ? "form-text-invalid" : ""
+    }`,
     disabled: captureDialog.consulta,
   };
 
   const facturaUploader = {
-    id: "logo-up",
+    id: "document",
     mode: "basic",
     label: `${t(`t.document`)}`,
     customUpload: true,
@@ -293,44 +381,41 @@ const FacturaDataForm = ({ props }) => {
     <>
       <div className="row">
         <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
-          <FormInputText props={nomProps}></FormInputText>
-          {getFormErrorMessage("nom")}
+          <SelectOneMenu props={proveidorProps}></SelectOneMenu>
+          {getFormErrorMessage("proveidor")}
         </div>
         <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
-          <FormInputText props={llinatge1Props}></FormInputText>
-          {getFormErrorMessage("llinatge1")}
+          <SelectOneMenu props={categoriaProps}></SelectOneMenu>
+          {getFormErrorMessage("categoriaDespesa")}
         </div>
         <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
-          <FormInputText props={llinatge2Props}></FormInputText>
+          <FormTextArea props={concepteProps}></FormTextArea>
         </div>
         <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
           <FormInputNumber props={despesaProps}></FormInputNumber>
           {getFormErrorMessage("despesa")}
         </div>
         <div className="col-12 col-md-6 form-group text-center text-md-start mt-3">
-          <SelectOneMenu props={estatProps}></SelectOneMenu>
+          <SelectOneMenu props={estatPagamentProps}></SelectOneMenu>
           {getFormErrorMessage("estatPagament")}
         </div>
         <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
           {!captureDialog.consulta ? (
             <>
-              <FormCalendar props={dataDespesaProps} />
+              <FormCalendar props={dataFacturaProps} />
               <br />
-              {getFormErrorMessage("dataDonacio")}
+              {getFormErrorMessage("dataFactura")}
             </>
           ) : (
-            <FormInputText props={dataDespesaProps}></FormInputText>
+            <FormInputText props={dataFacturaProps}></FormInputText>
           )}
-        </div>
-        <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
-          <FormTextArea props={observacioProps}></FormTextArea>
         </div>
         <div className="row align-items-center align-content-center mt-3 mt-md-0 gap-3">
           <div className="col-12 col-md-1 text-center text-md-start form-group">
             <FileUploader props={facturaUploader} />
           </div>
           {formikFactura.values.factura &&
-            !esBase64Embebida(formikFactura.values.factura) && (
+            !esBase64Embebida(formikFactura.values.document) && (
               <div className="col-12 col-md-2 text-center text-md-start form-group mt-3 mt-md-0 ms-3 my-auto">
                 <>
                   <p>{t("t.document.original")}</p>
@@ -338,7 +423,7 @@ const FacturaDataForm = ({ props }) => {
                     <a
                       href={
                         process.env.REACT_APP_URI_BACK +
-                        formikFactura.values.factura
+                        formikFactura.values.document
                       }
                       target="_blank"
                     >
@@ -366,10 +451,10 @@ const FacturaDataForm = ({ props }) => {
   );
 };
 
-const CaixaFixaPage = ({ props }) => {
+const FacturaPage = ({ props }) => {
   const location = useLocation();
   const { viewWidth, setViewWidth } = useContext(ConfigContext);
-  const opcionsPagament = gestorfutbolService.getOpcionsPagament();
+  const [estatsPagament, setEstatsPagament] = useState([]);
   const [factures, setFactures] = useState([]);
   const { t, i18n } = useTranslation("common");
   const [totalRecords, setTotalRecords] = useState(0);
@@ -382,15 +467,23 @@ const CaixaFixaPage = ({ props }) => {
   const [activeCampaign, setActiveCampaign] = useState(null);
   let emptyFactura = {
     id: null,
-    nom: "",
-    llinatge1: "",
-    llinatge2: "",
-    despesa: 0,
-    dataDespesa: null,
-    observacio: "",
-    factura: "",
-    estat: null,
     campanya: activeCampaign,
+    proveidor: {
+      id: null,
+      nom: "",
+      nomComercial: "",
+      cif: "",
+      contactes: [],
+    },
+    categoriaDespesa: {
+      id: null,
+      nom: "",
+    },
+    despesa: 0,
+    dataFactura: null,
+    observacio: "",
+    document: "",
+    estatPagament: null,
   };
   const [selectedFactura, setSelectedFactura] = useState(emptyFactura);
   const [lazyState, setlazyState] = useState({
@@ -455,8 +548,8 @@ const CaixaFixaPage = ({ props }) => {
   };
 
   const estatPagamentBodyTemplate = (factura) => {
-    let estat = opcionsPagament.find((o) => {
-      return o.valor === factura.estat;
+    let estat = estatsPagament.find((o) => {
+      return o.valor === factura.estatPagament;
     });
 
     if (estat != null) {
@@ -469,7 +562,7 @@ const CaixaFixaPage = ({ props }) => {
           )}
           <span
             className={`${
-              estat.valor === "P" ? "text-bg-success" : "text-bg-danger"
+              estat.valor === "PAGADA" ? "text-bg-success" : "text-bg-danger"
             } px-3 py-2 rounded-pill`}
           >
             {estat.nom}
@@ -480,14 +573,16 @@ const CaixaFixaPage = ({ props }) => {
   };
 
   const facturaBodyTemplate = (factura) => {
-    return (
-      <a
-        href={process.env.REACT_APP_URI_BACK + factura.factura}
-        target="_blank"
-      >
-        {t("t.document")}
-      </a>
-    );
+    if (factura.document) {
+      return (
+        <a
+          href={process.env.REACT_APP_URI_BACK + factura.document}
+          target="_blank"
+        >
+          {t("t.document")}
+        </a>
+      );
+    }
   };
 
   const textEditor = (options) => {
@@ -531,9 +626,9 @@ const CaixaFixaPage = ({ props }) => {
       id: "estat_editor",
       value: options.rowData.estat,
       onChange: (e) => options.editorCallback(e.value),
-      options: opcionsPagament,
+      options: estatsPagament,
       optionLabel: "nom",
-      optionValue: "valor",
+      optionValue: "id",
       className: "selectonemenu-large",
     };
     return !options.rowData.patrocinador ? (
@@ -543,49 +638,71 @@ const CaixaFixaPage = ({ props }) => {
     );
   };
 
+  const dataFacturaBody = (rowData) => {
+    // Crear objeto Date
+    const fecha = new Date(rowData.dataFactura);
+
+    // Obtener día, mes y año
+    const dia = String(fecha.getDate()).padStart(2, "0");
+    const mes = String(fecha.getMonth() + 1).padStart(2, "0"); // Los meses van de 0 a 11
+    const anio = fecha.getFullYear();
+
+    // Formatear como dd/mm/yyyy
+    const fechaFormateada = `${dia}/${mes}/${anio}`;
+
+    return (
+      <>
+        {viewWidth <= 900 ? (
+          <span className="fw-bold">{t("t.data.factura")}</span>
+        ) : (
+          <></>
+        )}
+        <span>{fechaFormateada}</span>
+      </>
+    );
+  };
+
   const tableColumns = [
     { field: "id", header: `${t("t.id")}` },
     {
-      field: "nom",
-      header: `${t("t.name")}`,
-      editor: (options) => textEditor(options),
+      field: "proveidor.nom",
+      header: `${t("t.proveidor")}`,
     },
     {
-      field: "llinatge1",
-      header: `${t("t.surname1")}`,
-      editor: (options) => textEditor(options),
+      field: "proveidor.nomComercial",
+      header: `${t("t.nom.comercial")}`,
     },
     {
-      field: "llinatge2",
-      header: `${t("t.surname2")}`,
-      editor: (options) => textEditor(options),
+      field: "dataFactura",
+      header: `${t("t.data.factura")}`,
+      body: dataFacturaBody,
+    },
+    {
+      field: "categoriaDespesa.nom",
+      header: `${t("t.categoria.despesa")}`,
+    },
+    {
+      field: "concepte",
+      header: `${t("t.concepte")}`,
     },
     {
       field: "despesa",
       header: `${t("t.despesa")}`,
-      editor: (options) => numberEditor(options),
     },
     {
-      field: "estat",
+      field: "estatPagament",
       header: `${t("t.payment.state")}`,
       body: estatPagamentBodyTemplate,
-      editor: (options) => opcionsEditor(options),
     },
     {
-      field: "observacio",
-      header: `${t("t.observacions")}`,
-      editor: (options) => textAreaEditor(options),
-    },
-    {
-      field: "factura",
+      field: "document",
       header: `${t("t.document")}`,
       body: facturaBodyTemplate,
     },
-    { rowEditor: true },
   ];
 
   const accept = () => {
-    gestorfutbolService.deleteCaixaFixa(selectedFactura.id).then(() => {
+    gestorfutbolService.deleteFactura(selectedFactura.id).then(() => {
       setDeleteFlag(true);
     });
   };
@@ -686,6 +803,15 @@ const CaixaFixaPage = ({ props }) => {
       results = data.data;
       setCampaigns(results);
     });
+
+    gestorfutbolService.getEstatsPagament().then((data) => {
+      let results = data.data;
+      const estatsFormatejats = results.map((item) => ({
+        valor: item.valor,
+        nom: t(`t.estat.${item.valor}`),
+      }));
+      setEstatsPagament(estatsFormatejats);
+    });
   }, []);
 
   useEffect(() => {
@@ -709,8 +835,6 @@ const CaixaFixaPage = ({ props }) => {
     }
   }, [campaigns]);
 
-
-
   useEffect(() => {
     if (location.state?.filtre) {
       filterFactura(location.state.filtre);
@@ -731,7 +855,7 @@ const CaixaFixaPage = ({ props }) => {
     };
 
     gestorfutbolService
-      .getCaixesFixes(apiFilter)
+      .getFacturas(apiFilter)
       .then((data) => {
         setTotalRecords(data.data.total);
         let results = data.data.result;
@@ -750,7 +874,7 @@ const CaixaFixaPage = ({ props }) => {
 
   const onRowEditComplete = (e) => {
     let { newData, index } = e;
-    gestorfutbolService.saveCaixaFixa(newData).then(() => loadLazyData());
+    gestorfutbolService.saveFactura(newData).then(() => loadLazyData());
   };
 
   const tableHeader = () => {
@@ -798,7 +922,6 @@ const CaixaFixaPage = ({ props }) => {
     sortField: lazyState.sortField,
     editMode: "row",
     onRowEditComplete: onRowEditComplete,
-    rowEditor: true,
     stripedRows: true,
     onContextMenu: (e) => cm.current.show(e.originalEvent),
     contextMenuSelection: selectedFactura,
@@ -822,16 +945,16 @@ const CaixaFixaPage = ({ props }) => {
     const facturaData = {
       id: formikFactura.values.id,
       campanya: formikFactura.values.campanya,
-      nom: formikFactura.values.nom,
-      llinatge1: formikFactura.values.llinatge1,
-      llinatge2: formikFactura.values.llinatge2,
+      proveidor: formikFactura.values.proveidor,
+      categoriaDespesa: formikFactura.values.categoriaDespesa,
+      concepte: formikFactura.values.concepte,
       despesa: formikFactura.values.despesa,
-      observacio: formikFactura.values.observacio,
-      estat: formikFactura.values.estat,
-      factura: formikFactura.values.factura,
+      document: formikFactura.values.document,
+      dataFactura: formikFactura.values.dataFactura,
+      estatPagament: formikFactura.values.estatPagament,
     };
 
-    gestorfutbolService.saveCaixaFixa(facturaData, file).then(() => {
+    gestorfutbolService.saveFactura(facturaData, file).then(() => {
       setCaptureDialog({
         visible: false,
         consulta: false,
@@ -842,21 +965,31 @@ const CaixaFixaPage = ({ props }) => {
 
   const filterFactura = (data) => {
     let facturaFilters = {};
-    if (data.observacio) {
-      facturaFilters.observacio = {
-        value: data.observacio,
+
+    if (data.proveidor) {
+      facturaFilters["proveidor.nom"] = {
+        value: data.proveidor.nom,
+        matchMode: "equals",
+      };
+    }
+
+    if (data.categoriaDespesa) {
+      facturaFilters["categoriaDespesa.nom"] = {
+        value: data.categoriaDespesa.nom,
+        matchMode: "equals",
+      };
+    }
+
+    if (data.concepte) {
+      facturaFilters["concepte"] = {
+        value: data.concepte,
         matchMode: "contains",
       };
     }
-    if (data.nom) {
-      facturaFilters.nom = {
-        value: data.nom,
-        matchMode: "contains",
-      };
-    }
-    if (data.estat) {
-      facturaFilters.estat = {
-        value: data.estat,
+
+    if (data.estatPagament) {
+      facturaFilters["estatPagament"] = {
+        value: data.estatPagament,
         matchMode: "equals",
       };
     }
@@ -916,32 +1049,38 @@ const CaixaFixaPage = ({ props }) => {
   const formikFactura = useFormik({
     initialValues: {
       nom: selectedFactura.nom,
-      llinatge1: selectedFactura.llinatge1,
-      llinatge2: selectedFactura.llinatge2,
+      proveidor: selectedFactura.proveidor,
+      categoriaDespesa: selectedFactura.categoriaDespesa,
+      concepte: selectedFactura.concepte,
       despesa: selectedFactura.despesa,
-      dataDespesa: selectedFactura.dataDespesa,
       observacio: selectedFactura.observacio,
-      factura: selectedFactura.factura,
+      document: selectedFactura.document,
       facturaFile: null,
       facturaBlob: null,
-      estat: selectedFactura.estat,
+      estatPagament: selectedFactura.estatPagament,
       campanya: activeCampaign,
+      dataFactura: selectedFactura.dataFactura,
     },
     enableReinitialize: true,
     validate: (data) => {
       let errors = {};
-      if (!data.nom) {
-        errors.nom = t("t.empty.field");
-      }
-      if (!data.llinatge2) {
-      }
       if (!data.despesa) {
         errors.despesa = t("t.empty.field");
       }
-      if (!data.patrocinador) {
+      if (!data.dataFactura) {
+        errors.dataFactura = t("t.empty.field");
       }
-      if (!data.estat) {
-        errors.estat = t("t.empty.field");
+      if (!data.concepte) {
+        errors.concepte = t("t.empty.field");
+      }
+      if (!data.categoriaDespesa || !data.categoriaDespesa.id) {
+        errors.categoriaDespesa = t("t.empty.field");
+      }
+      if (!data.proveidor || !data.proveidor.id) {
+        errors.proveidor = t("t.empty.field");
+      }
+      if (!data.estatPagament) {
+        errors.estatPagament = t("t.empty.field");
       }
       return errors;
     },
@@ -952,10 +1091,10 @@ const CaixaFixaPage = ({ props }) => {
 
   const formikFilters = useFormik({
     initialValues: {
-      observacio: emptyFactura.observacio,
-      nom: emptyFactura.nom,
-      despesa: emptyFactura.donacio,
+      proveidor: emptyFactura.proveidor,
+      categoriaDespesa: emptyFactura.categoriaDespesa,
       estatPagament: emptyFactura.estatPagament,
+      concepte: emptyFactura.concepte,
     },
     enableReinitialize: true,
     validate: (data) => {
@@ -970,7 +1109,7 @@ const CaixaFixaPage = ({ props }) => {
   return (
     <div className="container p-2 p-xl-4">
       <ConfirmPopup />
-      <PageTitle props={{ title: `${t("t.tiquets")}` }}></PageTitle>
+      <PageTitle props={{ title: `${t("t.factures")}` }}></PageTitle>
       <TabMenuComponent props={tabMenu}></TabMenuComponent>
       <div className="row justify-content-between align-items-start flex-wrap">
         <div className="col-12 col-xl-auto mb-3 mb-xl-0 d-flex flex-wrap gap-2 justify-content-center justify-content-xl-end">
@@ -1039,10 +1178,10 @@ const CaixaFixaPage = ({ props }) => {
   );
 };
 
-/*const CaixaFixaPage = ({props}) => {
+/*const FacturaPage = ({props}) => {
     return (
-        <div>CAixaFixaPage</div>
+        <div>FacturaPage</div>
     )
 }*/
 
-export default CaixaFixaPage;
+export default FacturaPage;

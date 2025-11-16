@@ -6,6 +6,8 @@ import TabMenuComponent from "../../components/tabmenucomponent/tabmenucomponent
 import ConfigGeneral from "./general/configgeneral";
 import TipoSocisPage from "./tiposocis/tiposocispage";
 import CategoriaPage from "./categories/categoriespage";
+import CategoriaDespesasPage from './categoriesdespesa/categoriesdespesa';
+import ProveidorsPage from './proveidors/proveidors';
 
 const ConfigurationPage = ({props}) => {
         const {t, i18n} = useTranslation("common");
@@ -14,6 +16,8 @@ const ConfigurationPage = ({props}) => {
             {label: `${t('t.general')}`},
             {label: `${t('t.tipo.socis')}`},
             {label: `${t('t.categories')}`},
+            {label: `${t('t.categories.despesa')}`},
+            {label: `${t('t.proveidors')}`},
         ],
         /********   HOOKS  ***********************/
         renderContenido = () => {
@@ -24,6 +28,10 @@ const ConfigurationPage = ({props}) => {
                     return <TipoSocisPage></TipoSocisPage>
                 case 2:
                     return <CategoriaPage></CategoriaPage>
+                case 3:
+                    return <CategoriaDespesasPage></CategoriaDespesasPage>
+                case 4:
+                    return <ProveidorsPage></ProveidorsPage>
             }
         },
         /********   PROPIETATS D'ELEMENTS DEL FRONTAL  ***********************/

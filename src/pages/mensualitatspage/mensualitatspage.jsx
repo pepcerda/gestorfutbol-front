@@ -21,6 +21,7 @@ import moment from "moment";
 import TableNoRespComponent from "../../components/tablenorespcomponent/tablenorespcomponent";
 import { FilterMatchMode } from "primereact/api";
 import { Divider } from "primereact/divider";
+import { explotacioDadesService } from "../../services/real/explotacioDadesService";
 
 const NominaContext = createContext();
 
@@ -491,22 +492,21 @@ const MensualitatsPage = ({ props }) => {
     }
   }, [campaigns]);
 
-  
-    useEffect(() => {
-      if (activeCampaign !== null) {
-        gestorfutbolService.getCategories(activeCampaign).then((data) => {
-          let results = data.data;
-          setCategories(results);
-          setSelectedCategoria(results[0]);
-        });
-      }
-    }, [activeCampaign]);
+  useEffect(() => {
+    if (activeCampaign !== null) {
+      gestorfutbolService.getCategories(activeCampaign).then((data) => {
+        let results = data.data;
+        setCategories(results);
+        setSelectedCategoria(results[0]);
+      });
+    }
+  }, [activeCampaign]);
 
   useEffect(() => {
     if (activeCampaign !== null) {
-      const apiFilter = { 
-        campanyaActiva: activeCampaign
-       };
+      const apiFilter = {
+        campanyaActiva: activeCampaign,
+      };
 
       gestorfutbolService.getMensualitats(apiFilter).then(async (data) => {
         const mensualitatsOriginals = data.data;
@@ -516,7 +516,9 @@ const MensualitatsPage = ({ props }) => {
             if (m.nomines && m.nomines.length > 0) {
               const apiFilterMembres = {
                 campanyaActiva: activeCampaign,
-                categoriaActiva: selectedCategoria ? selectedCategoria.id : null,
+                categoriaActiva: selectedCategoria
+                  ? selectedCategoria.id
+                  : null,
                 ids: m.nomines.map((n) => n.membre),
               };
 
@@ -580,7 +582,7 @@ const MensualitatsPage = ({ props }) => {
     className: "p-2 rounded-2",
   };
 
-    const categoriaProps = {
+  const categoriaProps = {
     id: "categoria",
     label: t("t.selecciona.categoria"),
     value: selectedCategoria ? selectedCategoria.id : null,
@@ -607,7 +609,9 @@ const MensualitatsPage = ({ props }) => {
             if (m.nomines && m.nomines.length > 0) {
               const apiFilterMembres = {
                 campanyaActiva: activeCampaign,
-                categoriaActiva: selectedCategoria ? selectedCategoria.id : null,
+                categoriaActiva: selectedCategoria
+                  ? selectedCategoria.id
+                  : null,
                 ids: m.nomines.map((n) => n.membre),
               };
 
@@ -714,6 +718,25 @@ const MensualitatsPage = ({ props }) => {
 
                 let tableProps = null;
 
+                const tableHeader = () => {
+
+                  var totalNominesMes = m.nomines.reduce((total, nomina) => {
+                    if (nomina.estatPagament === "PAGADA") {
+                      return total + nomina.quantitat;
+                    } else {
+                      return total;
+                    }
+                  }, 0); 
+
+                  return (
+                    <div className="table-header-container d-flex flex-column flex-md-row gap-3">
+                      <span>
+                        {t("t.total.mes")}: {totalNominesMes} €
+                      </span>
+                    </div>
+                  );
+                };
+
                 const estatPagamentBodyTemplate = (nomina) => {
                   let estat = estatsPagament.find((o) => {
                     return o.valor === nomina.estatPagament;
@@ -808,6 +831,7 @@ const MensualitatsPage = ({ props }) => {
                     rowsPerPageOptions: [5, 10, 25, 50],
                     breakpoint: "900px",
                     stripedRows: true,
+                    header: tableHeader,
                   };
                 }
 
@@ -838,7 +862,7 @@ const MensualitatsPage = ({ props }) => {
           >
             <form onSubmit={formikMensualitat.handleSubmit}>
               <NominaContext.Provider
-                value={{ activeCampaign, formikMensualitat, selectedCategoria}}
+                value={{ activeCampaign, formikMensualitat, selectedCategoria }}
               >
                 <NominaDataForm />
               </NominaContext.Provider>
