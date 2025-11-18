@@ -1,12 +1,12 @@
 /*Clases para el componente móvil/tablet*/
 
 .navbar {
-    max-width: 100%;
+  max-width: 100%;
 }
 
-.tabmenu ul{
-    background: rgba(255, 255, 255, 0);
-    padding: 0;
+.tabmenu ul {
+  background: rgba(255, 255, 255, 0);
+  padding: 0;
 }
 
 /*.tabmenu li[aria-selected="true"] a{
@@ -15,137 +15,128 @@
 }*/
 
 .sidenav-item.p-highlight .p-menuitem-link {
-    border-color: transparent;
+  border-color: transparent;
 }
 
 .tabmenu a {
-    color: #ffffff;
-    background: rgba(255, 255, 255, 0);
-
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0);
 }
 
 /*Clases para el componente desktop*/
 
 .sidenav {
-    position: static;
-    width: 8rem;
-    background-color: hsla(0,0%,100%,.5) !important;
-    height: auto;
-    min-height: calc(100vh - 5rem);
+  position: static;
+  width: 8rem;
+  background-color: hsla(0, 0%, 100%, 0.5) !important;
+  height: auto;
+  min-height: calc(100vh - 5rem);
 }
 
 .sidenav-menu {
-    background: transparent;
-    border: none;
-    width: 100%;
-    position: relative;
-    top: 2rem;
+  background: transparent;
+  border: none;
+  width: 100%;
+  position: relative;
+  top: 2rem;
 }
 
 .sidenav-menu ul {
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    align-content: center;
-    align-items: center;
-    justify-content: center;
-}
-
-.sidenav-item {
-    font-size: .8rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-content: center;
+  align-items: center;
+  justify-content: center;
 }
 
 .sidenav-menu.p-megamenu .p-submenu-header {
-    padding: 0!important;
+  padding: 0 !important;
 }
 
 .sidenav-item .p-megamenu-panel {
-    width: 15rem;
+  width: 15rem;
 }
 
 .active {
-    color: var(--main-color)  !important;
-    border-color: var(--main-color)  !important;
+  color: var(--main-color) !important;
+  border-color: var(--main-color) !important;
+}
+
+.sidenav-item .p-menuitem-icon {
+  color: var(--main-color) !important;
+}
+
+.sidenav-item .p-menuitem-text {
+  color: var(--main-color) !important;
+  font-weight: bold;
 }
 
 .burger-menu-card {
-    background: transparent !important;
-    border: none !important;
+  background: transparent !important;
+  border: none !important;
 }
 
 .burger-menu {
-    background: transparent !important;
-    border: none !important;
+  background: transparent !important;
+  border: none !important;
 }
 
 .burger-menu .p-menubar-button {
-    color: var(--main-color);
+  color: var(--main-color);
 }
 
 .burger-menu.p-menubar .p-menubar-button {
-    width: 3rem;
-    height: 3rem;
+  width: 3rem;
+  height: 3rem;
 }
 
 .burger-menu.p-menubar .p-menubar-button .p-icon,
 .burger-menu.p-menubar .p-menubar-button svg {
-    width: 1.5rem;
-    height: 1.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
-
 @media (min-width: 576px) {
-
 }
 
 @media (min-width: 768px) {
-
-    .tabmenu a {
-        padding: 1rem 2rem;
-
-    }
+  .tabmenu a {
+    padding: 1rem 2rem;
+  }
 }
 
 @media (min-width: 992px) {
-
 }
 
 @media (min-width: 1200px) {
-    .sidenav-item {
-        width: 6rem;
-    }
+  .sidenav-item {
+    width: 6rem;
+  }
 
-    .sidenav-item a {
-        flex-direction: column;
-        gap: 0.4em;
-        align-items: center;
-        align-content: center;
-        justify-content: center;
-        padding: 1em 1em;
-    }
+  .sidenav-item a {
+    flex-direction: column;
+    gap: 0.4em;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    padding: 1em 1em;
+  }
 
-    .sidenav-item a:hover {
-        background-color: hsla(0,0%,100%,.5) !important;
-        border-radius: 5px;
-    }
+  .sidenav-item {
+    font-size: 0.8rem;
+  }
 
-    .sidenav-item .p-menuitem-icon {
-        margin: 0 !important;
-        color: var(--main-color)  !important;
-    }
+  .sidenav-item a:hover {
+    background-color: hsla(0, 0%, 100%, 0.5) !important;
+    border-radius: 5px;
+  }
 
-    .sidenav-item .p-menuitem-text {
-        margin: auto;
-        color: var(--main-color) !important;
-        font-weight: bold;
-    }
-
-    .active {
-        background-color: hsla(0,0%,100%,.5) !important;
-    }
+  .active {
+    background-color: hsla(0, 0%, 100%, 0.5) !important;
+  }
 }
 
 @media (min-width: 1400px) {
-
 }

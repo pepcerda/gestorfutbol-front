@@ -183,12 +183,20 @@ const DespesesModul = ({ props }) => {
   };
 
   const { t, i18n } = useTranslation("common");
+  const [dadesCaixaFixa, setDadesCaixaFixa] = useState(emptyDadesFactures);
   const [dadesFactures, setDadesFactures] = useState(emptyDadesFactures);
   const [dadesNomines, setDadesNomines] = useState(emptyDadesNomines);
   const { activeCampaign } = useContext(CampanyaContext);
 
   useEffect(() => {
     if (activeCampaign) {
+
+      explotacioDadesService
+        .getDadesExplotacioCaixaFixa(activeCampaign)
+        .then((data) => {
+          setDadesCaixaFixa(data.data);
+        });
+
       explotacioDadesService
         .getDadesExplotacioFactures(activeCampaign)
         .then((data) => {
@@ -197,11 +205,37 @@ const DespesesModul = ({ props }) => {
 
         explotacioDadesService.getDadesExplotacioNomines(activeCampaign)
         .then((data) => {
-            console.log(data); 
             setDadesNomines(data.data);
         })
     }
   }, [activeCampaign]);
+
+    const caixaFixaContent = () => {
+    return (
+      <>
+        <p>
+          {t("t.pendent.pagar")}: {dadesCaixaFixa.pendentPagar} €
+        </p>
+        <p>
+          {t("t.total.pagat")}: {dadesCaixaFixa.totalPagat} €
+        </p>
+        <br />
+        <NavLink
+          to={"/tiquets"}
+          state={{ filtre: { estat: "D" } }}
+          className="basicbutton rounded-border-btn text-light"
+        >
+          {t("t.consulta.pendents")}
+        </NavLink>
+      </>
+    );
+  };
+
+  const caixaFixaCard = {
+    title: `${t("t.caixa.fixa")}`,
+    className: "red-text-card",
+    content: caixaFixaContent(),
+  };
 
   const facturesContent = () => {
     return (
@@ -215,7 +249,7 @@ const DespesesModul = ({ props }) => {
         <br />
         <NavLink
           to={"/factures"}
-          state={{ filtre: { estat: "D" } }}
+          state={{ filtre: { estatPagament: "PENDENT" } }}
           className="basicbutton rounded-border-btn text-light"
         >
           {t("t.consulta.pendents")}
@@ -244,7 +278,7 @@ const DespesesModul = ({ props }) => {
           to={"/mensualitats"}
           className="basicbutton rounded-border-btn text-light"
         >
-          {t("t.consulta")}
+          {t("t.consulta.pendents")}
         </NavLink>
       </>
     );
@@ -260,9 +294,12 @@ const DespesesModul = ({ props }) => {
   return (
     <div className="row gap-2 gap-md-0">
       <div className="col-12 col-md-6">
-        <DataCard props={facturesCard}></DataCard>
+        <DataCard props={caixaFixaCard}></DataCard>
       </div>
       <div className="col-12 col-md-6">
+        <DataCard props={facturesCard}></DataCard>
+      </div>
+      <div className="col-12 col-md-6 mt-md-3">
         <DataCard props={nominesCard}></DataCard>
       </div>
     </div>

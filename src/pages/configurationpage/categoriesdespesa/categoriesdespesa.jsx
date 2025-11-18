@@ -3,15 +3,13 @@ import { useTranslation } from "react-i18next";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
 import { useFormik } from "formik";
-import PageTitle from "../../../components/pagetitle/pagetitle";
 import BasicButton from "../../../components/basicbutton/basicbutton";
 import TableComponent from "../../../components/tablecomponent/tablecomponent";
 import { Dialog } from "primereact/dialog";
 import FormInputText from "../../../components/forminputtext/forminputtext";
-import TabMenuComponent from "../../../components/tabmenucomponent/tabmenucomponent";
 import { ConfigContext } from "../../../App";
 import { gestorfutbolService } from "../../../services/real/gestorfutbolService";
-import FormInputNumber from "../../../components/forminputnumber/forminputnumber";
+
 
 const CategoriaDespesaContext = createContext();
 
@@ -19,8 +17,6 @@ const CategoriaDespesaDataForm = ({ props }) => {
   const { t, i18n } = useTranslation("common");
   const { selectedCategoriaDespesa, setSelectedCategoriaDespesa, formikCategoriaDespesa } =
     useContext(CategoriaDespesaContext);
-
-  const [selectCheck, setSelectedCheck] = useState(null);
 
   const isFormFieldInvalid = (name) =>
     !!(formikCategoriaDespesa.touched[name] && formikCategoriaDespesa.errors[name]);
@@ -249,7 +245,7 @@ const CategoriaDespesasPage = ({ props }) => {
       </div>
       <Dialog
         visible={captureDialog}
-        header={t("t.new.member").toUpperCase()}
+        header={t("t.nova.categoria").toUpperCase()}
         onHide={hideDialog}
       >
         <form onSubmit={formikCategoriaDespesa.handleSubmit}>

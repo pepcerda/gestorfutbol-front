@@ -740,7 +740,7 @@ const CaixaFixaPage = ({ props }) => {
       .then(() => {
         if (activeCampaign) {
           explotacioDadesService
-            .getDadesExplotacioFactures(activeCampaign)
+            .getDadesExplotacioCaixaFixa(activeCampaign)
             .then((data) => {
               setDadesFactures(data.data);
             });

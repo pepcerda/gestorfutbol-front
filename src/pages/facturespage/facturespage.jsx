@@ -966,6 +966,8 @@ const FacturaPage = ({ props }) => {
   const filterFactura = (data) => {
     let facturaFilters = {};
 
+    console.log("Filtering with data:", data);
+
     if (data.proveidor) {
       facturaFilters["proveidor.nom"] = {
         value: data.proveidor.nom,

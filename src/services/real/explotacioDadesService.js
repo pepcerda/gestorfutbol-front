@@ -42,6 +42,11 @@ export const explotacioDadesService = {
         return response;
     },
 
+    getDadesExplotacioCaixaFixa(idCampanya) {
+        var response = apiClient.get("/explotacio-caixa-fixa/" + idCampanya);
+        return response;
+    },
+
     getDadesExplotacioFactures(idCampanya) {
         var response = apiClient.get("/explotacio-factures/" + idCampanya);
         return response;
