@@ -13,6 +13,8 @@ import FormCalendar from "../../../components/formcalendar/formcalendar";
 import SelectOneMenu from "../../../components/selectonemenu/selectonemenu";
 import { CampanyaContext } from "../plantillapage";
 import React from "react";
+import FormCheckbox from "../../../components/formcheckbox/formcheckbox";
+import moment from "moment";
 
 const DelegatContext = createContext();
 
@@ -78,11 +80,20 @@ const DelegatDataForm = () => {
       formikDelegat.setFieldValue("dataNaixement", e.target.value);
     },
     classNameError: `${
-      isFormFieldInvalid("dataDonacio") ? "formcalendar-invalid" : ""
+      isFormFieldInvalid("dataNaixement") ? "formcalendar-invalid" : ""
     }`,
     labelClassName: `${
-      isFormFieldInvalid("dataDonacio") ? "form-text-invalid" : ""
+      isFormFieldInvalid("dataNaixement") ? "form-text-invalid" : ""
     }`,
+  };
+
+  const esDelCampProps = {
+    id: "delCamp",
+    label: `${t("t.delegat.camp")}`,
+    checked: formikDelegat.values.esDelegatCamp,
+    onChange: (e) => {
+      formikDelegat.setFieldValue("esDelegatCamp", e.checked);
+    },
   };
 
   return (
@@ -102,7 +113,10 @@ const DelegatDataForm = () => {
         <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
           <FormCalendar props={dataNaixementProps} />
           <br />
-          {getFormErrorMessage("dataDonacio")}
+          {getFormErrorMessage("dataNaixement")}
+        </div>
+        <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
+          <FormCheckbox props={esDelCampProps}></FormCheckbox>
         </div>
       </div>
     </>
@@ -116,16 +130,19 @@ const DelegatsPage = () => {
   const [totalRecords, setTotalRecords] = useState(0);
   const [captureDialog, setCaptureDialog] = useState(false);
   const [deleteFlag, setDeleteFlag] = useState(false);
-  const { activeCampaign, setActiveCampaign, selectedCategoria } = useContext(CampanyaContext);
+  const { activeCampaign, setActiveCampaign, selectedEquip } =
+    useContext(CampanyaContext);
   const [posicions, setPosicions] = useState([]);
 
   let emptyDelegat = {
     id: null,
     campanya: activeCampaign,
+    equip: selectedEquip,
     nom: "",
     llinatge1: "",
     llinatge2: "",
     dataNaixement: null,
+    esDelegatCamp: false,
   };
   const [selectedDelegat, setSelectedDelegat] = useState(emptyDelegat);
   const [lazyState, setlazyState] = useState({
@@ -144,6 +161,25 @@ const DelegatsPage = () => {
     };
     return <FormInputText props={textProps} />;
   };
+
+  const calendarEditor = (options) => {
+    let dateString = options.value;
+    let dateMomentObject = moment(dateString, "YYYY-MM-DD");
+    let dateObject = dateMomentObject.toDate();
+
+    const calendarProps = {
+      value: dateObject,
+      dateFormat: "dd/mm/yy",
+      view: "date",
+      onChange: (e) => {
+        options.editorCallback(
+          moment(e.target.value).format("YYYY-MM-DD").toString()
+        );
+      },
+    };
+    return <FormCalendar props={calendarProps} />;
+  };
+
 
   const dataNaixementBody = (rowData) => {
     // Crear objeto Date
@@ -169,6 +205,27 @@ const DelegatsPage = () => {
     );
   };
 
+  const esDelegatCampBody = (rowData) => {
+    return (
+      <FormCheckbox
+        props={{
+          id: `delCamp_${rowData.id}`,
+          checked: rowData.esDelegatCamp,
+          disabled: true,
+        }}
+      ></FormCheckbox>
+    );
+  };
+
+  const checkEditor = (options) => {
+    const checkProps = {
+      value: options.value,
+      checked: options.value,
+      onChange: (e) => options.editorCallback(e.checked),
+    };
+    return <FormCheckbox props={checkProps} />;
+  };
+
   const tableColumns = [
     { field: "id", header: `${t("t.delegat")}` },
     {
@@ -190,7 +247,13 @@ const DelegatsPage = () => {
       field: "dataNaixement",
       header: `${t("t.data.naixement")}`,
       body: dataNaixementBody,
-      editor: (options) => textEditor(options),
+      editor: (options) => calendarEditor(options),
+    },
+    {
+      field: "esDelegatCamp",
+      header: `${t("t.delegat.camp")}`,
+      body: esDelegatCampBody,
+      editor: (options) => checkEditor(options),
     },
   ];
 
@@ -245,14 +308,14 @@ const DelegatsPage = () => {
   useEffect(() => {
     loadLazyData();
     setDeleteFlag(false);
-  }, [lazyState, deleteFlag, activeCampaign, selectedCategoria]);
+  }, [lazyState, deleteFlag, activeCampaign, selectedEquip]);
 
   const loadLazyData = () => {
     let apiFilter = {
       pageNum: lazyState.page,
       pageSize: lazyState.rows,
       campanyaActiva: activeCampaign,
-      categoriaActiva: selectedCategoria ? selectedCategoria.id : null,
+      equipActiu: selectedEquip ? selectedEquip.id : null,
     };
 
     gestorfutbolService.getDelegats(apiFilter).then((data) => {
@@ -324,8 +387,9 @@ const DelegatsPage = () => {
       llinatge1: selectedDelegat.llinatge1,
       llinatge2: selectedDelegat.llinatge2,
       dataNaixement: selectedDelegat.dataNaixement,
-      carrec: selectedDelegat.carrec,
+      esDelegatCamp: selectedDelegat.esDelegatCamp,
       campanya: activeCampaign,
+      equip: selectedDelegat.equip ? selectedDelegat.equip.id : null,
     },
     enableReinitialize: true,
     validate: (data) => {
@@ -335,6 +399,9 @@ const DelegatsPage = () => {
       }
       if (!data.llinatge1) {
         errors.llinatge1 = t("t.empty.field");
+      }
+      if (!data.dataNaixement) {
+        errors.dataNaixement = t("t.empty.field");
       }
       return errors;
     },
@@ -362,7 +429,7 @@ const DelegatsPage = () => {
           <DelegatContext.Provider
             value={{ selectedDelegat, setSelectedDelegat, formikDelegat }}
           >
-            <DelegatDataForm/>
+            <DelegatDataForm />
           </DelegatContext.Provider>
           <div className="p-dialog-footer pb-0 mt-5">
             <BasicButton props={cancelFormButton} />

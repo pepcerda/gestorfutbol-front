@@ -405,8 +405,6 @@ export const gestorfutbolService = {
       axiosConfig
     );
     return response;
-
-
   },
 
   getJugadors(filter) {
@@ -569,7 +567,7 @@ export const gestorfutbolService = {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-    };  
+    };
     var response = apiClient.post(
       "/nomina",
       JSON.stringify(nomina),
@@ -609,7 +607,7 @@ export const gestorfutbolService = {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
-      }, 
+      },
     };
     var response = apiClient.post(
       "/categoria-despesa",
@@ -698,9 +696,14 @@ export const gestorfutbolService = {
       axiosConfig
     );
     return response;
-  },  
+  },
   deleteProveidor(id) {
     var response = apiClient.delete("/proveidor/" + id);
     return response;
-  }
+  },
+
+  getEquips(idCampanya) {
+    var response = apiClient.get("/equips/" + idCampanya);
+    return response;
+  },
 };

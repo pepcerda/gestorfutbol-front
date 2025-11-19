@@ -539,22 +539,26 @@ const SponsorsPage = ({ props }) => {
       header: `${t("t.cif")}`,
       editor: (options) => textEditor(options),
       filter: true,
+      sortable: true,
     },
     {
       field: "nom",
       header: `${t("t.name")}`,
       editor: (options) => textEditor(options),
+      sortable: true,
     },
     {
       field: "donacio",
       header: `${t("t.donation")}`,
       editor: (options) => numberEditor(options),
+      sortable: true,
     },
     {
       field: "dataDonacio",
       header: `${t("t.donation.date")}`,
       editor: (options) => calendarEditor(options),
       body: dataDonacioBody,
+      sortable: true,
     },
     {
       field: "estatPagament",

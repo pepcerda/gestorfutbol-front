@@ -67,8 +67,12 @@ const ProveidorDataForm = ({ props }) => {
     onChange: (e) => {
       formikProveidor.setFieldValue("nomComercial", e.target.value);
     },
-    classNameError: `${isFormFieldInvalid("nomComercial") ? "invalid-inputtext" : ""}`,
-    labelClassName: `${isFormFieldInvalid("nomComercial") ? "form-text-invalid" : ""}`,
+    classNameError: `${
+      isFormFieldInvalid("nomComercial") ? "invalid-inputtext" : ""
+    }`,
+    labelClassName: `${
+      isFormFieldInvalid("nomComercial") ? "form-text-invalid" : ""
+    }`,
   };
 
   const addRow = () => {
@@ -210,16 +214,16 @@ const ProveidorsPage = ({ props }) => {
     { field: "id", header: `${t("t.id")}` },
     {
       field: "nom",
-      header: `${t("t.name")}`
+      header: `${t("t.name")}`,
     },
     {
       field: "cif",
-      header: `${t("t.cif")}`
+      header: `${t("t.cif")}`,
     },
     {
       field: "nomComercial",
-      header: `${t("t.nom.comercial")}`
-    }
+      header: `${t("t.nom.comercial")}`,
+    },
   ];
 
   const accept = () => {
@@ -281,8 +285,6 @@ const ProveidorsPage = ({ props }) => {
   }, [lazyState, deleteFlag]);
 
   const loadLazyData = () => {
-    console.log("Loading lazy data...");
-
     let apiFilter = {
       pageNum: lazyState.page,
       pageSize: lazyState.rows,
@@ -334,8 +336,7 @@ const ProveidorsPage = ({ props }) => {
   };
 
   const saveProveidor = (data) => {
-
-     if (selectedProveidor.id) {
+    if (selectedProveidor.id) {
       data.id = selectedProveidor.id;
     }
     const filtered = data.contactes.filter(

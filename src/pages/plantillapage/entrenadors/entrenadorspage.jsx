@@ -13,6 +13,7 @@ import FormCalendar from "../../../components/formcalendar/formcalendar";
 import SelectOneMenu from "../../../components/selectonemenu/selectonemenu";
 import { CampanyaContext } from "../plantillapage";
 import React from "react";
+import moment from "moment";
 
 const EntrenadorContext = createContext();
 
@@ -80,10 +81,10 @@ const EntrenadorDataForm = () => {
       formikEntrenador.setFieldValue("dataNaixement", e.target.value);
     },
     classNameError: `${
-      isFormFieldInvalid("dataDonacio") ? "formcalendar-invalid" : ""
+      isFormFieldInvalid("dataNaixement") ? "formcalendar-invalid" : ""
     }`,
     labelClassName: `${
-      isFormFieldInvalid("dataDonacio") ? "form-text-invalid" : ""
+      isFormFieldInvalid("dataNaixement") ? "form-text-invalid" : ""
     }`,
   };
 
@@ -113,7 +114,7 @@ const EntrenadorDataForm = () => {
         <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
           <FormCalendar props={dataNaixementProps} />
           <br />
-          {getFormErrorMessage("dataDonacio")}
+          {getFormErrorMessage("dataNaixement")}
         </div>
         <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
           <FormInputText props={carrecProps}></FormInputText>
@@ -130,12 +131,13 @@ const EntrenadorsPage = () => {
   const [totalRecords, setTotalRecords] = useState(0);
   const [captureDialog, setCaptureDialog] = useState(false);
   const [deleteFlag, setDeleteFlag] = useState(false);
-  const { activeCampaign, setActiveCampaign, selectedCategoria } = useContext(CampanyaContext);
+  const { activeCampaign, setActiveCampaign, selectedEquip } = useContext(CampanyaContext);
   const [posicions, setPosicions] = useState([]);
 
   let emptyEntrenador = {
     id: null,
     campanya: activeCampaign,
+    equip: selectedEquip,
     nom: "",
     llinatge1: "",
     llinatge2: "",
@@ -184,6 +186,24 @@ const EntrenadorsPage = () => {
     );
   };
 
+  const calendarEditor = (options) => {
+    let dateString = options.value;
+    let dateMomentObject = moment(dateString, "YYYY-MM-DD");
+    let dateObject = dateMomentObject.toDate();
+
+    const calendarProps = {
+      value: dateObject,
+      dateFormat: "dd/mm/yy",
+      view: "date",
+      onChange: (e) => {
+        options.editorCallback(
+          moment(e.target.value).format("YYYY-MM-DD").toString()
+        );
+      },
+    };
+    return <FormCalendar props={calendarProps} />;
+  };
+
   const tableColumns = [
     { field: "id", header: `${t("t.entrenador")}` },
     {
@@ -210,7 +230,7 @@ const EntrenadorsPage = () => {
       field: "dataNaixement",
       header: `${t("t.data.naixement")}`,
       body: dataNaixementBody,
-      editor: (options) => textEditor(options),
+      editor: (options) => calendarEditor(options),
     },
   ];
 
@@ -265,14 +285,14 @@ const EntrenadorsPage = () => {
   useEffect(() => {
     loadLazyData();
     setDeleteFlag(false);
-  }, [lazyState, deleteFlag, activeCampaign, selectedCategoria]);
+  }, [lazyState, deleteFlag, activeCampaign, selectedEquip]);
 
   const loadLazyData = () => {
     let apiFilter = {
       pageNum: lazyState.page,
       pageSize: lazyState.rows,
       campanyaActiva: activeCampaign,
-      categoriaActiva: selectedCategoria ? selectedCategoria.id : null,
+      equipActiu: selectedEquip ? selectedEquip.id : null,
     };
 
     gestorfutbolService.getEntrenadors(apiFilter).then((data) => {
@@ -346,6 +366,7 @@ const EntrenadorsPage = () => {
       dataNaixement: selectedEntrenador.dataNaixement,
       carrec: selectedEntrenador.carrec,
       campanya: activeCampaign,
+      equip: selectedEntrenador.equip ? selectedEntrenador.equip.id : null
     },
     enableReinitialize: true,
     validate: (data) => {
@@ -355,6 +376,9 @@ const EntrenadorsPage = () => {
       }
       if (!data.llinatge1) {
         errors.llinatge1 = t("t.empty.field");
+      }
+      if(!data.dataNaixement){
+        errors.dataNaixement = t("t.empty.field");
       }
       return errors;
     },

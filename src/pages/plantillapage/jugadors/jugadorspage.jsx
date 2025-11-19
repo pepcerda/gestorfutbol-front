@@ -80,10 +80,10 @@ const JugadorsDataForm = ({ props }) => {
       formikJugador.setFieldValue("dataNaixement", e.target.value);
     },
     classNameError: `${
-      isFormFieldInvalid("dataDonacio") ? "formcalendar-invalid" : ""
+      isFormFieldInvalid("dataNaixement") ? "formcalendar-invalid" : ""
     }`,
     labelClassName: `${
-      isFormFieldInvalid("dataDonacio") ? "form-text-invalid" : ""
+      isFormFieldInvalid("dataNaixement") ? "form-text-invalid" : ""
     }`,
   };
 
@@ -120,7 +120,7 @@ const JugadorsDataForm = ({ props }) => {
         <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
           <FormCalendar props={dataNaixementProps} />
           <br />
-          {getFormErrorMessage("dataDonacio")}
+          {getFormErrorMessage("dataNaixement")}
         </div>
         <div className="col-12 col-md-6 form-group text-center text-md-start mt-3">
           <SelectOneMenu props={posicioProps}></SelectOneMenu>
@@ -139,13 +139,14 @@ const JugadorsPage = ({ props }) => {
   const [captureDialog, setCaptureDialog] = useState(false);
   const [deleteFlag, setDeleteFlag] = useState(false);
   const [campaigns, setCampaigns] = useState(null);
-  const { activeCampaign, setActiveCampaign, selectedCategoria } = useContext(CampanyaContext);
+  const { activeCampaign, setActiveCampaign, selectedEquip } = useContext(CampanyaContext);
   const [posicions, setPosicions] = useState([]);
   const [expandedRows, setExpandedRows] = useState([]);
 
   let emptyJugador = {
     id: null,
     campanya: activeCampaign,
+    equip: selectedEquip,
     nom: "",
     llinatge1: "",
     llinatge2: "",
@@ -297,14 +298,14 @@ const JugadorsPage = ({ props }) => {
   useEffect(() => {
     loadLazyData();
     setDeleteFlag(false);
-  }, [lazyState, deleteFlag, activeCampaign, selectedCategoria]);
+  }, [lazyState, deleteFlag, activeCampaign, selectedEquip]);
 
   const loadLazyData = () => {
     let apiFilter = {
       pageNum: lazyState.page,
       pageSize: lazyState.rows,
       campanyaActiva: activeCampaign,
-      categoriaActiva: selectedCategoria ? selectedCategoria.id : null,
+      equipActiu: selectedEquip ? selectedEquip.id : null,
     };
 
     gestorfutbolService.getJugadors(apiFilter).then((data) => {
@@ -315,7 +316,6 @@ const JugadorsPage = ({ props }) => {
 
   const onRowEditComplete = (e) => {
     let { newData, index } = e;
-    console.log(newData);
     gestorfutbolService.saveJugador(newData).then(() => loadLazyData());
   };
 
@@ -398,6 +398,7 @@ const JugadorsPage = ({ props }) => {
       dataNaixement: selectedJugador.dataNaixement,
       posicio: selectedJugador.posicio,
       campanya: activeCampaign,
+      equip: selectedJugador.equip ? selectedJugador.equip.id : null,
     },
     enableReinitialize: true,
     validate: (data) => {
@@ -407,6 +408,12 @@ const JugadorsPage = ({ props }) => {
       }
       if (!data.llinatge1) {
         errors.llinatge1 = t("t.empty.field");
+      }
+      if (!data.posicio) {
+        errors.posicio = t("t.empty.field");
+      }
+      if(!data.dataNaixement){
+        errors.dataNaixement = t("t.empty.field");
       }
       return errors;
     },

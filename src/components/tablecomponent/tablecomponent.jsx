@@ -63,6 +63,7 @@ const TableComponent = ({props}) => {
                 onContextMenuSelectionChange={props.onContextMenuSelectionChange}
                 contextMenuSelection={props.contextMenuSelection}
                 onContextMenu={props.onContextMenu}
+                rowExpansionTemplate={props.rowExpansionTemplate}
             >
                 {(props.selectionMode === "checkbox" || props.selectionMode === "multiple") && (
                     <Column selectionMode={props.rowSelectionMode}></Column>

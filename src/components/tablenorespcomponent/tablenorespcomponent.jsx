@@ -8,7 +8,7 @@ const TableNoRespComponent = ({props})=> {
             <DataTable
                 dataKey={props.dataKey}
                 value={props.data}
-                className={`${props.className}`}
+                className={`table-component ${props.className}`}
                 selectionMode={props.selectionMode}
                 paginatorClassName="table-paginator"
                 paginatorDropdownAppendTo="self"
@@ -49,10 +49,15 @@ const TableNoRespComponent = ({props})=> {
                 onContextMenuSelectionChange={props.onContextMenuSelectionChange}
                 contextMenuSelection={props.contextMenuSelection}
                 onContextMenu={props.onContextMenu}
+                rowExpansionTemplate={props.rowExpansionTemplate}
             >
                 {(props.selectionMode === "checkbox" || props.selectionMode === "multiple") && (
                     <Column selectionMode={props.rowSelectionMode}></Column>
                 )}
+                {(props.rowExpansionTemplate) && (
+                    <Column expander={true} style={{ width: '5rem' }} />
+                )}
+                
                 {props.columns
                     .map((c, idx) => (
                     <Column

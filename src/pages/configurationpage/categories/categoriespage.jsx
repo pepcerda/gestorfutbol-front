@@ -10,6 +10,11 @@ import FormInputText from "../../../components/forminputtext/forminputtext";
 import TabMenuComponent from "../../../components/tabmenucomponent/tabmenucomponent";
 import { ConfigContext } from "../../../App";
 import { gestorfutbolService } from "../../../services/real/gestorfutbolService";
+import { Panel } from "primereact/panel";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
+import TableNoRespComponent from "../../../components/tablenorespcomponent/tablenorespcomponent";
+import { all } from "axios";
 
 const CategoriaContext = createContext();
 
@@ -20,12 +25,16 @@ const CategoriaDataForm = ({ props }) => {
 
   const [selectCheck, setSelectedCheck] = useState(null);
 
+  const [data, setData] = useState(formikCategoria.values.equips);
+
   const isFormFieldInvalid = (name) =>
     !!(formikCategoria.touched[name] && formikCategoria.errors[name]);
 
   const getFormErrorMessage = (name) => {
     return isFormFieldInvalid(name) ? (
-      <small className="form-text-invalid">{formikCategoria.errors[name]}</small>
+      <small className="form-text-invalid">
+        {formikCategoria.errors[name]}
+      </small>
     ) : (
       <small className="form-text-invalid">&nbsp;</small>
     );
@@ -42,6 +51,26 @@ const CategoriaDataForm = ({ props }) => {
     labelClassName: `${isFormFieldInvalid("nom") ? "form-text-invalid" : ""}`,
   };
 
+  const addRow = () => {
+    const newRow = {
+      id: null,
+      nom: "",
+      categoria: selectedCategoria.id,
+    };
+    formikCategoria.setFieldValue("equips", [
+      ...formikCategoria.values.equips,
+      newRow,
+    ]);
+  };
+
+  const addButton = {
+    icon: "pi pi-plus",
+    onClick: addRow,
+    type: "button",
+    className: "circular-btn basicbutton",
+    tooltip: t("t.afegeix.contacte"),
+    tooltipOptions: { position: "top" },
+  };
 
   return (
     <>
@@ -50,6 +79,35 @@ const CategoriaDataForm = ({ props }) => {
           <FormInputText props={nomProps}></FormInputText>
           {getFormErrorMessage("nom")}
         </div>
+        <Panel header={t("t.equips").toUpperCase()} className="mt-4">
+          <div className="row">
+            {formikCategoria.values.equips &&
+              formikCategoria.values.equips.map((c, index) => {
+                const nomEquipProps = {
+                  id: `nomEquip${index}`,
+                  label: `${t("t.name")}`,
+                  value: formikCategoria.values.equips[index].nom,
+                  onChange: (e) => {
+                    let equips = formikCategoria.values.equips;
+                    equips[index].nom = e.target.value;
+                    formikCategoria.setFieldValue("equips", equips);
+                  },
+                };
+
+                return (
+                  <>
+                    <div className="col-12 form-group text-center text-md-start mt-3 mt-md-0">
+                      <FormInputText props={nomEquipProps}></FormInputText>
+                    </div>
+                  </>
+                );
+              })}
+
+            <div className="col-12 form-group text-center text-md-start mt-3">
+              <BasicButton props={addButton}></BasicButton>
+            </div>
+          </div>
+        </Panel>
       </div>
     </>
   );
@@ -67,6 +125,7 @@ const CategoriasPage = ({ props }) => {
   let emptyCategoria = {
     id: null,
     nom: "",
+    equips: [],
   };
   const [selectedCategoria, setSelectedCategoria] = useState(emptyCategoria);
   const [lazyState, setlazyState] = useState({
@@ -79,6 +138,7 @@ const CategoriasPage = ({ props }) => {
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [tabMenuItems, setTabMenuItems] = useState(null);
+  const [expandedRows, setExpandedRows] = useState(null);
 
   const tabMenu = {
     model: tabMenuItems,
@@ -106,13 +166,7 @@ const CategoriasPage = ({ props }) => {
       field: "nom",
       header: `${t("t.name")}`,
       editor: (options) => textEditor(options),
-    },
-    {
-      field: "cuota",
-      header: `${t("t.surname1")}`,
-      editor: (options) => textEditor(options),
-    },
-    { rowEditor: true },
+    }
   ];
 
   const accept = () => {
@@ -153,6 +207,19 @@ const CategoriasPage = ({ props }) => {
       formikCategoria.resetForm();
       setCaptureDialog(true);
     },
+  };
+
+  const editButton = {
+    icon: "pi pi-pencil",
+    className: "circular-btn",
+    onClick: () => {
+      setCaptureDialog(true);
+    },
+    tooltip: `${t("t.edita")}`,
+    tooltipOptions: {
+      position: "bottom",
+    },
+    disabled: selectedCategoria.id === null,
   };
 
   useEffect(() => {
@@ -197,7 +264,6 @@ const CategoriasPage = ({ props }) => {
     };
 
     gestorfutbolService.getCategoria(apiFilter).then((data) => {
-      console.log(apiFilter.campanyaActiva);
       setTotalRecords(data.data.total);
       let results = data.data.result;
       setCategorias(results);
@@ -208,6 +274,23 @@ const CategoriasPage = ({ props }) => {
     let { newData, index } = e;
     gestorfutbolService.saveCategoria(newData).then(() => loadLazyData());
   };
+
+  
+  const allowExpansion = (rowData) => {
+    return rowData.equips.length > 0;
+  };
+
+  const rowExpansionTemplate = (data) => {
+    return (
+      <div className="p-3">
+        <DataTable value={data.equips}>
+          <Column field="id" header={t('t.id')} sortable></Column>
+          <Column field="nom" header={t('t.name')} sortable></Column>
+        </DataTable>
+      </div>
+    );
+  };
+
 
   const tableProps = {
     data: tipoSocis,
@@ -238,11 +321,20 @@ const CategoriasPage = ({ props }) => {
     sortField: lazyState.sortField,
     editMode: "row",
     onRowEditComplete: onRowEditComplete,
-    rowEditor: true,
     stripedRows: true,
+    rowExpansionTemplate: rowExpansionTemplate,
+    expandedRows: expandedRows,
+    onRowToggle: (e) => setExpandedRows(e.data),
   };
 
   const saveCategoria = (data) => {
+    if (selectedCategoria.id) {
+      data.id = selectedCategoria.id;
+    }
+    const filtered = data.equips.filter((c) => c.nom.trim() !== "");
+
+    data.equips = filtered;
+
     gestorfutbolService.saveCategoria(data).then(() => {
       setCaptureDialog(false);
       loadLazyData();
@@ -272,6 +364,7 @@ const CategoriasPage = ({ props }) => {
     initialValues: {
       nom: selectedCategoria.nom,
       campanya: activeCampaign,
+      equips: selectedCategoria.equips,
     },
     enableReinitialize: true,
     validate: (data) => {
@@ -279,6 +372,7 @@ const CategoriasPage = ({ props }) => {
       if (!data.nom) {
         errors.nom = t("t.empty.field");
       }
+
       return errors;
     },
     onSubmit: (data) => {
@@ -292,16 +386,18 @@ const CategoriasPage = ({ props }) => {
       <TabMenuComponent props={tabMenu}></TabMenuComponent>
       <div className="row gap-3 justify-content-center justify-content-xl-end">
         <BasicButton props={newButton}></BasicButton>
+        <BasicButton props={editButton}></BasicButton>
         <BasicButton props={deleteButton}></BasicButton>
       </div>
       <div className="row mt-3">
-        <TableComponent props={tableProps}></TableComponent>
+
+        <TableNoRespComponent props={tableProps}></TableNoRespComponent>
       </div>
       <Dialog
         visible={captureDialog}
         header={t("t.nova.categoria").toUpperCase()}
         onHide={hideDialog}
-        style={{width: '50vw'}}
+        style={{ width: "50vw" }}
       >
         <form onSubmit={formikCategoria.handleSubmit}>
           <CategoriaContext.Provider

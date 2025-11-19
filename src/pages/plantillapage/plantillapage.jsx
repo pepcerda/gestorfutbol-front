@@ -17,8 +17,8 @@ const PlantillaPage = ({ props }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [activeCampaign, setActiveCampaign] = useState(null);
   const [campaigns, setCampaigns] = useState(null);
-  const [categories, setCategories] = useState(null);
-  const [selectedCategoria, setSelectedCategoria] = useState(null);
+  const [equips, setEquips] = useState(null);
+  const [selectedEquip, setSelectedEquip] = useState(null);
   const [tabMenuItems, setTabMenuItems] = useState([]);
   const [subActiveIndex, setSubActiveIndex] = useState(0);
 
@@ -53,10 +53,10 @@ const PlantillaPage = ({ props }) => {
 
   useEffect(() => {
     if (activeCampaign !== null) {
-      gestorfutbolService.getCategories(activeCampaign).then((data) => {
+      gestorfutbolService.getEquips(activeCampaign).then((data) => {
         let results = data.data;
-        setCategories(results);
-        setSelectedCategoria(results[0]);
+        setEquips(results);
+        setSelectedEquip(results[0]);
       });
     }
   }, [activeCampaign]);
@@ -97,14 +97,14 @@ const PlantillaPage = ({ props }) => {
   };
 
   const categoriaProps = {
-    id: "categoria",
-    label: t("t.selecciona.categoria"),
-    value: selectedCategoria ? selectedCategoria.id : null,
+    id: "equip",
+    label: t("t.selecciona.equip"),
+    value: selectedEquip ? selectedEquip.id : null,
     onChange: (e) => {
-      let category = categories.find((c) => c.id === e.value);
-      setSelectedCategoria(category);
+      let category = equips.find((c) => c.id === e.value);
+      setSelectedEquip(category);
     },
-    options: categories,
+    options: equips,
     optionLabel: "nom",
     optionValue: "id",
     className: "w-auto",
@@ -119,7 +119,7 @@ const PlantillaPage = ({ props }) => {
       </div>
       <TabMenuComponent props={subTabMenu}></TabMenuComponent>
       <CampanyaContext.Provider
-        value={{ activeCampaign, setActiveCampaign, selectedCategoria }}
+        value={{ activeCampaign, setActiveCampaign, selectedEquip }}
       >
         {renderContenido()}
       </CampanyaContext.Provider>
