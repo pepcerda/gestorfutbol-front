@@ -449,6 +449,7 @@ const MensualitatsPage = ({ props }) => {
   const [mensualitats, setMensualitats] = useState(null);
   const [mensualitat, setMensualitat] = useState(null);
   const [estatsPagament, setEstatsPagament] = useState(null);
+  const [categories, setCategories] = useState(null);
   const [equips, setEquips] = useState(null);
   const [selectedEquip, setSelectedEquip] = useState(null);
 
@@ -494,11 +495,19 @@ const MensualitatsPage = ({ props }) => {
 
   useEffect(() => {
     if (activeCampaign !== null) {
-      gestorfutbolService.getEquips(activeCampaign).then((data) => {
-        let results = data.data;
-        setEquips(results);
-        setSelectedEquip(results[0]);
-      });
+      gestorfutbolService
+        .getCategories(activeCampaign)
+        .then((data) => {
+          let results = data.data;
+          setCategories(results);
+        })
+        .then(() => {
+          gestorfutbolService.getEquips(activeCampaign).then((data) => {
+            let results = data.data;
+            setEquips(results);
+            setSelectedEquip(results[0]);
+          });
+        });
     }
   }, [activeCampaign]);
 
@@ -517,9 +526,7 @@ const MensualitatsPage = ({ props }) => {
             if (m.nomines && m.nomines.length > 0) {
               const apiFilterMembres = {
                 campanyaActiva: activeCampaign,
-                equipActiu: selectedEquip
-                  ? selectedEquip.id
-                  : null,
+                equipActiu: selectedEquip ? selectedEquip.id : null,
                 ids: m.nomines.map((n) => n.membre),
               };
 
@@ -568,6 +575,19 @@ const MensualitatsPage = ({ props }) => {
     },
   };
 
+  const groupedEquips = () => {
+    if (categories == null) return [];
+
+    let grups = categories.map((c) => {
+      return {
+        label: c.nom,
+        items: c.equips,
+      };
+    });
+
+    return grups;
+  };
+
   const cancelFormButton = {
     icon: "pi pi-times",
     className: "basicbutton-outlined me-2",
@@ -588,13 +608,16 @@ const MensualitatsPage = ({ props }) => {
     label: t("t.selecciona.equip"),
     value: selectedEquip ? selectedEquip.id : null,
     onChange: (e) => {
-      let category = equips.find((c) => c.id === e.value);
-      setSelectedEquip(category);
+      let equip = equips.find((c) => c.id === e.value);
+      setSelectedEquip(equip);
     },
-    options: equips,
+    options: groupedEquips(),
     optionLabel: "nom",
     optionValue: "id",
-    className: "w-auto",
+    className: "w-60",
+    optionGroupLabel: "label",
+    optionGroupChildren: "items",
+    filter: true,
   };
 
   const saveNomines = (data) => {
@@ -611,9 +634,7 @@ const MensualitatsPage = ({ props }) => {
             if (m.nomines && m.nomines.length > 0) {
               const apiFilterMembres = {
                 campanyaActiva: activeCampaign,
-                equipActiu: selectedEquip
-                  ? selectedEquip.id
-                  : null,
+                equipActiu: selectedEquip ? selectedEquip.id : null,
                 ids: m.nomines.map((n) => n.membre),
               };
 
@@ -721,14 +742,13 @@ const MensualitatsPage = ({ props }) => {
                 let tableProps = null;
 
                 const tableHeader = () => {
-
                   var totalNominesMes = m.nomines.reduce((total, nomina) => {
                     if (nomina.estatPagament === "PAGADA") {
                       return total + nomina.quantitat;
                     } else {
                       return total;
                     }
-                  }, 0); 
+                  }, 0);
 
                   return (
                     <div className="table-header-container d-flex flex-column flex-md-row gap-3">

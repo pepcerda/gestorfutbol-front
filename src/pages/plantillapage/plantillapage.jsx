@@ -18,6 +18,7 @@ const PlantillaPage = ({ props }) => {
   const [activeCampaign, setActiveCampaign] = useState(null);
   const [campaigns, setCampaigns] = useState(null);
   const [equips, setEquips] = useState(null);
+  const [categories, setCategories] = useState(null);
   const [selectedEquip, setSelectedEquip] = useState(null);
   const [tabMenuItems, setTabMenuItems] = useState([]);
   const [subActiveIndex, setSubActiveIndex] = useState(0);
@@ -53,11 +54,19 @@ const PlantillaPage = ({ props }) => {
 
   useEffect(() => {
     if (activeCampaign !== null) {
-      gestorfutbolService.getEquips(activeCampaign).then((data) => {
-        let results = data.data;
-        setEquips(results);
-        setSelectedEquip(results[0]);
-      });
+      gestorfutbolService
+        .getCategories(activeCampaign)
+        .then((data) => {
+          let results = data.data;
+          setCategories(results);
+        })
+        .then(() => {
+          gestorfutbolService.getEquips(activeCampaign).then((data) => {
+            let results = data.data;
+            setEquips(results);
+            setSelectedEquip(results[0]);
+          });
+        });
     }
   }, [activeCampaign]);
 
@@ -96,18 +105,34 @@ const PlantillaPage = ({ props }) => {
     },
   };
 
-  const categoriaProps = {
+  const groupedEquips = () => {
+    if (categories == null) return [];
+
+    let grups = categories.map((c) => {
+      return {
+        label: c.nom,
+        items: c.equips,
+      };
+    });
+
+    return grups;
+  };
+
+  const equipProps = {
     id: "equip",
     label: t("t.selecciona.equip"),
     value: selectedEquip ? selectedEquip.id : null,
     onChange: (e) => {
-      let category = equips.find((c) => c.id === e.value);
-      setSelectedEquip(category);
+      let equip = equips.find((c) => c.id === e.value);
+      setSelectedEquip(equip);
     },
-    options: equips,
+    options: groupedEquips(),
     optionLabel: "nom",
     optionValue: "id",
-    className: "w-auto",
+    className: "w-60",
+    optionGroupLabel: "label",
+    optionGroupChildren: "items",
+    filter: true,
   };
 
   return (
@@ -115,7 +140,7 @@ const PlantillaPage = ({ props }) => {
       <PageTitle props={{ title: `${t("t.plantilla")}` }}></PageTitle>
       <TabMenuComponent props={tabMenu}></TabMenuComponent>
       <div className="d-flex gap-4 align-items-center mb-3 mt-3">
-        <SelectOneMenu props={categoriaProps}></SelectOneMenu>
+        <SelectOneMenu props={equipProps}></SelectOneMenu>
       </div>
       <TabMenuComponent props={subTabMenu}></TabMenuComponent>
       <CampanyaContext.Provider

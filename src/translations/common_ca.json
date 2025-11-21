@@ -155,6 +155,7 @@
   "t.data.factura": "Data factura",
   "t.nom.comercial": "Nom comercial",
   "t.proveidor": "Proveïdor",
-  "t.concepte": "Concepte"
+  "t.concepte": "Concepte",
+  "t.selecciona.equip": "Seleccioni l'equip"
 
 }

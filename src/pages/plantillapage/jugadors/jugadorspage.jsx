@@ -319,6 +319,23 @@ const JugadorsPage = ({ props }) => {
     gestorfutbolService.saveJugador(newData).then(() => loadLazyData());
   };
 
+  
+const onRowClick = (e) => {
+    const groupKey = e.data.posicio;  // El campo por el que agrupas
+
+    let newExpandedRows = { ...(expandedRows || {}) };
+
+    if (newExpandedRows[groupKey]) {
+        // Si ya está expandido → colapsar
+        delete newExpandedRows[groupKey];
+    } else {
+        // Expandir
+        newExpandedRows[groupKey] = true;
+    }
+
+    setExpandedRows(newExpandedRows);
+};
+
   const headerTemplate = (data) => {
     return (
       <React.Fragment>
@@ -360,6 +377,7 @@ const JugadorsPage = ({ props }) => {
     expandableRowGroups: true,
     expandedRows: expandedRows,
     onRowToggle: (e) => setExpandedRows(e.data),
+    onRowClick: onRowClick,
   };
 
   const saveJugador = (data) => {

@@ -291,7 +291,7 @@ const CategoriasPage = ({ props }) => {
     );
   };
 
-
+  
   const tableProps = {
     data: tipoSocis,
     selectedData: selectedCategoria,
@@ -390,7 +390,6 @@ const CategoriasPage = ({ props }) => {
         <BasicButton props={deleteButton}></BasicButton>
       </div>
       <div className="row mt-3">
-
         <TableNoRespComponent props={tableProps}></TableNoRespComponent>
       </div>
       <Dialog
