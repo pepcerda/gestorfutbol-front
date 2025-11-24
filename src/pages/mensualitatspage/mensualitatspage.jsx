@@ -245,7 +245,11 @@ const NominaDataForm = ({ props }) => {
               const dataPagamentCalc = (value) => {
                 let dateString = value;
                 let dateMomentObject = moment(dateString);
-                return dateMomentObject.toDate();
+                if (value !== null) {
+                  return dateMomentObject.toDate();
+                } else {
+                  return new Date();
+                }
               };
 
               const nomProps = {

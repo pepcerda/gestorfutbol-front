@@ -245,8 +245,10 @@ const FacturaDataForm = ({ props }) => {
     let dateMomentObject = moment(dateString);
     if (captureDialog.consulta) {
       return dateMomentObject.format("DD-MM-YYYY");
-    } else {
+    } else if(dateString!==null){
       return dateMomentObject.toDate();
+    } else {
+      return new Date();
     }
   };
 

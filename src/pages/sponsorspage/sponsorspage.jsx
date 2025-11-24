@@ -47,7 +47,11 @@ const FilterDataForm = ({ props }) => {
   const dataDonacioCalc = (value) => {
     let dateString = value;
     let dateMomentObject = moment(dateString, "YYYY-MM-DD");
-    return dateMomentObject.toDate();
+    if (value !== null) {
+      return dateMomentObject.toDate();
+    } else {
+      return new Date();
+    }
   };
 
   const cifProps = {
@@ -525,7 +529,11 @@ const SponsorsPage = ({ props }) => {
   const logoBodyTemplate = (sponsor) => {
     if (sponsor.logo) {
       return (
-        <a href={process.env.REACT_APP_URI_BACK + sponsor.logo} target="_blank">
+        <a
+          href={process.env.REACT_APP_URI_BACK + sponsor.logo}
+          target="_blank"
+          rel="noreferrer"
+        >
           {t("t.document")}
         </a>
       );

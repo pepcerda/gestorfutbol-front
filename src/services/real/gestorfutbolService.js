@@ -299,6 +299,7 @@ export const gestorfutbolService = {
   },
 
   saveCaixaFixa(caixaFixa, file) {
+    
     const formData = new FormData();
     formData.append("file", file);
     formData.append(

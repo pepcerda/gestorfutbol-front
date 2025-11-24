@@ -12,6 +12,35 @@
     color: var(--white-color);
 }
 
+/* Bordes redondeados para toda la tabla */
+.table-component.p-datatable-table {
+    border-collapse: separate; /* Necesario para que border-radius funcione */
+    border-spacing: 0;
+    border-radius: 8px; /* Ajusta el valor según lo que quieras */
+    overflow: hidden; /* Evita que las esquinas se vean cuadradas */
+    border: 1px solid #ddd; /* Opcional: borde suave */
+}
+
+.table-component .p-datatable-header {
+    border-radius: 5px;
+}
+
+/* Encabezado con esquinas redondeadas */
+.table-component .p-datatable-thead tr:first-child th:first-child {
+    border-top-left-radius: 8px;
+}
+.table-component .p-datatable-thead tr:first-child th:last-child {
+    border-top-right-radius: 8px;
+}
+
+/* Opcional: filas con bordes suaves */
+.table-component .p-datatable-tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 8px;
+}
+.table-component .p-datatable-tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 8px;
+}
+
 .table-paginator .p-dropdown-items {
     padding: 0 !important;
 }

@@ -168,15 +168,17 @@ const FacturaDataForm = ({ props }) => {
     event.options.clear();
   };
 
-    const dataDespesaCalc = (value) => {
-      let dateString = value;
-      let dateMomentObject = moment(dateString);
-      if (captureDialog.consulta) {
-        return dateMomentObject.format("DD-MM-YYYY");
-      } else {
-        return dateMomentObject.toDate();
-      }
-    };
+  const dataDespesaCalc = (value) => {
+    let dateString = value;
+    let dateMomentObject = moment(dateString);
+    if (captureDialog.consulta) {
+      return dateMomentObject.format("DD-MM-YYYY");
+    } else if (value !== null) {
+      return dateMomentObject.toDate();
+    } else {
+      return new Date();
+    }
+  };
 
   const nomProps = {
     id: "nom",
@@ -234,20 +236,20 @@ const FacturaDataForm = ({ props }) => {
     disabled: captureDialog.consulta,
   };
 
-  const dataDespesaProps = {
-    id: "dataDonacio",
+  const dataFacturaProps = {
+    id: "dataFactura",
     label: `${t("t.data.despesa")}`,
-    value: dataDespesaCalc(formikFactura.values.dataDonacio),
+    value: dataDespesaCalc(formikFactura.values.dataFactura),
     view: "date",
     dateFormat: "dd/mm/yy",
     onChange: (e) => {
-      formikFactura.setFieldValue("dataDespesa", e.target.value);
+      formikFactura.setFieldValue("dataFactura", e.target.value);
     },
     classNameError: `${
-      isFormFieldInvalid("dataDespesa") ? "formcalendar-invalid" : ""
+      isFormFieldInvalid("dataFactura") ? "formcalendar-invalid" : ""
     }`,
     labelClassName: `${
-      isFormFieldInvalid("dataDespesa") ? "form-text-invalid" : ""
+      isFormFieldInvalid("dataFactura") ? "form-text-invalid" : ""
     }`,
     disabled: captureDialog.consulta,
   };
@@ -314,12 +316,12 @@ const FacturaDataForm = ({ props }) => {
         <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
           {!captureDialog.consulta ? (
             <>
-              <FormCalendar props={dataDespesaProps} />
+              <FormCalendar props={dataFacturaProps} />
               <br />
-              {getFormErrorMessage("dataDonacio")}
+              {getFormErrorMessage("dataFactura")}
             </>
           ) : (
-            <FormInputText props={dataDespesaProps}></FormInputText>
+            <FormInputText props={dataFacturaProps}></FormInputText>
           )}
         </div>
         <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
@@ -386,7 +388,7 @@ const CaixaFixaPage = ({ props }) => {
     llinatge1: "",
     llinatge2: "",
     despesa: 0,
-    dataDespesa: null,
+    dataFactura: null,
     observacio: "",
     factura: "",
     estat: null,
@@ -479,15 +481,42 @@ const CaixaFixaPage = ({ props }) => {
     }
   };
 
-  const facturaBodyTemplate = (factura) => {
+  const dataDespesaBody = (rowData) => {
+    // Crear objeto Date
+    const fecha = new Date(rowData.dataFactura);
+
+    // Obtener día, mes y año
+    const dia = String(fecha.getDate()).padStart(2, "0");
+    const mes = String(fecha.getMonth() + 1).padStart(2, "0"); // Los meses van de 0 a 11
+    const anio = fecha.getFullYear();
+
+    // Formatear como dd/mm/yyyy
+    const fechaFormateada = `${dia}/${mes}/${anio}`;
+
     return (
-      <a
-        href={process.env.REACT_APP_URI_BACK + factura.factura}
-        target="_blank"
-      >
-        {t("t.document")}
-      </a>
+      <>
+        {viewWidth <= 900 ? (
+          <span className="fw-bold">{t("t.data.despesa")}</span>
+        ) : (
+          <></>
+        )}
+        <span>{fechaFormateada}</span>
+      </>
     );
+  };
+
+  const facturaBodyTemplate = (factura) => {
+    if (factura.factura) {
+      return (
+        <a
+          href={process.env.REACT_APP_URI_BACK + factura.factura}
+          target="_blank"
+          rel="noreferrer"
+        >
+          {t("t.document")}
+        </a>
+      );
+    }
   };
 
   const textEditor = (options) => {
@@ -543,33 +572,63 @@ const CaixaFixaPage = ({ props }) => {
     );
   };
 
+  const calendarEditor = (options) => {
+    let dateString = options.value;
+    let dateMomentObject = moment(dateString, "YYYY-MM-DD");
+    let dateObject = dateMomentObject.toDate();
+
+    const calendarProps = {
+      value: dateObject,
+      dateFormat: "dd/mm/yy",
+      view: "date",
+      onChange: (e) => {
+        options.editorCallback(
+          moment(e.target.value).format("YYYY-MM-DD").toString()
+        );
+      },
+    };
+    return <FormCalendar props={calendarProps} />;
+  };
+
   const tableColumns = [
-    { field: "id", header: `${t("t.id")}` },
+    { field: "id", header: `${t("t.id")}`, sortable: true },
     {
       field: "nom",
       header: `${t("t.name")}`,
       editor: (options) => textEditor(options),
+      sortable: true,
     },
     {
       field: "llinatge1",
       header: `${t("t.surname1")}`,
       editor: (options) => textEditor(options),
+      sortable: true,
     },
     {
       field: "llinatge2",
       header: `${t("t.surname2")}`,
       editor: (options) => textEditor(options),
+      sortable: true,
     },
     {
       field: "despesa",
       header: `${t("t.despesa")}`,
       editor: (options) => numberEditor(options),
+      sortable: true,
+    },
+    {
+      field: "dataFactura",
+      header: `${t("t.data.despesa")}`,
+      editor: (options) => calendarEditor(options),
+      body: dataDespesaBody,
+      sortable: true,
     },
     {
       field: "estat",
       header: `${t("t.payment.state")}`,
       body: estatPagamentBodyTemplate,
       editor: (options) => opcionsEditor(options),
+      sortable: true,
     },
     {
       field: "observacio",
@@ -709,8 +768,6 @@ const CaixaFixaPage = ({ props }) => {
     }
   }, [campaigns]);
 
-
-
   useEffect(() => {
     if (location.state?.filtre) {
       filterFactura(location.state.filtre);
@@ -727,6 +784,8 @@ const CaixaFixaPage = ({ props }) => {
       pageNum: lazyState.page,
       pageSize: lazyState.rows,
       campanyaActiva: activeCampaign,
+      sortField: lazyState.sortField,
+      sortOrder: lazyState.sortOrder,
       filters: lazyState.filters,
     };
 
@@ -751,6 +810,11 @@ const CaixaFixaPage = ({ props }) => {
   const onRowEditComplete = (e) => {
     let { newData, index } = e;
     gestorfutbolService.saveCaixaFixa(newData).then(() => loadLazyData());
+  };
+
+  const onSort = (event) => {
+    event.page = lazyState.page;
+    setlazyState(event);
   };
 
   const tableHeader = () => {
@@ -793,7 +857,7 @@ const CaixaFixaPage = ({ props }) => {
     onPage: (e) => setlazyState(e),
     totalRecords: totalRecords,
     first: lazyState.first,
-    onSort: (e) => setlazyState(e),
+    onSort: onSort,
     sortOrder: lazyState.sortOrder,
     sortField: lazyState.sortField,
     editMode: "row",
@@ -826,6 +890,7 @@ const CaixaFixaPage = ({ props }) => {
       llinatge1: formikFactura.values.llinatge1,
       llinatge2: formikFactura.values.llinatge2,
       despesa: formikFactura.values.despesa,
+      dataFactura: formikFactura.values.dataFactura,
       observacio: formikFactura.values.observacio,
       estat: formikFactura.values.estat,
       factura: formikFactura.values.factura,
@@ -919,7 +984,7 @@ const CaixaFixaPage = ({ props }) => {
       llinatge1: selectedFactura.llinatge1,
       llinatge2: selectedFactura.llinatge2,
       despesa: selectedFactura.despesa,
-      dataDespesa: selectedFactura.dataDespesa,
+      dataFactura: selectedFactura.dataFactura,
       observacio: selectedFactura.observacio,
       factura: selectedFactura.factura,
       facturaFile: null,

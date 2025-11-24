@@ -40,7 +40,11 @@ const FilterDataForm = ({ props }) => {
   const dataDonacioCalc = (value) => {
     let dateString = value;
     let dateMomentObject = moment(dateString, "YYYY-MM-DD");
-    return dateMomentObject.toDate();
+    if (value !== null) {
+      return dateMomentObject.toDate();
+    } else {
+      return new Date();
+    }
   };
 
   const nomProps = {
@@ -378,32 +382,37 @@ const MembersPage = ({ props }) => {
   };
 
   const tableColumns = [
-    { field: "idSoci", header: `${t("t.num.soci")}` },
+    { field: "idSoci", header: `${t("t.num.soci")}`, sortable: true },
     {
       field: "nom",
       header: `${t("t.name")}`,
       editor: (options) => textEditor(options),
+      sortable: true,
     },
     {
       field: "llinatge1",
       header: `${t("t.surname1")}`,
       editor: (options) => textEditor(options),
+      sortable: true,
     },
     {
       field: "llinatge2",
       header: `${t("t.surname2")}`,
       editor: (options) => textEditor(options),
+      sortable: true,
     },
     {
       field: "estatPagament",
       header: `${t("t.payment.state")}`,
       body: estatPagamentBodyTemplate,
       editor: (options) => opcionsEditor(options),
+      sortable: true,
     },
     {
       field: "tipoSoci.nom",
       header: `${t("t.tipo.soci")}`,
       editor: (options) => tipoSocisEditor(options),
+      sortable: true,
     },
     { rowEditor: true },
   ];
@@ -625,6 +634,11 @@ const MembersPage = ({ props }) => {
     gestorfutbolService.saveMember(newData).then(() => loadLazyData());
   };
 
+  const onSort = (event) => {
+    event.page = lazyState.page;
+    setlazyState(event);
+  };
+
   const tableHeader = () => {
     return (
       <div className="table-header-container d-flex flex-column flex-md-row gap-3">
@@ -672,7 +686,7 @@ const MembersPage = ({ props }) => {
     },
     totalRecords: totalRecords,
     first: lazyState.first,
-    onSort: (e) => setlazyState(e),
+    onSort: onSort,
     sortOrder: lazyState.sortOrder,
     sortField: lazyState.sortField,
     editMode: "row",
