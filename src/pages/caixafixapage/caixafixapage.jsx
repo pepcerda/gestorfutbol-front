@@ -27,6 +27,8 @@ import imageCompression from "browser-image-compression";
 import { ContextMenu } from "primereact/contextmenu";
 import { Card } from "primereact/card";
 import { Sidebar } from "primereact/sidebar";
+import * as xlsx from "xlsx";
+import * as module from "file-saver";
 import moment from "moment";
 import { explotacioDadesService } from "../../services/real/explotacioDadesService";
 import { useLocation } from "react-router-dom";
@@ -45,12 +47,12 @@ const FilterDataForm = ({ props }) => {
     return dateMomentObject.toDate();
   };
 
-  const nomProps = {
-    id: "nom",
-    label: `${t("t.name")}`,
-    value: formikFilters.values.nom,
+  const nomCompletProps = {
+    id: "nomComplet",
+    label: `${t("t.nom.complet")}`,
+    value: formikFilters.values.nomComplet,
     onChange: (e) => {
-      formikFilters.setFieldValue("nom", e.target.value);
+      formikFilters.setFieldValue("nomComplet", e.target.value);
     },
   };
 
@@ -79,7 +81,7 @@ const FilterDataForm = ({ props }) => {
     <>
       <div className="row">
         <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
-          <FormInputText props={nomProps}></FormInputText>
+          <FormInputText props={nomCompletProps}></FormInputText>
         </div>
         <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
           <FormInputText props={observacioProps}></FormInputText>
@@ -739,6 +741,56 @@ const CaixaFixaPage = ({ props }) => {
     },
   };
 
+  const exportButton = {
+    icon: "pi pi-file-excel",
+    className: "circular-btn",
+    onClick: () => {
+      exportExcel();
+    },
+    tooltip: `${t("t.exporta")}`,
+    tooltipOptions: {
+      position: "bottom",
+    },
+  };
+
+  const exportExcel = () => {
+    let apiFilter = {
+      pageNum: lazyState.page,
+      pageSize: lazyState.rows,
+      campanyaActiva: activeCampaign,
+      sortField: lazyState.sortField,
+      sortOrder: lazyState.sortOrder,
+      filters: lazyState.filters,
+    };
+
+    gestorfutbolService.getAllCaixesFixes(apiFilter).then((data) => {
+      const worksheet = xlsx.utils.json_to_sheet(data.data);
+      const workbook = { Sheets: { data: worksheet }, SheetNames: ["data"] };
+      const excelBuffer = xlsx.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+
+      saveAsExcelFile(excelBuffer, "tiquets");
+    });
+  };
+
+  const saveAsExcelFile = (buffer, fileName) => {
+    if (module && module.default) {
+      let EXCEL_TYPE =
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+      let EXCEL_EXTENSION = ".xlsx";
+      const data = new Blob([buffer], {
+        type: EXCEL_TYPE,
+      });
+
+      module.default.saveAs(
+        data,
+        fileName + "_export_" + new Date().getTime() + EXCEL_EXTENSION
+      );
+    }
+  };
+
   useEffect(() => {
     let results;
     gestorfutbolService.getAllCampaigns().then((data) => {
@@ -913,9 +965,9 @@ const CaixaFixaPage = ({ props }) => {
         matchMode: "contains",
       };
     }
-    if (data.nom) {
-      facturaFilters.nom = {
-        value: data.nom,
+    if (data.nomComplet) {
+      facturaFilters.nomComplet = {
+        value: data.nomComplet,
         matchMode: "contains",
       };
     }
@@ -1018,7 +1070,7 @@ const CaixaFixaPage = ({ props }) => {
   const formikFilters = useFormik({
     initialValues: {
       observacio: emptyFactura.observacio,
-      nom: emptyFactura.nom,
+      nom: emptyFactura.nomComplet,
       despesa: emptyFactura.donacio,
       estatPagament: emptyFactura.estatPagament,
     },
@@ -1040,6 +1092,7 @@ const CaixaFixaPage = ({ props }) => {
       <div className="row justify-content-between align-items-start flex-wrap">
         <div className="col-12 col-xl-auto mb-3 mb-xl-0 d-flex flex-wrap gap-2 justify-content-center justify-content-xl-end">
           <BasicButton props={filterButton} />
+          <BasicButton props={exportButton} />
         </div>
         <div className="col-12 col-xl-auto d-flex flex-wrap gap-2 justify-content-center justify-content-xl-end">
           <BasicButton props={newButton}></BasicButton>

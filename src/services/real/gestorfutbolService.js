@@ -283,6 +283,21 @@ export const gestorfutbolService = {
     return response;
   },
 
+  getAllCaixesFixes(filter) {
+    const axiosConfig = {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    };
+    var response = apiClient.post(
+      "/caixes-fixes-all",
+      JSON.stringify(filter),
+      axiosConfig
+    );
+    return response;
+  },
+
   getCaixesFixes(filter) {
     const axiosConfig = {
       headers: {
@@ -314,6 +329,22 @@ export const gestorfutbolService = {
 
   deleteCaixaFixa(id) {
     var response = apiClient.delete("/caixa-fixa/" + id);
+    return response;
+  },
+
+  getAllFacturas(filter) {
+    const axiosConfig = {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    };
+
+    var response = apiClient.post(
+      "/factures-all",
+      JSON.stringify(filter),
+      axiosConfig
+    );
     return response;
   },
 

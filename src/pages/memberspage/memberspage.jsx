@@ -47,12 +47,12 @@ const FilterDataForm = ({ props }) => {
     }
   };
 
-  const nomProps = {
-    id: "nom",
-    label: `${t("t.name")}`,
-    value: formikFilters.values.nom,
+  const nomCompletProps = {
+    id: "nomComplet",
+    label: `${t("t.nom.complet")}`,
+    value: formikFilters.values.nomComplet,
     onChange: (e) => {
-      formikFilters.setFieldValue("nom", e.target.value);
+      formikFilters.setFieldValue("nomComplet", e.target.value);
     },
   };
 
@@ -87,7 +87,7 @@ const FilterDataForm = ({ props }) => {
     <>
       <div className="row">
         <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
-          <FormInputText props={nomProps}></FormInputText>
+          <FormInputText props={nomCompletProps}></FormInputText>
         </div>
         <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
           <SelectOneMenu props={estatPagamentProps}></SelectOneMenu>
@@ -709,9 +709,9 @@ const MembersPage = ({ props }) => {
 
   const filterMember = (data) => {
     let sponsorFilters = {};
-    if (data.nom) {
-      sponsorFilters.nom = {
-        value: data.nom,
+    if (data.nomComplet) {
+      sponsorFilters.nomComplet = {
+        value: data.nomComplet,
         matchMode: "contains",
       };
     }
@@ -785,7 +785,7 @@ const MembersPage = ({ props }) => {
 
   const formikFilters = useFormik({
     initialValues: {
-      nom: emptyMember.nom,
+      nom: emptyMember.nomComplet,
       estatPagament: emptyMember.estatPagament,
       tipoSoci: emptyMember.tipoSoci,
     },

@@ -28,6 +28,8 @@ import { ContextMenu } from "primereact/contextmenu";
 import { Card } from "primereact/card";
 import { Sidebar } from "primereact/sidebar";
 import moment from "moment";
+import * as xlsx from "xlsx";
+import * as module from "file-saver";
 import { explotacioDadesService } from "../../services/real/explotacioDadesService";
 import { useLocation } from "react-router-dom";
 
@@ -665,36 +667,43 @@ const FacturaPage = ({ props }) => {
   };
 
   const tableColumns = [
-    { field: "id", header: `${t("t.id")}` },
+    { field: "id", header: `${t("t.id")}`, sortable: true },
     {
       field: "proveidor.nom",
       header: `${t("t.proveidor")}`,
+      sortable: true,
     },
     {
       field: "proveidor.nomComercial",
       header: `${t("t.nom.comercial")}`,
+      sortable: true,
     },
     {
       field: "dataFactura",
       header: `${t("t.data.factura")}`,
       body: dataFacturaBody,
+      sortable: true,
     },
     {
       field: "categoriaDespesa.nom",
       header: `${t("t.categoria.despesa")}`,
+      sortable: true,
     },
     {
       field: "concepte",
       header: `${t("t.concepte")}`,
+      sortable: true,
     },
     {
       field: "despesa",
       header: `${t("t.despesa")}`,
+      sortable: true,
     },
     {
       field: "estatPagament",
       header: `${t("t.payment.state")}`,
       body: estatPagamentBodyTemplate,
+      sortable: true,
     },
     {
       field: "document",
@@ -799,6 +808,56 @@ const FacturaPage = ({ props }) => {
     },
   };
 
+  const exportButton = {
+    icon: "pi pi-file-excel",
+    className: "circular-btn",
+    onClick: () => {
+      exportExcel();
+    },
+    tooltip: `${t("t.exporta")}`,
+    tooltipOptions: {
+      position: "bottom",
+    },
+  };
+
+  const exportExcel = () => {
+    let apiFilter = {
+      pageNum: lazyState.page,
+      pageSize: lazyState.rows,
+      campanyaActiva: activeCampaign,
+      sortField: lazyState.sortField,
+      sortOrder: lazyState.sortOrder,
+      filters: lazyState.filters,
+    };
+
+    gestorfutbolService.getAllFacturas(apiFilter).then((data) => {
+      const worksheet = xlsx.utils.json_to_sheet(data.data);
+      const workbook = { Sheets: { data: worksheet }, SheetNames: ["data"] };
+      const excelBuffer = xlsx.write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+
+      saveAsExcelFile(excelBuffer, "socis");
+    });
+  };
+
+  const saveAsExcelFile = (buffer, fileName) => {
+    if (module && module.default) {
+      let EXCEL_TYPE =
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+      let EXCEL_EXTENSION = ".xlsx";
+      const data = new Blob([buffer], {
+        type: EXCEL_TYPE,
+      });
+
+      module.default.saveAs(
+        data,
+        fileName + "_export_" + new Date().getTime() + EXCEL_EXTENSION
+      );
+    }
+  };
+
   useEffect(() => {
     let results;
     gestorfutbolService.getAllCampaigns().then((data) => {
@@ -853,6 +912,8 @@ const FacturaPage = ({ props }) => {
       pageNum: lazyState.page,
       pageSize: lazyState.rows,
       campanyaActiva: activeCampaign,
+      sortField: lazyState.sortField,
+      sortOrder: lazyState.sortOrder,
       filters: lazyState.filters,
     };
 
@@ -877,6 +938,11 @@ const FacturaPage = ({ props }) => {
   const onRowEditComplete = (e) => {
     let { newData, index } = e;
     gestorfutbolService.saveFactura(newData).then(() => loadLazyData());
+  };
+
+  const onSort = (event) => {
+    event.page = lazyState.page;
+    setlazyState(event);
   };
 
   const tableHeader = () => {
@@ -919,7 +985,7 @@ const FacturaPage = ({ props }) => {
     onPage: (e) => setlazyState(e),
     totalRecords: totalRecords,
     first: lazyState.first,
-    onSort: (e) => setlazyState(e),
+    onSort: onSort,
     sortOrder: lazyState.sortOrder,
     sortField: lazyState.sortField,
     editMode: "row",
@@ -1118,6 +1184,7 @@ const FacturaPage = ({ props }) => {
       <div className="row justify-content-between align-items-start flex-wrap">
         <div className="col-12 col-xl-auto mb-3 mb-xl-0 d-flex flex-wrap gap-2 justify-content-center justify-content-xl-end">
           <BasicButton props={filterButton} />
+          <BasicButton props={exportButton} />
         </div>
         <div className="col-12 col-xl-auto d-flex flex-wrap gap-2 justify-content-center justify-content-xl-end">
           <BasicButton props={newButton}></BasicButton>
