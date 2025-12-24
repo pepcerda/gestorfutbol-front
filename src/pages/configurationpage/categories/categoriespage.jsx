@@ -161,12 +161,15 @@ const CategoriasPage = ({ props }) => {
   };
 
   const tableColumns = [
-    { field: "id", header: `${t("t.id")}` },
+    { 
+      field: "id", 
+      header: `${t("t.id")}`
+    },
     {
       field: "nom",
       header: `${t("t.name")}`,
-      editor: (options) => textEditor(options),
-    }
+      editor: (options) => textEditor(options)
+    },
   ];
 
   const accept = () => {
@@ -275,7 +278,6 @@ const CategoriasPage = ({ props }) => {
     gestorfutbolService.saveCategoria(newData).then(() => loadLazyData());
   };
 
-  
   const allowExpansion = (rowData) => {
     return rowData.equips.length > 0;
   };
@@ -284,14 +286,13 @@ const CategoriasPage = ({ props }) => {
     return (
       <div className="p-3">
         <DataTable value={data.equips}>
-          <Column field="id" header={t('t.id')} sortable></Column>
-          <Column field="nom" header={t('t.name')} sortable></Column>
+          <Column field="id" header={t("t.id")} sortable></Column>
+          <Column field="nom" header={t("t.name")} sortable></Column>
         </DataTable>
       </div>
     );
   };
 
-  
   const tableProps = {
     data: tipoSocis,
     selectedData: selectedCategoria,

@@ -84,11 +84,16 @@ const CategoriaDespesasPage = ({ props }) => {
   };
 
   const tableColumns = [
-    { field: "id", header: `${t("t.id")}` },
+    { 
+      field: "id", 
+      header: `${t("t.id")}`,
+      sortable: true,
+    },
     {
       field: "nom",
       header: `${t("t.name")}`,
       editor: (options) => textEditor(options),
+      sortable: true,
     },
     { rowEditor: true },
   ];
@@ -142,7 +147,9 @@ const CategoriaDespesasPage = ({ props }) => {
     
     let apiFilter = {
       pageNum: lazyState.page,
-      pageSize: lazyState.rows
+      pageSize: lazyState.rows,
+      sortField: lazyState.sortField,
+      sortOrder: lazyState.sortOrder,
     };
 
     gestorfutbolService.getCategoriaDespesa(apiFilter).then((data) => {
@@ -155,6 +162,11 @@ const CategoriaDespesasPage = ({ props }) => {
   const onRowEditComplete = (e) => {
     let { newData, index } = e;
     gestorfutbolService.saveCategoriaDespesa(newData).then(() => loadLazyData());
+  };
+
+  const onSort = (event) => {
+    event.page = lazyState.page;
+    setlazyState(event);
   };
 
   const tableProps = {
@@ -181,7 +193,7 @@ const CategoriaDespesasPage = ({ props }) => {
     onPage: (e) => setlazyState(e),
     totalRecords: totalRecords,
     first: lazyState.first,
-    onSort: (e) => setlazyState(e),
+    onSort: onSort,
     sortOrder: lazyState.sortOrder,
     sortField: lazyState.sortField,
     editMode: "row",
