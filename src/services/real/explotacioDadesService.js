@@ -55,6 +55,11 @@ export const explotacioDadesService = {
     getDadesExplotacioNomines(idCampanya) {
         var response = apiClient.get("/explotacio-nomines/" + idCampanya);
         return response;
+    },
+
+    getDadesExplotacioQuotes(idCampanya, idEquip) {
+        var response = apiClient.get("/explotacio-quotes/" + idCampanya + "/" + idEquip);
+        return response;
     }
 
 }

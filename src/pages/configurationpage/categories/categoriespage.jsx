@@ -437,7 +437,6 @@ const CategoriasPage = ({ props }) => {
         visible={captureDialog}
         header={t("t.nova.categoria").toUpperCase()}
         onHide={hideDialog}
-        style={{ width: "50vw" }}
       >
         <form onSubmit={formikCategoria.handleSubmit}>
           <CategoriaContext.Provider

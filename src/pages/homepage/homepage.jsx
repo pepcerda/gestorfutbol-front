@@ -354,19 +354,19 @@ const HomePage = ({ props }) => {
     content: <DespesesModul />,
   };
 
-  const utilitatsCard = {
-    title: `${t("t.utilitats")}`,
-    content: <UtilitatsModul />,
-  };
+  // const utilitatsCard = {
+  //   title: `${t("t.utilitats")}`,
+  //   content: <UtilitatsModul />,
+  // };
 
   return (
     <>
       <PageTitle props={{ title: `${t("t.inici")}` }}></PageTitle>
-      <div className="row mt-3">
+      {/* <div className="row mt-3">
         <div className="col-12">
           <DataCard props={utilitatsCard}></DataCard>
         </div>
-      </div>
+      </div> */}
       <div className="row mt-5">
         <form onSubmit={formikMenu.handleSubmit}>
           <div className="col-12 col-md-5 form-group text-center text-md-start mt-3 mt-md-0">

@@ -116,7 +116,7 @@ const PlantillaPage = ({ props }) => {
     <div className="container p-2 p-xl-4">
       <PageTitle props={{ title: `${t("t.plantilla")}` }}></PageTitle>
       <TabMenuComponent props={tabMenu}></TabMenuComponent>
-      <div className="d-flex gap-4 align-items-center mb-3 mt-3">
+      <div className="d-flex flex-column flex-md-row gap-2 gap-md-4 align-items-center mb-3 mt-3">
         <SelectOneMenu props={equipProps}></SelectOneMenu>
       </div>
       <TabMenuComponent props={subTabMenu}></TabMenuComponent>
