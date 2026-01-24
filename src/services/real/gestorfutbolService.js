@@ -476,6 +476,8 @@ export const gestorfutbolService = {
     return response;
   },
 
+
+
   getEntrenadors(filter) {
     const axiosConfig = {
       headers: {
@@ -548,8 +550,44 @@ export const gestorfutbolService = {
     return response;
   },
 
-  getPosicions() {
+  getPosicions(filter) {
+    const axiosConfig = {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    };
+
+    var response = apiClient.post(
+      "/posicions",
+      JSON.stringify(filter),
+      axiosConfig
+    );
+    return response;
+  },
+
+  getAllPosicions() {
     var response = apiClient.get("/posicions");
+    return response;
+  },
+
+  savePosicio(posicio) {
+    const axiosConfig = {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    };
+    var response = apiClient.post(
+      "/posicio",
+      JSON.stringify(posicio),
+      axiosConfig
+    );
+    return response;
+  },
+
+  deletePosicio(id) {
+    var response = apiClient.delete("/posicio/" + id);
     return response;
   },
 
@@ -738,4 +776,52 @@ export const gestorfutbolService = {
     var response = apiClient.get("/equips/" + idCampanya);
     return response;
   },
+
+  getQuotasJugadors(filter) {
+    const axiosConfig = {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    };
+    var response = apiClient.post(
+      "/quota-jugadors",
+      JSON.stringify(filter),
+      axiosConfig
+    );
+    return response;
+  },
+
+  getAllQuotasJugadors(filter) {
+    const axiosConfig = {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    };
+    var response = apiClient.post(
+      "/quota-jugadors-all",
+      JSON.stringify(filter),
+      axiosConfig
+    );
+    return response;
+  },
+  saveQuotaJugador(quotaJugador) {
+    const axiosConfig = {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    };
+    var response = apiClient.post(
+      "/quota-jugador",
+      JSON.stringify(quotaJugador), 
+      axiosConfig
+    );
+    return response;
+  },
+  deleteQuotaJugador(id) {
+    var response = apiClient.delete("/quota-jugador/" + id);
+    return response;
+  }
 };

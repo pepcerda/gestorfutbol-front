@@ -14,8 +14,47 @@ import SelectOneMenu from "../../../components/selectonemenu/selectonemenu";
 import { CampanyaContext } from "../plantillapage";
 import React from "react";
 import moment from "moment";
+import { Panel } from "primereact/panel";
+import { Card } from "primereact/card";
+import { Sidebar } from "primereact/sidebar";
 
 const JugadorContext = createContext();
+const FiltraContext = createContext();
+
+const FilterDataForm = ({ props }) => {
+  const { t, i18n } = useTranslation("common");
+  const { formikFilters, tipoSocis } = useContext(FiltraContext);
+  const opcionsPagament = gestorfutbolService.getOpcionsPagament();
+
+  const dataDonacioCalc = (value) => {
+    let dateString = value;
+    let dateMomentObject = moment(dateString, "YYYY-MM-DD");
+    if (value !== null) {
+      return dateMomentObject.toDate();
+    } else {
+      return new Date();
+    }
+  };
+
+  const nomCompletProps = {
+    id: "nomComplet",
+    label: `${t("t.nom.complet")}`,
+    value: formikFilters.values.nomComplet,
+    onChange: (e) => {
+      formikFilters.setFieldValue("nomComplet", e.target.value);
+    },
+  };
+
+  return (
+    <>
+      <div className="row">
+        <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
+          <FormInputText props={nomCompletProps}></FormInputText>
+        </div>
+      </div>
+    </>
+  );
+};
 
 const JugadorsDataForm = ({ props }) => {
   const { t, i18n } = useTranslation("common");
@@ -33,6 +72,12 @@ const JugadorsDataForm = ({ props }) => {
     ) : (
       <small className="form-text-invalid">&nbsp;</small>
     );
+  };
+
+  const dataNaixamentCalc = (value) => {
+    let dateString = value;
+    let dateMomentObject = moment(dateString);
+    return dateMomentObject.toDate();
   };
 
   const nomProps = {
@@ -73,7 +118,7 @@ const JugadorsDataForm = ({ props }) => {
   const dataNaixementProps = {
     id: "dataNaixement",
     label: `${t("t.data.naixement")}`,
-    value: formikJugador.values.dataNaixement,
+    value: dataNaixamentCalc(formikJugador.values.dataNaixement),
     view: "date",
     dateFormat: "dd/mm/yy",
     onChange: (e) => {
@@ -90,17 +135,42 @@ const JugadorsDataForm = ({ props }) => {
   const posicioProps = {
     id: "posicio",
     label: `${t("t.posicio")}`,
-    value: formikJugador.values.posicio,
+    value: formikJugador.values.posicio.id,
     onChange: (e) => {
-      formikJugador.setFieldValue("posicio", e.target.value);
+      formikJugador.setFieldValue(
+        "posicio",
+        posicions.find((p) => p.id === e.value)
+      );
     },
     options: posicions,
-    optionLabel: "descripcion",
-    optionValue: "name",
+    optionLabel: "valor",
+    optionValue: "id",
     classNameError: `${isFormFieldInvalid("posicio") ? "invalid-select" : ""}`,
     labelClassName: `${
       isFormFieldInvalid("posicio") ? "form-text-invalid" : ""
     }`,
+  };
+
+  const addRow = () => {
+    const newRow = {
+      id: null,
+      nom: "",
+      email: "",
+      telefon: "",
+    };
+    formikJugador.setFieldValue("contactes", [
+      ...formikJugador.values.contactes,
+      newRow,
+    ]);
+  };
+
+  const addButton = {
+    icon: "pi pi-plus",
+    onClick: addRow,
+    type: "button",
+    className: "circular-btn basicbutton",
+    tooltip: t("t.afegeix.contacte"),
+    tooltipOptions: { position: "top" },
   };
 
   return (
@@ -126,6 +196,66 @@ const JugadorsDataForm = ({ props }) => {
           <SelectOneMenu props={posicioProps}></SelectOneMenu>
           {getFormErrorMessage("posicio")}
         </div>
+
+        <Panel header={t("t.contactes").toUpperCase()} className="mt-4">
+          <div className="row">
+            {formikJugador.values.contactes &&
+              formikJugador.values.contactes.map((c, index) => {
+                const nomContacteProps = {
+                  id: `nomContacte${index}`,
+                  label: `${t("t.name")}`,
+                  value: formikJugador.values.contactes[index].nom,
+                  onChange: (e) => {
+                    let contactes = formikJugador.values.contactes;
+                    contactes[index].nom = e.target.value;
+                    formikJugador.setFieldValue("contactes", contactes);
+                  },
+                };
+
+                const emailContacteProps = {
+                  id: `emailContacte${index}`,
+                  label: `${t("t.email")}`,
+                  value: formikJugador.values.contactes[index].email,
+                  onChange: (e) => {
+                    let contactes = formikJugador.values.contactes;
+                    contactes[index].email = e.target.value;
+                    formikJugador.setFieldValue("contactes", contactes);
+                  },
+                };
+
+                const telefonContacteProps = {
+                  id: `telefonContacte${index}`,
+                  label: `${t("t.telefon")}`,
+                  value: formikJugador.values.contactes[index].telefon,
+                  onChange: (e) => {
+                    let contactes = formikJugador.values.contactes;
+                    contactes[index].telefon = e.target.value;
+                    formikJugador.setFieldValue("contactes", contactes);
+                  },
+                };
+
+                return (
+                  <>
+                    <div className="col-12 col-md-4 form-group text-center text-md-start mt-3 mt-md-0">
+                      <FormInputText props={nomContacteProps}></FormInputText>
+                    </div>
+                    <div className="col-12 col-md-4 form-group text-center text-md-start mt-3 mt-md-0">
+                      <FormInputText props={emailContacteProps}></FormInputText>
+                    </div>
+                    <div className="col-12 col-md-4 form-group text-center text-md-start mt-3 mt-md-0">
+                      <FormInputText
+                        props={telefonContacteProps}
+                      ></FormInputText>
+                    </div>
+                  </>
+                );
+              })}
+
+            <div className="col-12 form-group text-center text-md-start mt-3">
+              <BasicButton props={addButton}></BasicButton>
+            </div>
+          </div>
+        </Panel>
       </div>
     </>
   );
@@ -139,9 +269,9 @@ const JugadorsPage = ({ props }) => {
   const [captureDialog, setCaptureDialog] = useState(false);
   const [deleteFlag, setDeleteFlag] = useState(false);
   const [campaigns, setCampaigns] = useState(null);
-  const { activeCampaign, setActiveCampaign, selectedEquip } = useContext(CampanyaContext);
+  const { activeCampaign, setActiveCampaign, selectedEquip } =
+    useContext(CampanyaContext);
   const [posicions, setPosicions] = useState([]);
-  const [expandedRows, setExpandedRows] = useState([]);
 
   let emptyJugador = {
     id: null,
@@ -152,6 +282,7 @@ const JugadorsPage = ({ props }) => {
     llinatge2: "",
     dataNaixement: null,
     posicio: "",
+    contactes: [],
   };
   const [selectedJugador, setSelectedJugador] = useState(emptyJugador);
   const [lazyState, setlazyState] = useState({
@@ -161,6 +292,8 @@ const JugadorsPage = ({ props }) => {
     sortOrder: null,
     sortField: null,
   });
+
+  const [filterVisible, setFilterVisible] = useState(false);
 
   const textEditor = (options) => {
     const textProps = {
@@ -173,7 +306,6 @@ const JugadorsPage = ({ props }) => {
 
   const calendarEditor = (options) => {
     let dateString = options.value;
-    console.log(dateString);
     let dateMomentObject = moment(dateString, "YYYY-MM-DD");
     let dateObject = dateMomentObject.toDate();
 
@@ -215,27 +347,36 @@ const JugadorsPage = ({ props }) => {
   };
 
   const tableColumns = [
-    { field: "id", header: `${t("t.jugador")}` },
+    { field: "id", header: `${t("t.jugador")}`, sortable: true },
     {
       field: "nom",
       header: `${t("t.name")}`,
       editor: (options) => textEditor(options),
+      sortable: true,
     },
     {
       field: "llinatge1",
       header: `${t("t.surname1")}`,
       editor: (options) => textEditor(options),
+      sortable: true,
     },
     {
       field: "llinatge2",
       header: `${t("t.surname2")}`,
       editor: (options) => textEditor(options),
+      sortable: true,
     },
     {
       field: "dataNaixement",
       header: `${t("t.data.naixement")}`,
       body: dataNaixementBody,
       editor: (options) => calendarEditor(options),
+      sortable: true,
+    },
+    {
+      field: "posicio.valor",
+      header: `${t("t.posicio")}`,
+      sortable: true,
     },
   ];
 
@@ -287,10 +428,59 @@ const JugadorsPage = ({ props }) => {
     },
   };
 
+  const editButton = {
+    icon: "pi pi-pencil",
+    className: "circular-btn",
+    onClick: () => {
+      setCaptureDialog(true);
+    },
+    tooltip: `${t("t.edita")}`,
+    tooltipOptions: {
+      position: "bottom",
+    },
+    disabled: selectedJugador.id === null,
+  };
+
+  const filterButton = {
+    icon: "pi pi-filter",
+    className: "circular-btn",
+    onClick: () => {
+      setFilterVisible(!filterVisible);
+    },
+    tooltip: `${t("t.filtra")}`,
+    tooltipOptions: {
+      position: "bottom",
+    },
+  };
+
+  const cercaFormButton = {
+    icon: "pi pi-search",
+    label: `${t("t.search")}`,
+    type: "submit",
+    className: "p-2 rounded-2 mx-2",
+    onClick: () => {
+      if (viewWidth < process.env.REACT_APP_XL_VW) setFilterVisible(false);
+    },
+  };
+
+  const netejaFormButton = {
+    className: "p-2 rounded-2 mx-2",
+    label: `${t("t.neteja")}`,
+    type: "button",
+    onClick: () => {
+      formikFilters.resetForm();
+      setlazyState((prevState) => ({
+        ...prevState,
+        filters: null,
+      }));
+      setFilterVisible(false);
+    },
+  };
+
   useEffect(() => {
-    gestorfutbolService.getPosicions().then((data) => {
+    gestorfutbolService.getAllPosicions().then((data) => {
       let results = data.data;
-      results.map((r) => (r.descripcion = t(`t.pos.${r.name}`)));
+      //results.map((r) => (r.descripcion = t(`t.pos.${r.name}`)));
       setPosicions(results);
     });
   }, []);
@@ -306,6 +496,9 @@ const JugadorsPage = ({ props }) => {
       pageSize: lazyState.rows,
       campanyaActiva: activeCampaign,
       equipActiu: selectedEquip ? selectedEquip.id : null,
+      sortField: lazyState.sortField,
+      sortOrder: lazyState.sortOrder,
+      filters: lazyState.filters,
     };
 
     gestorfutbolService.getJugadors(apiFilter).then((data) => {
@@ -319,31 +512,9 @@ const JugadorsPage = ({ props }) => {
     gestorfutbolService.saveJugador(newData).then(() => loadLazyData());
   };
 
-  
-const onRowClick = (e) => {
-    const groupKey = e.data.posicio;  // El campo por el que agrupas
-
-    let newExpandedRows = { ...(expandedRows || {}) };
-
-    if (newExpandedRows[groupKey]) {
-        // Si ya está expandido → colapsar
-        delete newExpandedRows[groupKey];
-    } else {
-        // Expandir
-        newExpandedRows[groupKey] = true;
-    }
-
-    setExpandedRows(newExpandedRows);
-};
-
-  const headerTemplate = (data) => {
-    return (
-      <React.Fragment>
-        <span className="vertical-align-middle ml-2 line-height-3 fw-bold">
-          {t(`t.pos.${data.posicio.valor}`)}
-        </span>
-      </React.Fragment>
-    );
+  const onSort = (event) => {
+    event.page = lazyState.page;
+    setlazyState(event);
   };
 
   const tableProps = {
@@ -364,29 +535,47 @@ const onRowClick = (e) => {
     onPage: (e) => setlazyState(e),
     totalRecords: totalRecords,
     first: lazyState.first,
-    sortOrder: 1,
-    sortField: "posicio.valor",
-    sortMode: "single",
+    onSort: onSort,
+    sortOrder: lazyState.sortOrder,
+    sortField: lazyState.sortField,
     editMode: "row",
     onRowEditComplete: onRowEditComplete,
     rowEditor: true,
     stripedRows: true,
-    rowGroupMode: "subheader",
-    groupRowsBy: "posicio",
-    rowGroupHeaderTemplate: headerTemplate,
-    expandableRowGroups: true,
-    expandedRows: expandedRows,
-    onRowToggle: (e) => setExpandedRows(e.data),
-    onRowClick: onRowClick,
   };
 
   const saveJugador = (data) => {
-    data.posicio = posicions.find((p) => p.name === data.posicio);
+    if (selectedJugador.id) {
+      data.id = selectedJugador.id;
+      data.equip = selectedJugador.equip;
+    }
+
+    const filtered = data.contactes.filter(
+      (c) =>
+        c.nom.trim() !== "" || c.email.trim() !== "" || c.telefon.trim() !== ""
+    );
+
+    data.contactes = filtered;
 
     gestorfutbolService.saveJugador(data).then(() => {
       setCaptureDialog(false);
       loadLazyData();
     });
+  };
+
+  const filterJugador = (data) => {
+    let jugadorFilters = {};
+    if (data.nomComplet) {
+      jugadorFilters.nomComplet = {
+        value: data.nomComplet,
+        matchMode: "contains",
+      };
+    }
+
+    setlazyState((prevState) => ({
+      ...prevState,
+      filters: jugadorFilters,
+    }));
   };
 
   const hideDialog = () => {
@@ -417,6 +606,7 @@ const onRowClick = (e) => {
       posicio: selectedJugador.posicio,
       campanya: activeCampaign,
       equip: selectedJugador.equip ? selectedJugador.equip.id : null,
+      contactes: selectedJugador.contactes ? selectedJugador.contactes : [],
     },
     enableReinitialize: true,
     validate: (data) => {
@@ -430,7 +620,7 @@ const onRowClick = (e) => {
       if (!data.posicio) {
         errors.posicio = t("t.empty.field");
       }
-      if(!data.dataNaixement){
+      if (!data.dataNaixement) {
         errors.dataNaixement = t("t.empty.field");
       }
       return errors;
@@ -440,13 +630,59 @@ const onRowClick = (e) => {
     },
   });
 
+  const formikFilters = useFormik({
+    initialValues: {
+      nomComplet: "",
+    },
+    enableReinitialize: true,
+    validate: (data) => {
+      let errors = {};
+      return errors;
+    },
+    onSubmit: (data) => {
+      filterJugador(data);
+    },
+  });
+
   return (
     <div className="container p-2 p-xl-4">
       <ConfirmPopup />
-      <div className="row gap-3 justify-content-center justify-content-xl-end">
-        <BasicButton props={newButton}></BasicButton>
-        <BasicButton props={deleteButton}></BasicButton>
+      <div className="row justify-content-between align-items-start flex-wrap">
+        <div className="col-12 col-xl-auto mb-3 mb-xl-0 d-flex flex-wrap gap-2 justify-content-center justify-content-xl-end">
+          <BasicButton props={filterButton} />
+        </div>
+
+        <div className="col-12 col-xl-auto d-flex flex-wrap gap-2 justify-content-center justify-content-xl-end">
+          <BasicButton props={newButton} />
+          <BasicButton props={editButton} />
+          <BasicButton props={deleteButton} />
+        </div>
       </div>
+      {filterVisible && viewWidth > process.env.REACT_APP_XL_VW ? (
+        <Card className="mt-3">
+          <form onSubmit={formikFilters.handleSubmit}>
+            <FiltraContext.Provider value={{ formikFilters }}>
+              <FilterDataForm />
+            </FiltraContext.Provider>
+            <div className="p-dialog-footer pb-0 mt-5">
+              <BasicButton props={cercaFormButton} />
+              <BasicButton props={netejaFormButton} />
+            </div>
+          </form>
+        </Card>
+      ) : (
+        <Sidebar visible={filterVisible} onHide={() => setFilterVisible(false)}>
+          <form onSubmit={formikFilters.handleSubmit}>
+            <FiltraContext.Provider value={{ formikFilters }}>
+              <FilterDataForm />
+            </FiltraContext.Provider>
+            <div className="p-dialog-footer pb-0 mt-5 text-center">
+              <BasicButton props={cercaFormButton} />
+              <BasicButton props={netejaFormButton} />
+            </div>
+          </form>
+        </Sidebar>
+      )}
       <div className="row mt-3">
         <TableComponent props={tableProps}></TableComponent>
       </div>

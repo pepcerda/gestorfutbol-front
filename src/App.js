@@ -19,6 +19,7 @@ import PlantillaPage from "./pages/plantillapage/plantillapage";
 import MensualitatsPage from "./pages/mensualitatspage/mensualitatspage";
 import { QueryClient, useQuery } from "@tanstack/react-query";
 import FacturaPage from "./pages/facturespage/facturespage";
+import QuotaJugadorsPage from "./pages/quotajugadorspage/quotajugadorspage";
 
 export const ConfigContext = createContext();
 
@@ -121,6 +122,10 @@ function App() {
               <Route
                 path={"/mensualitats"}
                 element={<MensualitatsPage />}
+              ></Route>
+              <Route
+                path={"/quotes-jugadors"}
+                element={<QuotaJugadorsPage />}
               ></Route>
               <Route path={"*"} element={<NotFoundPage />}></Route>
             </Route>

@@ -157,6 +157,13 @@
   "t.proveidor": "Proveïdor",
   "t.concepte": "Concepte",
   "t.selecciona.equip": "Seleccioni l'equip",
-  "t.nom.complet": "Nom complet"
+  "t.nom.complet": "Nom complet",
+  "t.valor": "Valor",
+  "t.posicions": "Posicions",
+  "t.delegat.camp": "Delegat de camp",
+  "t.equips": "Equips",
+  "t.quota": "Quota",
+  "t.quotes.jugadors": "Quotes jugadors",
+  "t.excepcio": "Excepció"
 
 }

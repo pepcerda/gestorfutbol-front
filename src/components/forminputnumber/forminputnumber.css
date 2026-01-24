@@ -3,9 +3,9 @@
     display: block;
 }
 
-.form-inputnumber input {
+/* .form-inputnumber input {
     width: 100% !important;
-}
+} */
 
 .inputnumber-label {
     color: var(--main-color);

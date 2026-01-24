@@ -2,7 +2,7 @@ import "./categoriespage.css";
 import { useTranslation } from "react-i18next";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
-import { useFormik } from "formik";
+import { getIn, useFormik } from "formik";
 import BasicButton from "../../../components/basicbutton/basicbutton";
 import TableComponent from "../../../components/tablecomponent/tablecomponent";
 import { Dialog } from "primereact/dialog";
@@ -15,6 +15,7 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import TableNoRespComponent from "../../../components/tablenorespcomponent/tablenorespcomponent";
 import { all } from "axios";
+import FormInputNumber from "../../../components/forminputnumber/forminputnumber";
 
 const CategoriaContext = createContext();
 
@@ -28,12 +29,15 @@ const CategoriaDataForm = ({ props }) => {
   const [data, setData] = useState(formikCategoria.values.equips);
 
   const isFormFieldInvalid = (name) =>
-    !!(formikCategoria.touched[name] && formikCategoria.errors[name]);
+    !!(
+      getIn(formikCategoria.touched, name) &&
+      getIn(formikCategoria.errors, name)
+    );
 
   const getFormErrorMessage = (name) => {
     return isFormFieldInvalid(name) ? (
       <small className="form-text-invalid">
-        {formikCategoria.errors[name]}
+        {getIn(formikCategoria.errors, name)}
       </small>
     ) : (
       <small className="form-text-invalid">&nbsp;</small>
@@ -55,6 +59,7 @@ const CategoriaDataForm = ({ props }) => {
     const newRow = {
       id: null,
       nom: "",
+      quota: null,
       categoria: selectedCategoria.id,
     };
     formikCategoria.setFieldValue("equips", [
@@ -83,23 +88,55 @@ const CategoriaDataForm = ({ props }) => {
           <div className="row">
             {formikCategoria.values.equips &&
               formikCategoria.values.equips.map((c, index) => {
+                const nameEquip = `equips[${index}].nom`;
+
                 const nomEquipProps = {
                   id: `nomEquip${index}`,
                   label: `${t("t.name")}`,
-                  value: formikCategoria.values.equips[index].nom,
+                  value: getIn(formikCategoria.values, nameEquip) ?? "",
                   onChange: (e) => {
-                    let equips = formikCategoria.values.equips;
-                    equips[index].nom = e.target.value;
-                    formikCategoria.setFieldValue("equips", equips);
+                    const value = e?.target?.value ?? e?.value ?? e; // según tu componente
+                    formikCategoria.setFieldValue(nameEquip, value);
                   },
+                  classNameError: isFormFieldInvalid(nameEquip)
+                    ? "invalid-inputtext"
+                    : "",
+                  labelClassName: isFormFieldInvalid(nameEquip)
+                    ? "form-text-invalid"
+                    : "",
+                };
+
+                // dentro del map de equips:
+                const nameQuota = `equips[${index}].quota`;
+
+                const quotaProps = {
+                  id: `quota${index}`,
+                  label: `${t("t.quota")}`,
+                  value: getIn(formikCategoria.values, nameQuota) ?? null,
+                  onValueChange: (e) => {
+                    formikCategoria.setFieldValue(nameQuota, e.target.value);
+                  },
+                  mode: "currency",
+                  currency: "EUR",
+                  classNameError: isFormFieldInvalid(nameQuota)
+                    ? "invalid-inputnumber"
+                    : "",
+                  labelClassName: isFormFieldInvalid(nameQuota)
+                    ? "form-text-invalid"
+                    : "",
                 };
 
                 return (
-                  <>
-                    <div className="col-12 form-group text-center text-md-start mt-3 mt-md-0">
+                  <div className="row w-100 p-2 mb-3">
+                    <div className="col-12 col-md-8 form-group text-center text-md-start mt-3 mt-md-0">
                       <FormInputText props={nomEquipProps}></FormInputText>
+                      {getFormErrorMessage(nameEquip)}
                     </div>
-                  </>
+                    <div className="col-12 col-md-4 form-group text-center text-md-start mt-3 mt-md-0">
+                      <FormInputNumber props={quotaProps}></FormInputNumber>
+                      {getFormErrorMessage(nameQuota)}
+                    </div>
+                  </div>
                 );
               })}
 
@@ -161,15 +198,15 @@ const CategoriasPage = ({ props }) => {
   };
 
   const tableColumns = [
-    { 
-      field: "id", 
-      header: `${t("t.id")}`
+    {
+      field: "id",
+      header: `${t("t.id")}`,
     },
     {
       field: "nom",
-      header: `${t("t.name")}`,
-      editor: (options) => textEditor(options)
+      header: `${t("t.name")}`
     },
+
   ];
 
   const accept = () => {
@@ -282,12 +319,20 @@ const CategoriasPage = ({ props }) => {
     return rowData.equips.length > 0;
   };
 
+  const currencyTemplate = (rowData) => {
+    return `${rowData.quota.toLocaleString("es-ES", {
+      style: "currency",
+      currency: "EUR",
+    })}`; 
+  };
+
   const rowExpansionTemplate = (data) => {
     return (
       <div className="p-3">
         <DataTable value={data.equips}>
           <Column field="id" header={t("t.id")} sortable></Column>
           <Column field="nom" header={t("t.name")} sortable></Column>
+          <Column field="quota" header={t("t.quota")} sortable body={currencyTemplate}></Column>
         </DataTable>
       </div>
     );
@@ -335,7 +380,6 @@ const CategoriasPage = ({ props }) => {
     const filtered = data.equips.filter((c) => c.nom.trim() !== "");
 
     data.equips = filtered;
-
     gestorfutbolService.saveCategoria(data).then(() => {
       setCaptureDialog(false);
       loadLazyData();
@@ -372,6 +416,27 @@ const CategoriasPage = ({ props }) => {
       let errors = {};
       if (!data.nom) {
         errors.nom = t("t.empty.field");
+      }
+
+      if (data.equips && data.equips.length > 0) {
+        data.equips.forEach((c, index) => {
+          const itemErr = {};
+
+          if (!c.nom?.trim()) {
+            itemErr.nom = t("t.empty.field");
+          }
+          if (c.quota == null) {
+            itemErr.quota = t("t.empty.field");
+          }
+
+          if (Object.keys(itemErr).length > 0) {
+            if (!errors.equips) errors.equips = [];
+            errors.equips[index] = {
+              ...(errors.equips[index] || {}),
+              ...itemErr,
+            };
+          }
+        });
       }
 
       return errors;

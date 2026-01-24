@@ -700,7 +700,6 @@ const MembersPage = ({ props }) => {
   };
 
   const saveMember = (data) => {
-    console.log(data);
     gestorfutbolService.saveMember(data).then(() => {
       setCaptureDialog(false);
       loadLazyData();
