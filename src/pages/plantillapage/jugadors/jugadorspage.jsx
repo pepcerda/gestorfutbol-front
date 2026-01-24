@@ -11,12 +11,13 @@ import { ConfigContext } from "../../../App";
 import { gestorfutbolService } from "../../../services/real/gestorfutbolService";
 import FormCalendar from "../../../components/formcalendar/formcalendar";
 import SelectOneMenu from "../../../components/selectonemenu/selectonemenu";
-import { CampanyaContext } from "../plantillapage";
+import { EquipContext } from "../plantillapage";
 import React from "react";
 import moment from "moment";
 import { Panel } from "primereact/panel";
 import { Card } from "primereact/card";
 import { Sidebar } from "primereact/sidebar";
+import { useActiveCampaign } from "../../../hooks/campaignHook";
 
 const JugadorContext = createContext();
 const FiltraContext = createContext();
@@ -268,14 +269,20 @@ const JugadorsPage = ({ props }) => {
   const [totalRecords, setTotalRecords] = useState(0);
   const [captureDialog, setCaptureDialog] = useState(false);
   const [deleteFlag, setDeleteFlag] = useState(false);
-  const [campaigns, setCampaigns] = useState(null);
-  const { activeCampaign, setActiveCampaign, selectedEquip } =
-    useContext(CampanyaContext);
+  const { selectedEquip } = useContext(EquipContext);
+    const {
+    campaigns,
+    tabMenuItems,
+    activeIndex,
+    setActiveByIndex,
+    activeCampaign,
+    activeCampaignId,
+  } = useActiveCampaign();
   const [posicions, setPosicions] = useState([]);
 
   let emptyJugador = {
     id: null,
-    campanya: activeCampaign,
+    campanya: activeCampaignId,
     equip: selectedEquip,
     nom: "",
     llinatge1: "",
@@ -494,7 +501,7 @@ const JugadorsPage = ({ props }) => {
     let apiFilter = {
       pageNum: lazyState.page,
       pageSize: lazyState.rows,
-      campanyaActiva: activeCampaign,
+      campanyaActiva: activeCampaignId,
       equipActiu: selectedEquip ? selectedEquip.id : null,
       sortField: lazyState.sortField,
       sortOrder: lazyState.sortOrder,
@@ -604,7 +611,7 @@ const JugadorsPage = ({ props }) => {
       llinatge2: selectedJugador.llinatge2,
       dataNaixement: selectedJugador.dataNaixement,
       posicio: selectedJugador.posicio,
-      campanya: activeCampaign,
+      campanya:  activeCampaignId,
       equip: selectedJugador.equip ? selectedJugador.equip.id : null,
       contactes: selectedJugador.contactes ? selectedJugador.contactes : [],
     },

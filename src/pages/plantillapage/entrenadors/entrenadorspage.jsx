@@ -11,9 +11,10 @@ import { ConfigContext } from "../../../App";
 import { gestorfutbolService } from "../../../services/real/gestorfutbolService";
 import FormCalendar from "../../../components/formcalendar/formcalendar";
 import SelectOneMenu from "../../../components/selectonemenu/selectonemenu";
-import { CampanyaContext } from "../plantillapage";
+import { CampanyaContext, EquipContext } from "../plantillapage";
 import React from "react";
 import moment from "moment";
+import { useActiveCampaign } from "../../../hooks/campaignHook";
 
 const EntrenadorContext = createContext();
 
@@ -131,12 +132,21 @@ const EntrenadorsPage = () => {
   const [totalRecords, setTotalRecords] = useState(0);
   const [captureDialog, setCaptureDialog] = useState(false);
   const [deleteFlag, setDeleteFlag] = useState(false);
-  const { activeCampaign, setActiveCampaign, selectedEquip } = useContext(CampanyaContext);
+  const { selectedEquip } = useContext(EquipContext);
+    const {
+    campaigns,
+    tabMenuItems,
+    activeIndex,
+    setActiveByIndex,
+    activeCampaign,
+    activeCampaignId,
+    seasonLabel
+  } = useActiveCampaign();
   const [posicions, setPosicions] = useState([]);
 
   let emptyEntrenador = {
     id: null,
-    campanya: activeCampaign,
+    campanya: activeCampaignId,
     equip: selectedEquip,
     nom: "",
     llinatge1: "",
@@ -291,7 +301,7 @@ const EntrenadorsPage = () => {
     let apiFilter = {
       pageNum: lazyState.page,
       pageSize: lazyState.rows,
-      campanyaActiva: activeCampaign,
+      campanyaActiva: activeCampaignId,
       equipActiu: selectedEquip ? selectedEquip.id : null,
     };
 
@@ -365,7 +375,7 @@ const EntrenadorsPage = () => {
       llinatge2: selectedEntrenador.llinatge2,
       dataNaixement: selectedEntrenador.dataNaixement,
       carrec: selectedEntrenador.carrec,
-      campanya: activeCampaign,
+      campanya: activeCampaignId,
       equip: selectedEntrenador.equip ? selectedEntrenador.equip.id : null
     },
     enableReinitialize: true,

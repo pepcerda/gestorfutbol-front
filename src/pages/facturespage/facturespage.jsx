@@ -32,6 +32,7 @@ import * as xlsx from "xlsx";
 import * as module from "file-saver";
 import { explotacioDadesService } from "../../services/real/explotacioDadesService";
 import { useLocation } from "react-router-dom";
+import { useActiveCampaign } from "../../hooks/campaignHook";
 
 const FacturaContext = createContext();
 const FiltraContext = createContext();
@@ -467,8 +468,15 @@ const FacturaPage = ({ props }) => {
     consulta: false,
   });
   const [deleteFlag, setDeleteFlag] = useState(false);
-  const [campaigns, setCampaigns] = useState(null);
-  const [activeCampaign, setActiveCampaign] = useState(null);
+  const {
+    campaigns,
+    tabMenuItems,
+    activeIndex,
+    setActiveByIndex,
+    activeCampaign,
+    activeCampaignId,
+    seasonLabel
+  } = useActiveCampaign();
   let emptyFactura = {
     id: null,
     campanya: activeCampaign,
@@ -498,8 +506,6 @@ const FacturaPage = ({ props }) => {
     sortField: null,
   });
   const [filterVisible, setFilterVisible] = useState(false);
-
-  const [activeIndex, setActiveIndex] = useState(0);
   const cm = useRef(null);
 
   const emptyDadesFactures = {
@@ -538,15 +544,13 @@ const FacturaPage = ({ props }) => {
     },
   ];
 
-  const [tabMenuItems, setTabMenuItems] = useState(null);
 
   const tabMenu = {
     model: tabMenuItems,
     activeIndex: activeIndex,
     onTabChange: (e) => {
-      setActiveIndex(e.index);
+      setActiveByIndex(e.index);
       let result = campaigns[e.index];
-      setActiveCampaign(result.id);
       setSelectedFactura(emptyFactura);
     },
   };
@@ -824,7 +828,7 @@ const FacturaPage = ({ props }) => {
     let apiFilter = {
       pageNum: lazyState.page,
       pageSize: lazyState.rows,
-      campanyaActiva: activeCampaign,
+      campanyaActiva: activeCampaignId,
       sortField: lazyState.sortField,
       sortOrder: lazyState.sortOrder,
       filters: lazyState.filters,
@@ -860,10 +864,6 @@ const FacturaPage = ({ props }) => {
 
   useEffect(() => {
     let results;
-    gestorfutbolService.getAllCampaigns().then((data) => {
-      results = data.data;
-      setCampaigns(results);
-    });
 
     gestorfutbolService.getEstatsPagament().then((data) => {
       let results = data.data;
@@ -874,27 +874,6 @@ const FacturaPage = ({ props }) => {
       setEstatsPagament(estatsFormatejats);
     });
   }, []);
-
-  useEffect(() => {
-    if (campaigns !== null) {
-      setTabMenuItems(
-        campaigns.map((r) => {
-          return { label: r.titol };
-        })
-      );
-      let year = new Date().getFullYear();
-      let campaign = campaigns.find(
-        (c) => new Date(c.any).getFullYear() === year
-      );
-      if (campaign) {
-        let index = campaigns.findIndex((c) => c.id === campaign.id);
-        setActiveCampaign(campaign.id);
-        setActiveIndex(index);
-      } else {
-        setActiveCampaign(campaigns[0].id);
-      }
-    }
-  }, [campaigns]);
 
   useEffect(() => {
     if (location.state?.filtre) {
@@ -911,7 +890,7 @@ const FacturaPage = ({ props }) => {
     let apiFilter = {
       pageNum: lazyState.page,
       pageSize: lazyState.rows,
-      campanyaActiva: activeCampaign,
+      campanyaActiva: activeCampaignId,
       sortField: lazyState.sortField,
       sortOrder: lazyState.sortOrder,
       filters: lazyState.filters,
@@ -927,7 +906,7 @@ const FacturaPage = ({ props }) => {
       .then(() => {
         if (activeCampaign) {
           explotacioDadesService
-            .getDadesExplotacioFactures(activeCampaign)
+            .getDadesExplotacioFactures(activeCampaignId)
             .then((data) => {
               setDadesFactures(data.data);
             });
@@ -1128,7 +1107,7 @@ const FacturaPage = ({ props }) => {
       facturaFile: null,
       facturaBlob: null,
       estatPagament: selectedFactura.estatPagament,
-      campanya: activeCampaign,
+      campanya: activeCampaignId,
       dataFactura: selectedFactura.dataFactura,
     },
     enableReinitialize: true,

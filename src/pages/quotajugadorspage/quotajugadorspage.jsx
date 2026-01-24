@@ -18,6 +18,7 @@ import { Panel } from "primereact/panel";
 import FormInputNumber from "../../components/forminputnumber/forminputnumber";
 import FormCheckbox from "../../components/formcheckbox/formcheckbox";
 import { Dialog } from "primereact/dialog";
+import { useActiveCampaign } from "../../hooks/campaignHook";
 
 const FiltraContext = createContext();
 const QuotaJugadorContext = createContext();
@@ -318,14 +319,19 @@ const QuotaJugadorsDataForm = ({ props }) => {
 const QuotaJugadorsPage = ({ props }) => {
   const { viewWidth, setViewWidth } = useContext(ConfigContext);
   const { t, i18n } = useTranslation("common");
-  const [activeIndex, setActiveIndex] = useState(0);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [activeCampaign, setActiveCampaign] = useState(null);
-  const [campaigns, setCampaigns] = useState(null);
+    const {
+    campaigns,
+    tabMenuItems,
+    activeIndex,
+    setActiveByIndex,
+    activeCampaign,
+    activeCampaignId,
+    seasonLabel
+  } = useActiveCampaign();
   const [equips, setEquips] = useState(null);
   const [categories, setCategories] = useState(null);
   const [selectedEquip, setSelectedEquip] = useState(null);
-  const [tabMenuItems, setTabMenuItems] = useState([]);
   const [captureDialog, setCaptureDialog] = useState(false);
   const [deleteFlag, setDeleteFlag] = useState(false);
   const [quotesJugadors, setQuotesJugadors] = useState([]);
@@ -335,7 +341,7 @@ const QuotaJugadorsPage = ({ props }) => {
     id: null,
     jugador: {
       id: null,
-      campanya: activeCampaign,
+      campanya: activeCampaignId,
       equip: selectedEquip,
       nom: "",
       llinatge1: "",
@@ -365,10 +371,6 @@ const QuotaJugadorsPage = ({ props }) => {
 
   useEffect(() => {
     let results;
-    gestorfutbolService.getAllCampaigns().then((data) => {
-      results = data.data;
-      setCampaigns(results);
-    });
 
     gestorfutbolService.getEstatsPagament().then((data) => {
       let results = data.data;
@@ -380,37 +382,17 @@ const QuotaJugadorsPage = ({ props }) => {
     });
   }, []);
 
-  useEffect(() => {
-    if (campaigns !== null) {
-      setTabMenuItems(
-        campaigns.map((r) => {
-          return { label: r.titol };
-        })
-      );
-      let year = new Date().getFullYear();
-      let campaign = campaigns.find(
-        (c) => new Date(c.any).getFullYear() === year
-      );
-      if (campaign) {
-        let index = campaigns.findIndex((c) => c.id === campaign.id);
-        setActiveCampaign(campaign.id);
-        setActiveIndex(index);
-      } else {
-        setActiveCampaign(campaigns[0].id);
-      }
-    }
-  }, [campaigns]);
 
   useEffect(() => {
     if (activeCampaign !== null) {
       gestorfutbolService
-        .getCategories(activeCampaign)
+        .getCategories(activeCampaignId)
         .then((data) => {
           let results = data.data;
           setCategories(results);
         })
         .then(() => {
-          gestorfutbolService.getEquips(activeCampaign).then((data) => {
+          gestorfutbolService.getEquips(activeCampaignId).then((data) => {
             let results = data.data;
             setEquips(results);
             setSelectedEquip(results[0]);
@@ -428,7 +410,7 @@ const QuotaJugadorsPage = ({ props }) => {
     let apiFilter = {
       pageNum: lazyState.page,
       pageSize: lazyState.rows,
-      campanyaActiva: activeCampaign,
+      campanyaActiva: activeCampaignId,
       equipActiu: selectedEquip ? selectedEquip.id : null,
       sortField: lazyState.sortField,
       sortOrder: lazyState.sortOrder,
@@ -438,7 +420,6 @@ const QuotaJugadorsPage = ({ props }) => {
     gestorfutbolService.getQuotasJugadors(apiFilter).then((data) => {
       setTotalRecords(data.data.total);
       let results = data.data.result;
-      console.log(results);
       setQuotesJugadors(results);
     });
   };
@@ -447,9 +428,8 @@ const QuotaJugadorsPage = ({ props }) => {
     model: tabMenuItems,
     activeIndex: activeIndex,
     onTabChange: (e) => {
-      setActiveIndex(e.index);
+      setActiveByIndex(e.index);
       let result = campaigns[e.index];
-      setActiveCampaign(result.id);
     },
   };
 

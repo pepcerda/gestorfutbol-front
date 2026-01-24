@@ -11,8 +11,9 @@ import ffiblogo from "../../resources/utilitats/utilitatffib.png";
 import drivelogo from "../../resources/utilitats/utilitatsdrive.png";
 import intranet from "../../resources/utilitats/utilitatintranet.png";
 import { NavLink } from "react-router-dom";
+import { CampaignContext } from "../../App";
+import { useActiveCampaign } from "../../hooks/campaignHook";
 
-const CampanyaContext = createContext();
 
 const UtilitatsModul = ({ props }) => {
   const { t, i18n } = useTranslation("common");
@@ -77,24 +78,24 @@ const IngressosModul = ({ props }) => {
   };
 
   const { t, i18n } = useTranslation("common");
-  const { activeCampaign } = useContext(CampanyaContext);
+  const { activeCampaignId } = useActiveCampaign();
   const [dadesPatrocinis, setDadesPatrocinis] = useState(emptyDadesPatrocinis);
   const [dadesSocis, setDadesSocis] = useState(emptyDadesSocis);
 
   useEffect(() => {
-    if (activeCampaign) {
+    if (activeCampaignId) {
       explotacioDadesService
-        .getDadesExplotacioPatrocinis(activeCampaign)
+        .getDadesExplotacioPatrocinis(activeCampaignId)
         .then((data) => {
           setDadesPatrocinis(data.data);
         });
       explotacioDadesService
-        .getDadesExplotacioSocis(activeCampaign)
+        .getDadesExplotacioSocis(activeCampaignId)
         .then((data) => {
           setDadesSocis(data.data);
         });
     }
-  }, [activeCampaign]);
+  }, [activeCampaignId]);
 
   const patrocinadorsContent = () => {
     return (
@@ -186,31 +187,31 @@ const DespesesModul = ({ props }) => {
   const [dadesCaixaFixa, setDadesCaixaFixa] = useState(emptyDadesFactures);
   const [dadesFactures, setDadesFactures] = useState(emptyDadesFactures);
   const [dadesNomines, setDadesNomines] = useState(emptyDadesNomines);
-  const { activeCampaign } = useContext(CampanyaContext);
+  const { activeCampaignId } = useActiveCampaign();
 
   useEffect(() => {
-    if (activeCampaign) {
-
+    if (activeCampaignId) {
       explotacioDadesService
-        .getDadesExplotacioCaixaFixa(activeCampaign)
+        .getDadesExplotacioCaixaFixa(activeCampaignId)
         .then((data) => {
           setDadesCaixaFixa(data.data);
         });
 
       explotacioDadesService
-        .getDadesExplotacioFactures(activeCampaign)
+        .getDadesExplotacioFactures(activeCampaignId)
         .then((data) => {
           setDadesFactures(data.data);
         });
 
-        explotacioDadesService.getDadesExplotacioNomines(activeCampaign)
+      explotacioDadesService
+        .getDadesExplotacioNomines(activeCampaignId)
         .then((data) => {
-            setDadesNomines(data.data);
-        })
+          setDadesNomines(data.data);
+        });
     }
-  }, [activeCampaign]);
+  }, [activeCampaignId]);
 
-    const caixaFixaContent = () => {
+  const caixaFixaContent = () => {
     return (
       <>
         <p>
@@ -290,7 +291,6 @@ const DespesesModul = ({ props }) => {
     content: nominesContent(),
   };
 
-
   return (
     <div className="row gap-2 gap-md-0">
       <div className="col-12 col-md-6">
@@ -308,47 +308,33 @@ const DespesesModul = ({ props }) => {
 
 const HomePage = ({ props }) => {
   const { t, i18n } = useTranslation("common");
-  const [campaigns, setCampaigns] = useState(null);
-  const [activeCampaign, setActiveCampaign] = useState(null);
+  const {
+    campaigns,
+    tabMenuItems,
+    activeIndex,
+    setActiveByIndex,
+    activeCampaign,
+    activeCampaignId,
+    seasonLabel
+  } = useActiveCampaign();
 
-  useEffect(() => {
-    let results;
-    gestorfutbolService.getAllCampaigns().then((data) => {
-      results = data.data;
-      setCampaigns(results);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (campaigns !== null) {
-      let year = new Date().getFullYear();
-      let campaign = campaigns.find(
-        (c) => new Date(c.any).getFullYear() === year
-      );
-      if (campaign) {
-        let index = campaigns.findIndex((c) => c.id === campaign.id);
-        setActiveCampaign(campaign.id);
-      } else {
-        setActiveCampaign(campaigns[0].id);
-      }
-    }
-  }, [campaigns]);
 
   const formikMenu = useFormik({
     initialValues: {
-      campanya: activeCampaign,
+      campanya: activeCampaignId,
     },
     onSubmit: (data) => {
-      setActiveCampaign(data.campanya);
+      setActiveByIndex(data.campanya);
     },
   });
 
   const campanyaProps = {
     id: "campanya",
     label: `${t("t.campaign")}`,
-    value: activeCampaign,
+    value: activeCampaignId,
     onChange: (e) => {
-      formikMenu.setFieldValue("campanya", e.value);
+      console.log("Canvi campanya:", e.value);
+      formikMenu.setFieldValue("campanya", campaigns.findIndex(c => c.id === e.value));
       formikMenu.handleSubmit();
     },
     options: campaigns,
@@ -388,7 +374,6 @@ const HomePage = ({ props }) => {
           </div>
         </form>
       </div>
-      <CampanyaContext.Provider value={{ activeCampaign }}>
         <div className="row mt-5 gap-2 gap-md-0">
           <div className="col-12 col-md-6">
             <DataCard props={ingressosCard}></DataCard>
@@ -397,7 +382,6 @@ const HomePage = ({ props }) => {
             <DataCard props={despesesCard}></DataCard>
           </div>
         </div>
-      </CampanyaContext.Provider>
     </>
   );
 };

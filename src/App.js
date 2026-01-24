@@ -20,8 +20,10 @@ import MensualitatsPage from "./pages/mensualitatspage/mensualitatspage";
 import { QueryClient, useQuery } from "@tanstack/react-query";
 import FacturaPage from "./pages/facturespage/facturespage";
 import QuotaJugadorsPage from "./pages/quotajugadorspage/quotajugadorspage";
+import { CampaignProvider } from "./hooks/campaignHook";
 
 export const ConfigContext = createContext();
+export const CampaignContext = createContext();
 
 const ConfigLoader = () => {
   const { setLogo, setNom, setColor, setColor1, setColor2 } =
@@ -60,6 +62,7 @@ function App() {
   const [color2, setColor2] = useState("#e8d1d1");
   const [logo, setLogo] = useState(null);
   const [nom, setNom] = useState(null);
+  const [campaigns, setCampaigns] = useState([]);
 
   useEffect(() => {
     function handleResize() {
@@ -70,10 +73,19 @@ function App() {
   }, [viewWidth]);
 
   useEffect(() => {
+    let results;
+    gestorfutbolService.getAllCampaigns().then((data) => {
+      console.log("Campanyes carregades:", data);
+      results = data.data;
+      setCampaigns(results);
+    });
+  }, []);
+
+  useEffect(() => {
     document.documentElement.style.setProperty("--main-color", color);
     document.documentElement.style.setProperty(
       "--gradient-bg",
-      `linear-gradient(265deg, ${color1} 12.56%, ${color2} 63.38%)`
+      `linear-gradient(265deg, ${color1} 12.56%, ${color2} 63.38%)`,
     );
   }, [color, color1, color2]);
 
@@ -101,36 +113,41 @@ function App() {
           setColor2,
         }}
       >
-        {/* 🚀 Carga y cachea la configuración general con React Query */}
-        <ConfigLoader />
-        <Routes>
-          <Route path={"/"} element={<ProtectedPage />}>
-            <Route path={"/"} element={<BackofficePage />}>
-              <Route path={"/"} element={<HomePage />}></Route>
-              <Route path={"/home"} element={<HomePage />}></Route>
-              <Route path={"/campanya"} element={<CampaignPage />}></Route>
-              <Route path={"/socis"} element={<MembersPage />}></Route>
-              <Route path={"/patrocinadors"} element={<SponsorsPage />}></Route>
-              <Route path={"/directiva"} element={<DirectivaPage />}></Route>
-              <Route
-                path={"/configuracio"}
-                element={<ConfigurationPage />}
-              ></Route>
-              <Route path={"/tiquets"} element={<CaixaFixaPage />}></Route>
-              <Route path={"/factures"} element={<FacturaPage />}></Route>
-              <Route path={"/plantilla"} element={<PlantillaPage />}></Route>
-              <Route
-                path={"/mensualitats"}
-                element={<MensualitatsPage />}
-              ></Route>
-              <Route
-                path={"/quotes-jugadors"}
-                element={<QuotaJugadorsPage />}
-              ></Route>
-              <Route path={"*"} element={<NotFoundPage />}></Route>
+        <CampaignProvider campaigns={campaigns} fallbackStrategy="latest">
+          {/* 🚀 Carga y cachea la configuración general con React Query */}
+          <ConfigLoader />
+          <Routes>
+            <Route path={"/"} element={<ProtectedPage />}>
+              <Route path={"/"} element={<BackofficePage />}>
+                <Route path={"/"} element={<HomePage />}></Route>
+                <Route path={"/home"} element={<HomePage />}></Route>
+                <Route path={"/campanya"} element={<CampaignPage />}></Route>
+                <Route path={"/socis"} element={<MembersPage />}></Route>
+                <Route
+                  path={"/patrocinadors"}
+                  element={<SponsorsPage />}
+                ></Route>
+                <Route path={"/directiva"} element={<DirectivaPage />}></Route>
+                <Route
+                  path={"/configuracio"}
+                  element={<ConfigurationPage />}
+                ></Route>
+                <Route path={"/tiquets"} element={<CaixaFixaPage />}></Route>
+                <Route path={"/factures"} element={<FacturaPage />}></Route>
+                <Route path={"/plantilla"} element={<PlantillaPage />}></Route>
+                <Route
+                  path={"/mensualitats"}
+                  element={<MensualitatsPage />}
+                ></Route>
+                <Route
+                  path={"/quotes-jugadors"}
+                  element={<QuotaJugadorsPage />}
+                ></Route>
+                <Route path={"*"} element={<NotFoundPage />}></Route>
+              </Route>
             </Route>
-          </Route>
-        </Routes>
+          </Routes>
+        </CampaignProvider>
       </ConfigContext.Provider>
     </KindeProvider>
   );

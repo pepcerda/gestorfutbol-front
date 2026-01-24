@@ -12,6 +12,7 @@ import TabMenuComponent from "../../../components/tabmenucomponent/tabmenucompon
 import { ConfigContext } from "../../../App";
 import { gestorfutbolService } from "../../../services/real/gestorfutbolService";
 import FormInputNumber from "../../../components/forminputnumber/forminputnumber";
+import { useActiveCampaign } from "../../../hooks/campaignHook";
 
 const TipoSociContext = createContext();
 
@@ -82,8 +83,15 @@ const TipoSocisPage = ({ props }) => {
   const [totalRecords, setTotalRecords] = useState(0);
   const [captureDialog, setCaptureDialog] = useState(false);
   const [deleteFlag, setDeleteFlag] = useState(false);
-  const [campaigns, setCampaigns] = useState(null);
-  const [activeCampaign, setActiveCampaign] = useState(null);
+  const {
+    campaigns,
+    tabMenuItems,
+    activeIndex,
+    setActiveByIndex,
+    activeCampaign,
+    activeCampaignId,
+    seasonLabel
+  } = useActiveCampaign();
   let emptyTipoSoci = {
     id: null,
     nom: "",
@@ -98,16 +106,12 @@ const TipoSocisPage = ({ props }) => {
     sortField: null,
   });
 
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [tabMenuItems, setTabMenuItems] = useState(null);
-
   const tabMenu = {
     model: tabMenuItems,
     activeIndex: activeIndex,
     onTabChange: (e) => {
-      setActiveIndex(e.index);
+      setActiveByIndex(e.index);
       let result = campaigns[e.index];
-      setActiveCampaign(result.id);
       setSelectedTipoSoci(emptyTipoSoci);
     },
   };
@@ -176,34 +180,6 @@ const TipoSocisPage = ({ props }) => {
     },
   };
 
-  useEffect(() => {
-    let results;
-    gestorfutbolService.getAllCampaigns().then((data) => {
-      results = data.data;
-      setCampaigns(results);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (campaigns !== null) {
-      setTabMenuItems(
-        campaigns.map((r) => {
-          return { label: r.titol };
-        })
-      );
-      let year = new Date().getFullYear();
-      let campaign = campaigns.find(
-        (c) => new Date(c.any).getFullYear() === year
-      );
-      if (campaign) {
-        let index = campaigns.findIndex((c) => c.id === campaign.id);
-        setActiveCampaign(campaign.id);
-        setActiveIndex(index);
-      } else {
-        setActiveCampaign(campaigns[0].id);
-      }
-    }
-  }, [campaigns]);
 
   useEffect(() => {
     loadLazyData();
@@ -214,7 +190,7 @@ const TipoSocisPage = ({ props }) => {
     let apiFilter = {
       pageNum: lazyState.page,
       pageSize: lazyState.rows,
-      campanyaActiva: activeCampaign,
+      campanyaActiva: activeCampaignId,
     };
 
     gestorfutbolService.getTipoSoci(apiFilter).then((data) => {
@@ -293,7 +269,7 @@ const TipoSocisPage = ({ props }) => {
     initialValues: {
       nom: selectedTipoSoci.nom,
       cuota: selectedTipoSoci.cuota,
-      campanya: activeCampaign,
+      campanya:  activeCampaignId,
     },
     enableReinitialize: true,
     validate: (data) => {

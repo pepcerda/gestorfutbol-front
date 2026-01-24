@@ -28,6 +28,7 @@ import { Sidebar } from "primereact/sidebar";
 import { useLocation } from "react-router-dom";
 import { explotacioDadesService } from "../../services/real/explotacioDadesService";
 import { ContextMenu } from "primereact/contextmenu";
+import { useActiveCampaign } from "../../hooks/campaignHook";
 
 const MemberContext = createContext();
 const FiltraContext = createContext();
@@ -102,7 +103,7 @@ const FilterDataForm = ({ props }) => {
 
 const MemberDataForm = ({ props }) => {
   const { t, i18n } = useTranslation("common");
-  const { selectedMember, setSelectedMember, formikMember, activeCampaign } =
+  const { selectedMember, setSelectedMember, formikMember, activeCampaignId } =
     useContext(MemberContext);
 
   const [selectCheck, setSelectedCheck] = useState(null);
@@ -110,7 +111,7 @@ const MemberDataForm = ({ props }) => {
   const opcionsPagament = gestorfutbolService.getOpcionsPagament();
 
   useEffect(() => {
-    gestorfutbolService.getAllTipoSocis(activeCampaign).then((data) => {
+    gestorfutbolService.getAllTipoSocis(activeCampaignId).then((data) => {
       let results = data.data;
       setTipoSocis(results);
     });
@@ -235,8 +236,15 @@ const MembersPage = ({ props }) => {
   const [totalRecords, setTotalRecords] = useState(0);
   const [captureDialog, setCaptureDialog] = useState(false);
   const [deleteFlag, setDeleteFlag] = useState(false);
-  const [campaigns, setCampaigns] = useState(null);
-  const [activeCampaign, setActiveCampaign] = useState(null);
+  const {
+    campaigns,
+    tabMenuItems,
+    activeIndex,
+    setActiveByIndex,
+    activeCampaign,
+    activeCampaignId,
+    seasonLabel
+  } = useActiveCampaign();
   const [, forceUpdate] = useReducer((x) => x + 1, 0);
   let emptyMember = {
     id: null,
@@ -247,11 +255,11 @@ const MembersPage = ({ props }) => {
     idSoci: null,
     tipoSoci: {
       id: null,
-      campanya: activeCampaign,
+      campanya: activeCampaignId,
       nom: "",
       cuota: 0,
     },
-    campanya: activeCampaign,
+    campanya: activeCampaignId,
   };
 
   const emptyDadesSocis = {
@@ -268,8 +276,6 @@ const MembersPage = ({ props }) => {
     sortField: null,
   });
 
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [tabMenuItems, setTabMenuItems] = useState(null);
   const [filterVisible, setFilterVisible] = useState(false);
   const [dadesSocis, setDadesSocis] = useState(emptyDadesSocis);
 
@@ -296,9 +302,8 @@ const MembersPage = ({ props }) => {
     model: tabMenuItems,
     activeIndex: activeIndex,
     onTabChange: (e) => {
-      setActiveIndex(e.index);
+      setActiveByIndex(e.index);
       let result = campaigns[e.index];
-      setActiveCampaign(result.id);
       setSelectedMember(emptyMember);
     },
   };
@@ -552,39 +557,11 @@ const MembersPage = ({ props }) => {
     }
   };
 
-  useEffect(() => {
-    let results;
-    gestorfutbolService.getAllCampaigns().then((data) => {
-      results = data.data;
-      setCampaigns(results);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (campaigns !== null) {
-      setTabMenuItems(
-        campaigns.map((r) => {
-          return { label: r.titol };
-        })
-      );
-      let year = new Date().getFullYear();
-      let campaign = campaigns.find(
-        (c) => new Date(c.any).getFullYear() === year
-      );
-      if (campaign) {
-        let index = campaigns.findIndex((c) => c.id === campaign.id);
-        setActiveCampaign(campaign.id);
-        setActiveIndex(index);
-      } else {
-        setActiveCampaign(campaigns[0].id);
-      }
-    }
-  }, [campaigns]);
 
   useEffect(() => {
     if (activeCampaign) {
       explotacioDadesService
-        .getDadesExplotacioSocis(activeCampaign)
+        .getDadesExplotacioSocis(activeCampaignId)
         .then((data) => {
           setDadesSocis(data.data);
         });
@@ -606,7 +583,7 @@ const MembersPage = ({ props }) => {
     let apiFilter = {
       pageNum: lazyState.page,
       pageSize: lazyState.rows,
-      campanyaActiva: activeCampaign,
+      campanyaActiva: activeCampaignId,
       sortField: lazyState.sortField,
       sortOrder: lazyState.sortOrder,
       filters: lazyState.filters,
@@ -621,7 +598,7 @@ const MembersPage = ({ props }) => {
       })
       .then(() => {
         if (activeCampaign) {
-          gestorfutbolService.getAllTipoSocis(activeCampaign).then((data) => {
+          gestorfutbolService.getAllTipoSocis(activeCampaignId).then((data) => {
             let results = data.data;
             setTipoSocis(results);
           });
@@ -761,7 +738,7 @@ const MembersPage = ({ props }) => {
       llinatge2: selectedMember.llinatge2,
       estatPagament: selectedMember.estatPagament,
       tipoSoci: selectedMember.tipoSoci,
-      campanya: activeCampaign,
+      campanya: activeCampaignId,
     },
     enableReinitialize: true,
     validate: (data) => {
@@ -855,7 +832,7 @@ const MembersPage = ({ props }) => {
               selectedMember,
               setSelectedMember,
               formikMember,
-              activeCampaign,
+              activeCampaignId,
             }}
           >
             <MemberDataForm />

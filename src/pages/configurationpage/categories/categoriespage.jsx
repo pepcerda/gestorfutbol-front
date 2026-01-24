@@ -16,6 +16,7 @@ import { Column } from "primereact/column";
 import TableNoRespComponent from "../../../components/tablenorespcomponent/tablenorespcomponent";
 import { all } from "axios";
 import FormInputNumber from "../../../components/forminputnumber/forminputnumber";
+import { useActiveCampaign } from "../../../hooks/campaignHook";
 
 const CategoriaContext = createContext();
 
@@ -157,8 +158,15 @@ const CategoriasPage = ({ props }) => {
   const [totalRecords, setTotalRecords] = useState(0);
   const [captureDialog, setCaptureDialog] = useState(false);
   const [deleteFlag, setDeleteFlag] = useState(false);
-  const [campaigns, setCampaigns] = useState(null);
-  const [activeCampaign, setActiveCampaign] = useState(null);
+    const {
+    campaigns,
+    tabMenuItems,
+    activeIndex,
+    setActiveByIndex,
+    activeCampaign,
+    activeCampaignId,
+    seasonLabel
+  } = useActiveCampaign();
   let emptyCategoria = {
     id: null,
     nom: "",
@@ -172,18 +180,14 @@ const CategoriasPage = ({ props }) => {
     sortOrder: null,
     sortField: null,
   });
-
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [tabMenuItems, setTabMenuItems] = useState(null);
   const [expandedRows, setExpandedRows] = useState(null);
 
   const tabMenu = {
     model: tabMenuItems,
     activeIndex: activeIndex,
     onTabChange: (e) => {
-      setActiveIndex(e.index);
+      setActiveByIndex(e.index);
       let result = campaigns[e.index];
-      setActiveCampaign(result.id);
       setSelectedCategoria(emptyCategoria);
     },
   };
@@ -263,35 +267,6 @@ const CategoriasPage = ({ props }) => {
   };
 
   useEffect(() => {
-    let results;
-    gestorfutbolService.getAllCampaigns().then((data) => {
-      results = data.data;
-      setCampaigns(results);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (campaigns !== null) {
-      setTabMenuItems(
-        campaigns.map((r) => {
-          return { label: r.titol };
-        })
-      );
-      let year = new Date().getFullYear();
-      let campaign = campaigns.find(
-        (c) => new Date(c.any).getFullYear() === year
-      );
-      if (campaign) {
-        let index = campaigns.findIndex((c) => c.id === campaign.id);
-        setActiveCampaign(campaign.id);
-        setActiveIndex(index);
-      } else {
-        setActiveCampaign(campaigns[0].id);
-      }
-    }
-  }, [campaigns]);
-
-  useEffect(() => {
     loadLazyData();
     setDeleteFlag(false);
   }, [lazyState, deleteFlag, activeCampaign]);
@@ -300,7 +275,7 @@ const CategoriasPage = ({ props }) => {
     let apiFilter = {
       pageNum: lazyState.page,
       pageSize: lazyState.rows,
-      campanyaActiva: activeCampaign,
+      campanyaActiva: activeCampaignId,
     };
 
     gestorfutbolService.getCategoria(apiFilter).then((data) => {
@@ -408,7 +383,7 @@ const CategoriasPage = ({ props }) => {
   const formikCategoria = useFormik({
     initialValues: {
       nom: selectedCategoria.nom,
-      campanya: activeCampaign,
+      campanya: activeCampaignId,
       equips: selectedCategoria.equips,
     },
     enableReinitialize: true,

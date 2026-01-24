@@ -34,6 +34,7 @@ import { useLocation } from "react-router-dom";
 import { explotacioDadesService } from "../../services/real/explotacioDadesService";
 import context from "react-bootstrap/esm/AccordionContext";
 import { ContextMenu } from "primereact/contextmenu";
+import { useActiveCampaign } from "../../hooks/campaignHook";
 
 const SponsorContext = createContext();
 const DuplicaContext = createContext();
@@ -390,8 +391,16 @@ const SponsorsPage = ({ props }) => {
   });
   const [captureDialogDuplica, setCaptureDialogDuplica] = useState(false);
   const [deleteFlag, setDeleteFlag] = useState(false);
-  const [campaigns, setCampaigns] = useState(null);
-  const [activeCampaign, setActiveCampaign] = useState(null);
+  const {
+    campaigns,
+    tabMenuItems,
+    activeIndex,
+    setActiveByIndex,
+    activeCampaign,
+    activeCampaignId,
+    seasonLabel
+  } = useActiveCampaign();
+
   let emptySponsor = {
     id: null,
     cif: "",
@@ -401,7 +410,7 @@ const SponsorsPage = ({ props }) => {
     observacio: "",
     estatPagament: null,
     logo: "",
-    campanya: activeCampaign,
+    campanya: activeCampaignId,
   };
 
   const emptyDadesPatrocinis = {
@@ -419,8 +428,6 @@ const SponsorsPage = ({ props }) => {
     sortField: null,
   });
 
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [tabMenuItems, setTabMenuItems] = useState(null);
   const [filterVisible, setFilterVisible] = useState(false);
   const [dadesPatrocinis, setDadesPatrocinis] = useState(emptyDadesPatrocinis);
   const cm = useRef(null);
@@ -457,9 +464,8 @@ const SponsorsPage = ({ props }) => {
     model: tabMenuItems,
     activeIndex: activeIndex,
     onTabChange: (e) => {
-      setActiveIndex(e.index);
+      setActiveByIndex(e.index);
       let result = campaigns[e.index];
-      setActiveCampaign(result.id);
       setSelectedSponsor(emptySponsor);
     },
   };
@@ -708,7 +714,7 @@ const SponsorsPage = ({ props }) => {
     let apiFilter = {
       pageNum: lazyState.page,
       pageSize: lazyState.rows,
-      campanyaActiva: activeCampaign,
+      campanyaActiva: activeCampaignId,
       sortField: lazyState.sortField,
       sortOrder: lazyState.sortOrder,
       filters: lazyState.filters,
@@ -743,34 +749,6 @@ const SponsorsPage = ({ props }) => {
     }
   };
 
-  useEffect(() => {
-    let results;
-    gestorfutbolService.getAllCampaigns().then((data) => {
-      results = data.data;
-      setCampaigns(results);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (campaigns !== null) {
-      setTabMenuItems(
-        campaigns.map((r) => {
-          return { label: r.titol };
-        })
-      );
-      let year = new Date().getFullYear();
-      let campaign = campaigns.find(
-        (c) => new Date(c.any).getFullYear() === year
-      );
-      if (campaign) {
-        let index = campaigns.findIndex((c) => c.id === campaign.id);
-        setActiveCampaign(campaign.id);
-        setActiveIndex(index);
-      } else {
-        setActiveCampaign(campaigns[0].id);
-      }
-    }
-  }, [campaigns]);
 
   useEffect(() => {
     if (location.state?.filtre) {
@@ -808,7 +786,7 @@ const SponsorsPage = ({ props }) => {
     var apiFilter = {
       pageNum: lazyState.page,
       pageSize: lazyState.rows,
-      campanyaActiva: activeCampaign,
+      campanyaActiva: activeCampaignId,
       sortField: lazyState.sortField,
       sortOrder: lazyState.sortOrder,
       filters: lazyState.filters,
@@ -826,7 +804,7 @@ const SponsorsPage = ({ props }) => {
       .then(() => {
         if (activeCampaign) {
           explotacioDadesService
-            .getDadesExplotacioPatrocinis(activeCampaign)
+            .getDadesExplotacioPatrocinis(activeCampaignId)
             .then((data) => {
               setDadesPatrocinis(data.data);
             });
@@ -950,9 +928,8 @@ const SponsorsPage = ({ props }) => {
       .duplicaSponsor(selectedSponsor, data.campanya)
       .then(() => {
         setCaptureDialogDuplica(false);
-        setActiveCampaign(data.campanya);
         let index = campaigns.findIndex((c) => c.id === data.campanya);
-        setActiveIndex(index);
+        setActiveByIndex(index);
         loadLazyData();
       });
   };
@@ -978,7 +955,7 @@ const SponsorsPage = ({ props }) => {
       estatPagament: selectedSponsor.estatPagament,
       logo: selectedSponsor.logo,
       logoBlob: null,
-      campanya: activeCampaign,
+      campanya: activeCampaignId,
     },
     enableReinitialize: true,
     validate: (data) => {
@@ -1024,12 +1001,12 @@ const SponsorsPage = ({ props }) => {
 
   const formikDuplica = useFormik({
     initialValues: {
-      campanya: activeCampaign,
+      campanya: activeCampaignId,
     },
     enableReinitialize: true,
     validate: (data) => {
       let errors = {};
-      if (data.campanya === activeCampaign) {
+      if (data.campanya === activeCampaignId) {
         errors.campanya = t("t.sponsor.repeated");
       }
 

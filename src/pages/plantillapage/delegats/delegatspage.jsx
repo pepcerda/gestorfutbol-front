@@ -11,10 +11,11 @@ import { ConfigContext } from "../../../App";
 import { gestorfutbolService } from "../../../services/real/gestorfutbolService";
 import FormCalendar from "../../../components/formcalendar/formcalendar";
 import SelectOneMenu from "../../../components/selectonemenu/selectonemenu";
-import { CampanyaContext } from "../plantillapage";
+import { CampanyaContext, EquipContext } from "../plantillapage";
 import React from "react";
 import FormCheckbox from "../../../components/formcheckbox/formcheckbox";
 import moment from "moment";
+import { useActiveCampaign } from "../../../hooks/campaignHook";
 
 const DelegatContext = createContext();
 
@@ -130,13 +131,21 @@ const DelegatsPage = () => {
   const [totalRecords, setTotalRecords] = useState(0);
   const [captureDialog, setCaptureDialog] = useState(false);
   const [deleteFlag, setDeleteFlag] = useState(false);
-  const { activeCampaign, setActiveCampaign, selectedEquip } =
-    useContext(CampanyaContext);
+  const { selectedEquip } = useContext(EquipContext);
+    const {
+    campaigns,
+    tabMenuItems,
+    activeIndex,
+    setActiveByIndex,
+    activeCampaign,
+    activeCampaignId,
+    seasonLabel
+  } = useActiveCampaign();
   const [posicions, setPosicions] = useState([]);
 
   let emptyDelegat = {
     id: null,
-    campanya: activeCampaign,
+    campanya: activeCampaignId,
     equip: selectedEquip,
     nom: "",
     llinatge1: "",
@@ -314,7 +323,7 @@ const DelegatsPage = () => {
     let apiFilter = {
       pageNum: lazyState.page,
       pageSize: lazyState.rows,
-      campanyaActiva: activeCampaign,
+      campanyaActiva: activeCampaignId,
       equipActiu: selectedEquip ? selectedEquip.id : null,
     };
 
@@ -388,7 +397,7 @@ const DelegatsPage = () => {
       llinatge2: selectedDelegat.llinatge2,
       dataNaixement: selectedDelegat.dataNaixement,
       esDelegatCamp: selectedDelegat.esDelegatCamp,
-      campanya: activeCampaign,
+      campanya: activeCampaignId,
       equip: selectedDelegat.equip ? selectedDelegat.equip.id : null,
     },
     enableReinitialize: true,

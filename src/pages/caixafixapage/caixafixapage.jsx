@@ -32,6 +32,7 @@ import * as module from "file-saver";
 import moment from "moment";
 import { explotacioDadesService } from "../../services/real/explotacioDadesService";
 import { useLocation } from "react-router-dom";
+import { useActiveCampaign } from "../../hooks/campaignHook";
 
 const FacturaContext = createContext();
 const FiltraContext = createContext();
@@ -382,8 +383,15 @@ const CaixaFixaPage = ({ props }) => {
     consulta: false,
   });
   const [deleteFlag, setDeleteFlag] = useState(false);
-  const [campaigns, setCampaigns] = useState(null);
-  const [activeCampaign, setActiveCampaign] = useState(null);
+  const {
+    campaigns,
+    tabMenuItems,
+    activeIndex,
+    setActiveByIndex,
+    activeCampaign,
+    activeCampaignId,
+    seasonLabel
+  } = useActiveCampaign();
   let emptyFactura = {
     id: null,
     nom: "",
@@ -394,7 +402,7 @@ const CaixaFixaPage = ({ props }) => {
     observacio: "",
     factura: "",
     estat: null,
-    campanya: activeCampaign,
+    campanya: activeCampaignId,
   };
   const [selectedFactura, setSelectedFactura] = useState(emptyFactura);
   const [lazyState, setlazyState] = useState({
@@ -406,7 +414,6 @@ const CaixaFixaPage = ({ props }) => {
   });
   const [filterVisible, setFilterVisible] = useState(false);
 
-  const [activeIndex, setActiveIndex] = useState(0);
   const cm = useRef(null);
 
   const emptyDadesFactures = {
@@ -445,15 +452,12 @@ const CaixaFixaPage = ({ props }) => {
     },
   ];
 
-  const [tabMenuItems, setTabMenuItems] = useState(null);
-
   const tabMenu = {
     model: tabMenuItems,
     activeIndex: activeIndex,
     onTabChange: (e) => {
-      setActiveIndex(e.index);
+      setActiveByIndex(e.index);
       let result = campaigns[e.index];
-      setActiveCampaign(result.id);
       setSelectedFactura(emptyFactura);
     },
   };
@@ -757,7 +761,7 @@ const CaixaFixaPage = ({ props }) => {
     let apiFilter = {
       pageNum: lazyState.page,
       pageSize: lazyState.rows,
-      campanyaActiva: activeCampaign,
+      campanyaActiva: activeCampaignId,
       sortField: lazyState.sortField,
       sortOrder: lazyState.sortOrder,
       filters: lazyState.filters,
@@ -791,34 +795,6 @@ const CaixaFixaPage = ({ props }) => {
     }
   };
 
-  useEffect(() => {
-    let results;
-    gestorfutbolService.getAllCampaigns().then((data) => {
-      results = data.data;
-      setCampaigns(results);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (campaigns !== null) {
-      setTabMenuItems(
-        campaigns.map((r) => {
-          return { label: r.titol };
-        })
-      );
-      let year = new Date().getFullYear();
-      let campaign = campaigns.find(
-        (c) => new Date(c.any).getFullYear() === year
-      );
-      if (campaign) {
-        let index = campaigns.findIndex((c) => c.id === campaign.id);
-        setActiveCampaign(campaign.id);
-        setActiveIndex(index);
-      } else {
-        setActiveCampaign(campaigns[0].id);
-      }
-    }
-  }, [campaigns]);
 
   useEffect(() => {
     if (location.state?.filtre) {
@@ -835,7 +811,7 @@ const CaixaFixaPage = ({ props }) => {
     let apiFilter = {
       pageNum: lazyState.page,
       pageSize: lazyState.rows,
-      campanyaActiva: activeCampaign,
+      campanyaActiva: activeCampaignId,
       sortField: lazyState.sortField,
       sortOrder: lazyState.sortOrder,
       filters: lazyState.filters,
@@ -851,7 +827,7 @@ const CaixaFixaPage = ({ props }) => {
       .then(() => {
         if (activeCampaign) {
           explotacioDadesService
-            .getDadesExplotacioCaixaFixa(activeCampaign)
+            .getDadesExplotacioCaixaFixa(activeCampaignId)
             .then((data) => {
               setDadesFactures(data.data);
             });
@@ -1042,7 +1018,7 @@ const CaixaFixaPage = ({ props }) => {
       facturaFile: null,
       facturaBlob: null,
       estat: selectedFactura.estat,
-      campanya: activeCampaign,
+      campanya: activeCampaignId,
     },
     enableReinitialize: true,
     validate: (data) => {

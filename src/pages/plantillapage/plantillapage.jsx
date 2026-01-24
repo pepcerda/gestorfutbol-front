@@ -1,6 +1,6 @@
 import "./plantillapage.css";
 import { useTranslation } from "react-i18next";
-import React, { useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import ConfigGeneral from "../configurationpage/general/configgeneral";
 import PageTitle from "../../components/pagetitle/pagetitle";
 import TabMenuComponent from "../../components/tabmenucomponent/tabmenucomponent";
@@ -9,59 +9,37 @@ import JugadorsPage from "./jugadors/jugadorspage";
 import EntrenadorsPage from "./entrenadors/entrenadorspage";
 import DelegatsPage from "./delegats/delegatspage";
 import SelectOneMenu from "../../components/selectonemenu/selectonemenu";
+import { useActiveCampaign } from "../../hooks/campaignHook";
 
-export const CampanyaContext = React.createContext();
+export const EquipContext = createContext();
 
 const PlantillaPage = ({ props }) => {
   const { t, i18n } = useTranslation("common");
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [activeCampaign, setActiveCampaign] = useState(null);
-  const [campaigns, setCampaigns] = useState(null);
+    const {
+    campaigns,
+    tabMenuItems,
+    activeIndex,
+    setActiveByIndex,
+    activeCampaign,
+    activeCampaignId,
+    seasonLabel
+  } = useActiveCampaign();
   const [equips, setEquips] = useState(null);
   const [categories, setCategories] = useState(null);
   const [selectedEquip, setSelectedEquip] = useState(null);
-  const [tabMenuItems, setTabMenuItems] = useState([]);
   const [subActiveIndex, setSubActiveIndex] = useState(0);
 
-  useEffect(() => {
-    let results;
-    gestorfutbolService.getAllCampaigns().then((data) => {
-      results = data.data;
-      setCampaigns(results);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (campaigns !== null) {
-      setTabMenuItems(
-        campaigns.map((r) => {
-          return { label: r.titol };
-        })
-      );
-      let year = new Date().getFullYear();
-      let campaign = campaigns.find(
-        (c) => new Date(c.any).getFullYear() === year
-      );
-      if (campaign) {
-        let index = campaigns.findIndex((c) => c.id === campaign.id);
-        setActiveCampaign(campaign.id);
-        setActiveIndex(index);
-      } else {
-        setActiveCampaign(campaigns[0].id);
-      }
-    }
-  }, [campaigns]);
 
   useEffect(() => {
     if (activeCampaign !== null) {
       gestorfutbolService
-        .getCategories(activeCampaign)
+        .getCategories(activeCampaignId)
         .then((data) => {
           let results = data.data;
           setCategories(results);
         })
         .then(() => {
-          gestorfutbolService.getEquips(activeCampaign).then((data) => {
+          gestorfutbolService.getEquips(activeCampaignId).then((data) => {
             let results = data.data;
             setEquips(results);
             setSelectedEquip(results[0]);
@@ -87,9 +65,8 @@ const PlantillaPage = ({ props }) => {
     model: tabMenuItems,
     activeIndex: activeIndex,
     onTabChange: (e) => {
-      setActiveIndex(e.index);
+      setActiveByIndex(e.index);
       let result = campaigns[e.index];
-      setActiveCampaign(result.id);
     },
   };
 
@@ -143,11 +120,11 @@ const PlantillaPage = ({ props }) => {
         <SelectOneMenu props={equipProps}></SelectOneMenu>
       </div>
       <TabMenuComponent props={subTabMenu}></TabMenuComponent>
-      <CampanyaContext.Provider
-        value={{ activeCampaign, setActiveCampaign, selectedEquip }}
+      <EquipContext.Provider
+        value={{ selectedEquip }}
       >
         {renderContenido()}
-      </CampanyaContext.Provider>
+      </EquipContext.Provider>
     </div>
   );
 };

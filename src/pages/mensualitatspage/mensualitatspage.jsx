@@ -22,6 +22,7 @@ import TableNoRespComponent from "../../components/tablenorespcomponent/tablenor
 import { FilterMatchMode } from "primereact/api";
 import { Divider } from "primereact/divider";
 import { explotacioDadesService } from "../../services/real/explotacioDadesService";
+import { useActiveCampaign } from "../../hooks/campaignHook";
 
 const NominaContext = createContext();
 
@@ -445,10 +446,15 @@ const NominaDataForm = ({ props }) => {
 const MensualitatsPage = ({ props }) => {
   const { t, i18n } = useTranslation("common");
   const { viewWidth, setViewWidth } = useContext(ConfigContext);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [activeCampaign, setActiveCampaign] = useState(null);
-  const [campaigns, setCampaigns] = useState(null);
-  const [tabMenuItems, setTabMenuItems] = useState([]);
+  const {
+    campaigns,
+    tabMenuItems,
+    activeIndex,
+    setActiveByIndex,
+    activeCampaign,
+    activeCampaignId,
+    seasonLabel
+  } = useActiveCampaign();
   const [captureDialog, setCaptureDialog] = useState(false);
   const [mensualitats, setMensualitats] = useState(null);
   const [mensualitat, setMensualitat] = useState(null);
@@ -460,12 +466,6 @@ const MensualitatsPage = ({ props }) => {
   const handleMensualitats = () => {};
 
   useEffect(() => {
-    let results;
-    gestorfutbolService.getAllCampaigns().then((data) => {
-      results = data.data;
-      setCampaigns(results);
-    });
-
     gestorfutbolService.getEstatsPagament().then((data) => {
       let results = data.data;
       const estatsFormatejats = results.map((item) => ({
@@ -477,36 +477,15 @@ const MensualitatsPage = ({ props }) => {
   }, []);
 
   useEffect(() => {
-    if (campaigns !== null) {
-      setTabMenuItems(
-        campaigns.map((r) => {
-          return { label: r.titol };
-        })
-      );
-      let year = new Date().getFullYear();
-      let campaign = campaigns.find(
-        (c) => new Date(c.any).getFullYear() === year
-      );
-      if (campaign) {
-        let index = campaigns.findIndex((c) => c.id === campaign.id);
-        setActiveCampaign(campaign.id);
-        setActiveIndex(index);
-      } else {
-        setActiveCampaign(campaigns[0].id);
-      }
-    }
-  }, [campaigns]);
-
-  useEffect(() => {
     if (activeCampaign !== null) {
       gestorfutbolService
-        .getCategories(activeCampaign)
+        .getCategories(activeCampaignId)
         .then((data) => {
           let results = data.data;
           setCategories(results);
         })
         .then(() => {
-          gestorfutbolService.getEquips(activeCampaign).then((data) => {
+          gestorfutbolService.getEquips(activeCampaignId).then((data) => {
             let results = data.data;
             setEquips(results);
             setSelectedEquip(results[0]);
@@ -518,7 +497,7 @@ const MensualitatsPage = ({ props }) => {
   useEffect(() => {
     if (activeCampaign !== null) {
       const apiFilter = {
-        campanyaActiva: activeCampaign,
+        campanyaActiva: activeCampaignId,
         equipActiu: selectedEquip ? selectedEquip.id : null,
       };
 
@@ -529,7 +508,7 @@ const MensualitatsPage = ({ props }) => {
           mensualitatsOriginals.map(async (m) => {
             if (m.nomines && m.nomines.length > 0) {
               const apiFilterMembres = {
-                campanyaActiva: activeCampaign,
+                campanyaActiva: activeCampaignId,
                 equipActiu: selectedEquip ? selectedEquip.id : null,
                 ids: m.nomines.map((n) => n.membre),
               };
@@ -573,9 +552,8 @@ const MensualitatsPage = ({ props }) => {
     model: tabMenuItems,
     activeIndex: activeIndex,
     onTabChange: (e) => {
-      setActiveIndex(e.index);
+      setActiveByIndex(e.index);
       let result = campaigns[e.index];
-      setActiveCampaign(result.id);
     },
   };
 
@@ -627,7 +605,7 @@ const MensualitatsPage = ({ props }) => {
   const saveNomines = (data) => {
     gestorfutbolService.saveMensualitat(data.mensualitat).then(() => {
       let apiFilter = {
-        campanyaActiva: activeCampaign,
+        campanyaActiva: activeCampaignId,
         equipActiu: selectedEquip ? selectedEquip.id : null,
       };
       gestorfutbolService.getMensualitats(apiFilter).then(async (data) => {
@@ -637,7 +615,7 @@ const MensualitatsPage = ({ props }) => {
           mensualitatsOriginals.map(async (m) => {
             if (m.nomines && m.nomines.length > 0) {
               const apiFilterMembres = {
-                campanyaActiva: activeCampaign,
+                campanyaActiva: activeCampaignId,
                 equipActiu: selectedEquip ? selectedEquip.id : null,
                 ids: m.nomines.map((n) => n.membre),
               };
@@ -888,7 +866,7 @@ const MensualitatsPage = ({ props }) => {
           >
             <form onSubmit={formikMensualitat.handleSubmit}>
               <NominaContext.Provider
-                value={{ activeCampaign, formikMensualitat, selectedEquip }}
+                value={{ activeCampaignId, formikMensualitat, selectedEquip }}
               >
                 <NominaDataForm />
               </NominaContext.Provider>
