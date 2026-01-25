@@ -116,7 +116,7 @@ const DelegatDataForm = () => {
           <br />
           {getFormErrorMessage("dataNaixement")}
         </div>
-        <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
+        <div className="col-12 col-md-6 form-group d-flex flex-column justify-content-center align-items-center align-items-md-start   mt-3 mt-md-0">
           <FormCheckbox props={esDelCampProps}></FormCheckbox>
         </div>
       </div>

@@ -75,7 +75,6 @@ function App() {
   useEffect(() => {
     let results;
     gestorfutbolService.getAllCampaigns().then((data) => {
-      console.log("Campanyes carregades:", data);
       results = data.data;
       setCampaigns(results);
     });

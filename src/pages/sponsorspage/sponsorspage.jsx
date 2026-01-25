@@ -1,6 +1,6 @@
 import "./sponsorspage.css";
 import { gestorfutbolService } from "../../services/real/gestorfutbolService";
-import React, {
+import {
   createContext,
   useContext,
   useEffect,
@@ -20,19 +20,16 @@ import FormInputNumber from "../../components/forminputnumber/forminputnumber";
 import moment from "moment";
 import TabMenuComponent from "../../components/tabmenucomponent/tabmenucomponent";
 import { saveAs } from "file-saver";
-import { Calendar } from "primereact/calendar";
 import FormTextArea from "../../components/formtextarea/formtextarea";
 import SelectOneMenu from "../../components/selectonemenu/selectonemenu";
 import { ConfigContext } from "../../App";
 import FileUploader from "../../components/fileuploader/fileuploader";
-import { DataTable } from "primereact/datatable";
 import { Card } from "primereact/card";
 import { Sidebar } from "primereact/sidebar";
 import * as xlsx from "xlsx";
 import * as module from "file-saver";
 import { useLocation } from "react-router-dom";
 import { explotacioDadesService } from "../../services/real/explotacioDadesService";
-import context from "react-bootstrap/esm/AccordionContext";
 import { ContextMenu } from "primereact/contextmenu";
 import { useActiveCampaign } from "../../hooks/campaignHook";
 import { exportToExcel } from "../../helpers/excelExport";
@@ -45,16 +42,6 @@ const FilterDataForm = ({ props }) => {
   const { t, i18n } = useTranslation("common");
   const { formikFilters } = useContext(FiltraContext);
   const opcionsPagament = gestorfutbolService.getOpcionsPagament();
-
-  const dataDonacioCalc = (value) => {
-    let dateString = value;
-    let dateMomentObject = moment(dateString, "YYYY-MM-DD");
-    if (value !== null) {
-      return dateMomentObject.toDate();
-    } else {
-      return new Date();
-    }
-  };
 
   const cifProps = {
     id: "cif",
@@ -104,11 +91,9 @@ const FilterDataForm = ({ props }) => {
 };
 const SponsorDataForm = ({ props }) => {
   const { t, i18n } = useTranslation("common");
-  const { selectedSponsor, setSelectedSponsor, formikSponsor, captureDialog } =
+  const { formikSponsor, captureDialog } =
     useContext(SponsorContext);
 
-  const [selectCheck, setSelectedCheck] = useState(null);
-  const [fecha, setFecha] = useState(null);
   const opcionsPagament = gestorfutbolService.getOpcionsPagament();
   const [fileName, setFileName] = useState(null);
 
@@ -336,7 +321,7 @@ const SponsorDataForm = ({ props }) => {
 };
 
 const DuplicaForm = ({ props }) => {
-  const { t, i18n } = useTranslation("common");
+  const { t } = useTranslation("common");
   const { formikDuplica, campaigns } = useContext(DuplicaContext);
 
   const isFormFieldInvalid = (name) =>

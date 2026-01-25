@@ -789,7 +789,7 @@ const DirectivaPage = ({ props }) => {
       <PageTitle props={{ title: `${t("t.directive")}` }}></PageTitle>
       {directius === null ? (
         <>
-          <div className="d-flex justify-content-center gap-2 align-items-center py-4 mt-4">
+          <div className="d-flex flex-column flex-md-row justify-content-center gap-2 align-items-center py-4 mt-4">
             <span>{t("t.suscribe.directive")}</span>
             <BasicButton props={newButton}></BasicButton>
           </div>

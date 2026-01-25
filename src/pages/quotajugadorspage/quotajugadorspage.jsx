@@ -19,36 +19,28 @@ import FormInputNumber from "../../components/forminputnumber/forminputnumber";
 import FormCheckbox from "../../components/formcheckbox/formcheckbox";
 import { Dialog } from "primereact/dialog";
 import { useActiveCampaign } from "../../hooks/campaignHook";
+import { explotacioDadesService } from "../../services/real/explotacioDadesService";
 
 const FiltraContext = createContext();
 const QuotaJugadorContext = createContext();
 
-const FilterDataForm = ({ props }) => {
-  const { t, i18n } = useTranslation("common");
-  const { formikFilters, tipoSocis } = useContext(FiltraContext);
+const FilterDataForm = () => {
+  const { t } = useTranslation("common");
+  const { formikFilters } = useContext(FiltraContext);
   const [estatsPagament, setEstatsPagament] = useState([]);
 
-  const dataDonacioCalc = (value) => {
-    let dateString = value;
-    let dateMomentObject = moment(dateString, "YYYY-MM-DD");
-    if (value !== null) {
-      return dateMomentObject.toDate();
-    } else {
-      return new Date();
-    }
-  };
 
-    useEffect(() => {
-      gestorfutbolService.getEstatsPagament().then((data) => {
-        let results = data.data;
-  
-        const estatsFormatejats = results.map((item) => ({
-          valor: item.valor,
-          nom: t(`t.estat.${item.valor}`),
-        }));
-        setEstatsPagament(estatsFormatejats);
-      });
-    }, []);
+  useEffect(() => {
+    gestorfutbolService.getEstatsPagament().then((data) => {
+      let results = data.data;
+
+      const estatsFormatejats = results.map((item) => ({
+        valor: item.valor,
+        nom: t(`t.estat.${item.valor}`),
+      }));
+      setEstatsPagament(estatsFormatejats);
+    });
+  }, []);
 
   const nomCompletProps = {
     id: "nomComplet",
@@ -71,7 +63,6 @@ const FilterDataForm = ({ props }) => {
     optionValue: "valor",
   };
 
-
   return (
     <>
       <div className="row">
@@ -86,9 +77,9 @@ const FilterDataForm = ({ props }) => {
   );
 };
 
-const QuotaJugadorsDataForm = ({ props }) => {
-  const { t, i18n } = useTranslation("common");
-  const { selectedQuotaJugador, setSelectedQuotaJugador, formikQuotaJugador } =
+const QuotaJugadorsDataForm = () => {
+  const { t } = useTranslation("common");
+  const { formikQuotaJugador } =
     useContext(QuotaJugadorContext);
   const [selectCheck, setSelectedCheck] = useState(null);
   const [estatsPagament, setEstatsPagament] = useState([]);
@@ -302,7 +293,7 @@ const QuotaJugadorsDataForm = ({ props }) => {
               <br />
               {getFormErrorMessage("dataPagament")}
             </div>
-            <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
+            <div className="col-12 col-md-6 form-group d-flex flex-column justify-content-center align-items-center align-items-md-start mt-3 mt-md-0">
               <FormCheckbox props={excepcioProps}></FormCheckbox>
             </div>
             <div className="col-12 col-md-6 form-group text-center text-md-start mt-3 mt-md-0">
@@ -316,18 +307,16 @@ const QuotaJugadorsDataForm = ({ props }) => {
   );
 };
 
-const QuotaJugadorsPage = ({ props }) => {
-  const { viewWidth, setViewWidth } = useContext(ConfigContext);
-  const { t, i18n } = useTranslation("common");
+const QuotaJugadorsPage = () => {
+  const { viewWidth } = useContext(ConfigContext);
+  const { t } = useTranslation("common");
   const [totalRecords, setTotalRecords] = useState(0);
-    const {
-    campaigns,
+  const {
     tabMenuItems,
     activeIndex,
     setActiveByIndex,
     activeCampaign,
     activeCampaignId,
-    seasonLabel
   } = useActiveCampaign();
   const [equips, setEquips] = useState(null);
   const [categories, setCategories] = useState(null);
@@ -356,8 +345,18 @@ const QuotaJugadorsPage = ({ props }) => {
     quantitat: null,
   };
 
+  const emptyDadesExplotacioQuotes = {
+    totalRecaptat: 0,
+    previsioRecaptacioPerEquip: 0,
+    totalRecaptatPerEquip: 0,
+  };
+
   const [selectedQuotaJugador, setSelectedQuotaJugador] =
     useState(emptyQuotaJugador);
+
+  const [dadesExplotacioQuotes, setDadesExplotacioQuotes] = useState(
+    emptyDadesExplotacioQuotes
+  );
 
   const [lazyState, setlazyState] = useState({
     first: 0,
@@ -370,7 +369,6 @@ const QuotaJugadorsPage = ({ props }) => {
   const [filterVisible, setFilterVisible] = useState(false);
 
   useEffect(() => {
-    let results;
 
     gestorfutbolService.getEstatsPagament().then((data) => {
       let results = data.data;
@@ -381,7 +379,6 @@ const QuotaJugadorsPage = ({ props }) => {
       setEstatsPagament(estatsFormatejats);
     });
   }, []);
-
 
   useEffect(() => {
     if (activeCampaign !== null) {
@@ -424,12 +421,21 @@ const QuotaJugadorsPage = ({ props }) => {
     });
   };
 
+  useEffect(() => {
+    if (activeCampaign) {
+      explotacioDadesService
+        .getDadesExplotacioQuotes(activeCampaignId, selectedEquip ? selectedEquip.id : 0)
+        .then((data) => {
+          setDadesExplotacioQuotes(data.data);
+        });
+    }
+  }, [activeCampaign]);
+
   const tabMenu = {
     model: tabMenuItems,
     activeIndex: activeIndex,
     onTabChange: (e) => {
       setActiveByIndex(e.index);
-      let result = campaigns[e.index];
     },
   };
 
@@ -561,13 +567,31 @@ const QuotaJugadorsPage = ({ props }) => {
   ];
 
   const onRowEditComplete = (e) => {
-    let { newData, index } = e;
+    let { newData } = e;
     gestorfutbolService.saveJugador(newData).then(() => loadLazyData());
   };
 
   const onSort = (event) => {
     event.page = lazyState.page;
     setlazyState(event);
+  };
+
+  const tableHeader = () => {
+    return (
+      <div className="table-header-container d-flex flex-column flex-md-row gap-3">
+        <span>
+          {t("t.total.socis")}: {dadesExplotacioQuotes.totalRecaptat} €
+        </span>
+        <span>
+          {t("t.total.recaptacio")}:{" "}
+          {dadesExplotacioQuotes.totalRecaptatPerEquip} €
+        </span>
+        <span>
+          {t("t.previsio.recaptacio")}:{" "}
+          {dadesExplotacioQuotes.previsioRecaptacioPerEquip} €
+        </span>
+      </div>
+    );
   };
 
   const tableProps = {
@@ -603,6 +627,7 @@ const QuotaJugadorsPage = ({ props }) => {
     totalRecords: totalRecords,
     first: lazyState.first,
     onSort: onSort,
+    header: tableHeader,
     sortOrder: lazyState.sortOrder,
     sortField: lazyState.sortField,
     editMode: "row",
@@ -754,7 +779,6 @@ const QuotaJugadorsPage = ({ props }) => {
       };
     }
 
-
     setlazyState((prevState) => ({
       ...prevState,
       filters: quotaJugadorsFilters,
@@ -771,7 +795,7 @@ const QuotaJugadorsPage = ({ props }) => {
       quantitat: selectedQuotaJugador.quantitat,
     },
     enableReinitialize: true,
-    validate: (data) => {
+    validate: () => {
       let errors = {};
       return errors;
     },
@@ -785,7 +809,7 @@ const QuotaJugadorsPage = ({ props }) => {
       nomComplet: "",
     },
     enableReinitialize: true,
-    validate: (data) => {
+    validate: () => {
       let errors = {};
       return errors;
     },
@@ -797,7 +821,7 @@ const QuotaJugadorsPage = ({ props }) => {
   return (
     <div className="container p-2 p-xl-4">
       <TabMenuComponent props={tabMenu}></TabMenuComponent>
-      <div className="d-flex gap-4 align-items-center mb-3 mt-3">
+      <div className="d-flex flex-column flex-md-row gap-2 gap-md-4 align-items-center mb-3 mt-3">
         <SelectOneMenu props={equipProps}></SelectOneMenu>
       </div>
       <div className="row justify-content-between align-items-start flex-wrap">
