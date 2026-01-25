@@ -20,8 +20,8 @@ import SelectOneMenu from "../../components/selectonemenu/selectonemenu";
 import FormInputText from "../../components/forminputtext/forminputtext";
 import TabMenuComponent from "../../components/tabmenucomponent/tabmenucomponent";
 import { ConfigContext } from "../../App";
-import * as xlsx from "xlsx";
-import * as module from "file-saver";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
 import moment from "moment";
 import { Card } from "primereact/card";
 import { Sidebar } from "primereact/sidebar";
@@ -29,6 +29,7 @@ import { useLocation } from "react-router-dom";
 import { explotacioDadesService } from "../../services/real/explotacioDadesService";
 import { ContextMenu } from "primereact/contextmenu";
 import { useActiveCampaign } from "../../hooks/campaignHook";
+import { exportToExcel } from "../../helpers/excelExport";
 
 const MemberContext = createContext();
 const FiltraContext = createContext();
@@ -76,7 +77,7 @@ const FilterDataForm = ({ props }) => {
     onChange: (e) => {
       formikFilters.setFieldValue(
         "tipoSoci",
-        tipoSocis.find((c) => c.id === e.value)
+        tipoSocis.find((c) => c.id === e.value),
       );
     },
     options: tipoSocis,
@@ -170,7 +171,7 @@ const MemberDataForm = ({ props }) => {
     onChange: (e) => {
       formikMember.setFieldValue(
         "tipoSoci",
-        tipoSocis.find((c) => c.id === e.value)
+        tipoSocis.find((c) => c.id === e.value),
       );
     },
     options: tipoSocis,
@@ -243,7 +244,7 @@ const MembersPage = ({ props }) => {
     setActiveByIndex,
     activeCampaign,
     activeCampaignId,
-    seasonLabel
+    seasonLabel,
   } = useActiveCampaign();
   const [, forceUpdate] = useReducer((x) => x + 1, 0);
   let emptyMember = {
@@ -519,44 +520,25 @@ const MembersPage = ({ props }) => {
     },
   };
 
-  const exportExcel = () => {
+  async function exportExcel() {
     let apiFilter = {
       pageNum: lazyState.page,
       pageSize: lazyState.rows,
-      campanyaActiva: activeCampaign,
+      campanyaActiva: activeCampaignId,
       sortField: lazyState.sortField,
       sortOrder: lazyState.sortOrder,
       filters: lazyState.filters,
     };
+    const res = await gestorfutbolService.getAllMembers(apiFilter);
+    const rows = res.data || [];
 
-    gestorfutbolService.getAllMembers(apiFilter).then((data) => {
-      const worksheet = xlsx.utils.json_to_sheet(data.data);
-      const workbook = { Sheets: { data: worksheet }, SheetNames: ["data"] };
-      const excelBuffer = xlsx.write(workbook, {
-        bookType: "xlsx",
-        type: "array",
-      });
-
-      saveAsExcelFile(excelBuffer, "socis");
+    await exportToExcel(rows, undefined, {
+      fileName: "socis",
+      sheetName: "Socis",
+      tableName: "TablaSocis",
+      totalsRow: true,
     });
-  };
-
-  const saveAsExcelFile = (buffer, fileName) => {
-    if (module && module.default) {
-      let EXCEL_TYPE =
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-      let EXCEL_EXTENSION = ".xlsx";
-      const data = new Blob([buffer], {
-        type: EXCEL_TYPE,
-      });
-
-      module.default.saveAs(
-        data,
-        fileName + "_export_" + new Date().getTime() + EXCEL_EXTENSION
-      );
-    }
-  };
-
+  }
 
   useEffect(() => {
     if (activeCampaign) {

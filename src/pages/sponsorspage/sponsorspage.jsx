@@ -35,6 +35,7 @@ import { explotacioDadesService } from "../../services/real/explotacioDadesServi
 import context from "react-bootstrap/esm/AccordionContext";
 import { ContextMenu } from "primereact/contextmenu";
 import { useActiveCampaign } from "../../hooks/campaignHook";
+import { exportToExcel } from "../../helpers/excelExport";
 
 const SponsorContext = createContext();
 const DuplicaContext = createContext();
@@ -398,7 +399,7 @@ const SponsorsPage = ({ props }) => {
     setActiveByIndex,
     activeCampaign,
     activeCampaignId,
-    seasonLabel
+    seasonLabel,
   } = useActiveCampaign();
 
   let emptySponsor = {
@@ -710,7 +711,7 @@ const SponsorsPage = ({ props }) => {
     },
   };
 
-  const exportExcel = () => {
+  async function exportExcel() {
     let apiFilter = {
       pageNum: lazyState.page,
       pageSize: lazyState.rows,
@@ -719,36 +720,16 @@ const SponsorsPage = ({ props }) => {
       sortOrder: lazyState.sortOrder,
       filters: lazyState.filters,
     };
+    const res = await gestorfutbolService.getAllSponsors(apiFilter);
+    const rows = res.data || [];
 
-    gestorfutbolService.getAllSponsors(apiFilter).then((data) => {
-      console.log(data);
-      const worksheet = xlsx.utils.json_to_sheet(data.data);
-      const workbook = { Sheets: { data: worksheet }, SheetNames: ["data"] };
-      const excelBuffer = xlsx.write(workbook, {
-        bookType: "xlsx",
-        type: "array",
-      });
-
-      saveAsExcelFile(excelBuffer, "patrocinadors");
+    await exportToExcel(rows, undefined, {
+      fileName: "patrocinadors",
+      sheetName: "Patrocinadors",
+      tableName: "TablaPatrocinadors",
+      totalsRow: true,
     });
-  };
-
-  const saveAsExcelFile = (buffer, fileName) => {
-    if (module && module.default) {
-      let EXCEL_TYPE =
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-      let EXCEL_EXTENSION = ".xlsx";
-      const data = new Blob([buffer], {
-        type: EXCEL_TYPE,
-      });
-
-      module.default.saveAs(
-        data,
-        fileName + "_export_" + new Date().getTime() + EXCEL_EXTENSION
-      );
-    }
-  };
-
+  }
 
   useEffect(() => {
     if (location.state?.filtre) {
@@ -1103,7 +1084,7 @@ const SponsorsPage = ({ props }) => {
       view: "date",
       onChange: (e) => {
         options.editorCallback(
-          moment(e.target.value).format("YYYY-MM-DD").toString()
+          moment(e.target.value).format("YYYY-MM-DD").toString(),
         );
       },
     };

@@ -33,6 +33,7 @@ import moment from "moment";
 import { explotacioDadesService } from "../../services/real/explotacioDadesService";
 import { useLocation } from "react-router-dom";
 import { useActiveCampaign } from "../../hooks/campaignHook";
+import { exportToExcel } from "../../helpers/excelExport";
 
 const FacturaContext = createContext();
 const FiltraContext = createContext();
@@ -757,7 +758,7 @@ const CaixaFixaPage = ({ props }) => {
     },
   };
 
-  const exportExcel = () => {
+async function exportExcel() {
     let apiFilter = {
       pageNum: lazyState.page,
       pageSize: lazyState.rows,
@@ -766,34 +767,16 @@ const CaixaFixaPage = ({ props }) => {
       sortOrder: lazyState.sortOrder,
       filters: lazyState.filters,
     };
+    const res = await gestorfutbolService.getAllCaixesFixes(apiFilter);
+    const rows = res.data || [];
 
-    gestorfutbolService.getAllCaixesFixes(apiFilter).then((data) => {
-      const worksheet = xlsx.utils.json_to_sheet(data.data);
-      const workbook = { Sheets: { data: worksheet }, SheetNames: ["data"] };
-      const excelBuffer = xlsx.write(workbook, {
-        bookType: "xlsx",
-        type: "array",
-      });
-
-      saveAsExcelFile(excelBuffer, "tiquets");
+    await exportToExcel(rows, undefined, {
+      fileName: "tiquets",
+      sheetName: "Tiquets",
+      tableName: "TablaCaixes",
+      totalsRow: true,
     });
-  };
-
-  const saveAsExcelFile = (buffer, fileName) => {
-    if (module && module.default) {
-      let EXCEL_TYPE =
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-      let EXCEL_EXTENSION = ".xlsx";
-      const data = new Blob([buffer], {
-        type: EXCEL_TYPE,
-      });
-
-      module.default.saveAs(
-        data,
-        fileName + "_export_" + new Date().getTime() + EXCEL_EXTENSION
-      );
-    }
-  };
+  }
 
 
   useEffect(() => {
