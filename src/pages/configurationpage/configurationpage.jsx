@@ -9,6 +9,7 @@ import CategoriaPage from "./categories/categoriespage";
 import CategoriaDespesasPage from './categoriesdespesa/categoriesdespesa';
 import ProveidorsPage from './proveidors/proveidors';
 import PosicionsPage from './posicions/posicions';
+import EditorPlantilles from './editorplantilles/editorplantilles';
 
 const ConfigurationPage = ({props}) => {
         const {t, i18n} = useTranslation("common");
@@ -20,6 +21,7 @@ const ConfigurationPage = ({props}) => {
             {label: `${t('t.categories.despesa')}`},
             {label: `${t('t.proveidors')}`},
             {label: `${t('t.posicions')}`},
+            {label: `${t('t.editor.plantilles')}`},
         ],
         /********   HOOKS  ***********************/
         renderContenido = () => {
@@ -36,6 +38,8 @@ const ConfigurationPage = ({props}) => {
                     return <ProveidorsPage></ProveidorsPage>
                 case 5:
                     return <PosicionsPage></PosicionsPage>
+                case 6:
+                    return <EditorPlantilles></EditorPlantilles>
             }
         },
         /********   PROPIETATS D'ELEMENTS DEL FRONTAL  ***********************/

@@ -346,9 +346,9 @@ const QuotaJugadorsPage = () => {
   };
 
   const emptyDadesExplotacioQuotes = {
+    totalJugadors: 0,
     totalRecaptat: 0,
-    previsioRecaptacioPerEquip: 0,
-    totalRecaptatPerEquip: 0,
+    previsioQuotes: 0,
   };
 
   const [selectedQuotaJugador, setSelectedQuotaJugador] =
@@ -429,7 +429,7 @@ const QuotaJugadorsPage = () => {
           setDadesExplotacioQuotes(data.data);
         });
     }
-  }, [activeCampaign]);
+  }, [activeCampaign, selectedEquip]);
 
   const tabMenu = {
     model: tabMenuItems,
@@ -580,15 +580,15 @@ const QuotaJugadorsPage = () => {
     return (
       <div className="table-header-container d-flex flex-column flex-md-row gap-3">
         <span>
-          {t("t.total.socis")}: {dadesExplotacioQuotes.totalRecaptat} €
+          {t("t.total.jugadors")}: {dadesExplotacioQuotes.totalJugadors}
         </span>
         <span>
           {t("t.total.recaptacio")}:{" "}
-          {dadesExplotacioQuotes.totalRecaptatPerEquip} €
+          {dadesExplotacioQuotes.totalRecaptat} €
         </span>
         <span>
           {t("t.previsio.recaptacio")}:{" "}
-          {dadesExplotacioQuotes.previsioRecaptacioPerEquip} €
+          {dadesExplotacioQuotes.previsioQuotes} €
         </span>
       </div>
     );

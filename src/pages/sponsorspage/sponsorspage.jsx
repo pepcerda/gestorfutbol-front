@@ -567,7 +567,6 @@ const SponsorsPage = ({ props }) => {
       editor: (options) => opcionsEditor(options),
       sortable: true,
     },
-    { field: "logo", header: `${t("t.logo")}`, body: logoBodyTemplate },
     {
       header: `${t("t.rebut")}`,
       body: (rowData) => donwloadPdfButton(rowData.id),
